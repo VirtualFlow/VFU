@@ -1,0 +1,56 @@
+CRYST1   49.670   66.480  303.100  90.00  90.00  90.00 P 21 21 21    1
+HETATM    1  CAA P0G A1401      -6.393 -10.915 -54.317  1.00 49.25           C  
+HETATM    2  CAB P0G A1401      -4.199 -10.932 -51.583  1.00 52.25           C  
+HETATM    3  CAC P0G A1401      -3.679 -13.236 -52.387  1.00 41.07           C  
+HETATM    4  CAG P0G A1401      -6.857 -14.410 -55.642  1.00 45.11           C  
+HETATM    5  CAH P0G A1401      -6.710 -15.185 -54.497  1.00 44.49           C  
+HETATM    6  CAI P0G A1401      -6.755 -13.027 -55.573  1.00 42.43           C  
+HETATM    7  CAJ P0G A1401      -6.467 -14.573 -53.281  1.00 43.77           C  
+HETATM    8  CAK P0G A1401      -0.043 -12.351 -46.134  1.00 47.88           C  
+HETATM    9  CAL P0G A1401      -1.271 -12.710 -46.682  1.00 50.03           C  
+HETATM   10  CAM P0G A1401       0.963 -14.115 -50.627  1.00 59.97           C  
+HETATM   11  CAN P0G A1401      -3.218 -12.339 -49.448  1.00 52.99           C  
+HETATM   12  CAO P0G A1401      -6.081 -12.556 -51.859  1.00 48.06           C  
+HETATM   13  CAS P0G A1401       2.240 -13.496 -50.093  1.00 54.92           C  
+HETATM   14  CAT P0G A1401      -6.502 -12.416 -54.354  1.00 45.88           C  
+HETATM   15  CAU P0G A1401       1.103 -12.357 -46.921  1.00 48.18           C  
+HETATM   16  CAV P0G A1401      -6.345 -13.188 -53.208  1.00 45.37           C  
+HETATM   17  CAW P0G A1401      -1.363 -13.076 -48.020  1.00 54.92           C  
+HETATM   18  CAX P0G A1401       1.019 -12.727 -48.248  1.00 53.90           C  
+HETATM   19  CAY P0G A1401      -0.201 -13.086 -48.797  1.00 57.74           C  
+HETATM   20  CAZ P0G A1401      -2.687 -13.464 -48.577  1.00 56.84           C  
+HETATM   21  NAP P0G A1401      -4.408 -12.801 -50.131  1.00 52.91           N  
+HETATM   22  NAQ P0G A1401       2.133 -12.722 -49.017  1.00 52.35           N  
+HETATM   23  OAD P0G A1401       3.313 -13.708 -50.637  1.00 55.84           O  
+HETATM   24  OAE P0G A1401       2.310 -12.006 -46.394  1.00 43.87           O  
+HETATM   25  OAF P0G A1401      -3.656 -13.704 -47.543  1.00 58.88           O  
+HETATM   26  OAR P0G A1401      -0.189 -13.431 -50.122  1.00 61.06           O  
+HETATM   27  CBA P0G A1401      -4.601 -12.400 -51.508  1.00 48.78           C  
+CONECT    1   14
+CONECT    2   27
+CONECT    3   27
+CONECT    4    5    6
+CONECT    5    4    7
+CONECT    6    4   14
+CONECT    7    5   16
+CONECT    8    9   15
+CONECT    9    8   17
+CONECT   10   13   26
+CONECT   11   20   21
+CONECT   12   16   27
+CONECT   13   10   22   23
+CONECT   14    1    6   16
+CONECT   15    8   18   24
+CONECT   16    7   12   14
+CONECT   17    9   19   20
+CONECT   18   15   19   22
+CONECT   19   17   18   26
+CONECT   20   11   17   25
+CONECT   21   11   27
+CONECT   22   13   18
+CONECT   23   13
+CONECT   24   15
+CONECT   25   20
+CONECT   26   10   19
+CONECT   27    2    3   12   21
+END
