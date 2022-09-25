@@ -139,7 +139,7 @@ def process_ligand(smi, output_format):
         
         with open('./test.smi', 'w') as f: 
             f.writelines(smi)        
-        os.system('obabel test.smi --gen3d  -O ./ligands/{}.sdf'.format(i)) # Protonation states at pH 7.4 is used!
+        os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
         
     os.system('rm test.smi')    
     
