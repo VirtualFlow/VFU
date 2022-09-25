@@ -1,0 +1,31 @@
+=======================================================================
+GWOVina version 1.0                                                    
+Michael K. M. Wong & Shirley W. I. Siu                                   
+                                                                       
+Computational Biology and Bioinformatics Lab                           
+University of Macau                                                    
+                                                                       
+Visit http://cbbio.cis.umac.mo for more information.                   
+                                                                       
+GWOVina was developed based on the framework of AutoDock Vina.         
+                                                                       
+For more information about Vina, please visit http://vina.scripps.edu. 
+                                                                       
+=======================================================================
+
+Detected 12 CPUs
+WARNING: at low exhaustiveness, it may be impossible to utilize all CPUs
+Reading input ... done.
+Setting up the scoring function ... done.
+Analyzing the binding site ... done.
+Using random seed: 1037510388
+Performing search ... done.
+
+Refining results ... done.
+
+mode |   affinity | dist from best mode
+     | (kcal/mol) | rmsd l.b.| rmsd u.b.
+-----+------------+----------+----------
+   1    -1.643273481      0.000      0.000
+   2    0.207737252      3.639      7.004
+Writing output ... done.

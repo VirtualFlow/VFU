@@ -12,7 +12,7 @@ from lig_process import process_ligand
 command = []
 
 # Parameters:  
-program_choice = 'vina_xb' # smina/qvina/qvina-w/vina/vina_carb/vina_xb
+program_choice = 'gwovina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina
 receptor       = './config/prot_1.pdb'
 smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 
@@ -40,13 +40,13 @@ if not(file_type_check == 'pdb' or file_type_check == 'pdbqt'):
 if program_choice == 'smina': 
     command.append('-r')
     command.append(receptor)
-elif program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb': 
+elif program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
     command.append('--receptor')
     command.append(receptor)
 
 
 # Assign the right ligand for docking
-if program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb':
+if program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina':
     process_ligand(smi, 'pdbqt')
 lig_locations = os.listdir('./ligands/')
 
@@ -54,7 +54,7 @@ lig_locations = os.listdir('./ligands/')
 for lig_ in lig_locations: 
     
     # Add in the ligand file and the exhaustiveness setting
-    if program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb': 
+    if program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
         cmd = command + ['--ligand', './ligands/{}'.format(lig_), '--exhaustiveness', str(exhaustiveness)]
     elif program_choice == 'smina': 
         cmd = command + ['-l', './ligands/{}'.format(lig_), '--exhaustiveness', str(exhaustiveness)]
@@ -68,7 +68,7 @@ for lig_ in lig_locations:
     cmd = cmd + ['--size_z', str(size_z)]
 
     # Add in parameters for generating output files: 
-    if program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb': 
+    if program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
         cmd = cmd + ['--out', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
     elif program_choice == 'smina': 
         cmd = cmd + ['-o', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
