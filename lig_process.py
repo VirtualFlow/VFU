@@ -10,6 +10,7 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem import MolToSmiles as mol2smi
+from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 
 
 def desalt_smi(smi): 
@@ -38,6 +39,34 @@ def desalt_smi(smi):
         return smi
         
     return smi_
+
+
+def enumerate_sterio(smi): 
+    '''
+    Enumerate all sterioisomers of the provided molecule smi. 
+    Note: Only unspecified stereocenters are expanded. 
+
+    Parameters
+    ----------
+    smi : str
+         Valid molecule SMILE string.
+
+    Returns
+    -------
+    sterio_smiles: list of strs.
+         A list of valid smile strings, representing sterioisomers.
+
+    '''
+
+    m = Chem.MolFromSmiles(smi)
+    opts = StereoEnumerationOptions(unique=True)
+    isomers = tuple(EnumerateStereoisomers(m, options=opts))
+    
+    sterio_smiles = []
+    for smi in sorted(Chem.MolToSmiles(x,isomericSmiles=True) for x in isomers):
+        sterio_smiles.append(smi)
+
+    return sterio_smiles
 
 
 def reorderTautomers(m):
@@ -128,15 +157,25 @@ def process_ligand(smi, output_format):
         print('Invalid starting molecule provided! A valid SMILE is required for the program.')
         return 
     
-    smi = desalt_smi(smi) # Desault the input molecule
+    # Desault the input molecule
+    smi = desalt_smi(smi) 
+    mol = Chem.MolFromSmiles(smi)
     
-    mol = neutralize_atoms(mol) # Neutralize the molecule such that the net charge is 0
+    # Neutralize the molecule such that the net charge is 0
+    mol = neutralize_atoms(mol) 
     
-    tautomers = reorderTautomers(mol) # Generate all posible tautomers of a molecule
-    smiles_all = [mol2smi(x) for x in tautomers]
-        
+    # Enumerate sterio-isomers of the molecules: 
+    smi = mol2smi(mol)
+    sterio_smiles = enumerate_sterio(smi)
+    
+    # Enumerate all tautomers of the sterio-isomers: 
+    smiles_all = []
+    for item in sterio_smiles: 
+        tautomers = reorderTautomers(Chem.MolFromSmiles(item))
+        tautomers = [mol2smi(x) for x in tautomers]
+        smiles_all.extend(tautomers)
+
     for i,smi in enumerate(smiles_all): 
-        
         with open('./test.smi', 'w') as f: 
             f.writelines(smi)        
         os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
@@ -144,6 +183,7 @@ def process_ligand(smi, output_format):
     os.system('rm test.smi')    
     
     
-    
 if __name__ == '__main__': 
-    process_ligand('Oc1c(cccc3)c3nc2ccncc12.CC.[Cl][Cl]', 'sdf')
+    process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf')
+
+    

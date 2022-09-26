@@ -12,9 +12,10 @@ from lig_process import process_ligand
 command = []
 
 # Parameters:  
-program_choice = 'gwovina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina
+program_choice = 'qvina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina
 receptor       = './config/prot_1.pdb'
-smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
+# smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
+smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
 
 # Docking search paramters: 
@@ -82,8 +83,8 @@ for lig_ in lig_locations:
     # Check the quality of generated structure (some post-processing quality control):
     # TODO: Make a function out of this! 
     try: 
-        command = ['obenergy', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
-        command_obabel_check = subprocess.run(command, capture_output=True)
+        ob_cmd = ['obenergy', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
+        command_obabel_check = subprocess.run(ob_cmd, capture_output=True)
         command_obabel_check = command_obabel_check.stdout.decode("utf-8").split('\n')[-2]
         total_energy         = float(command_obabel_check.split(' ')[-2])
     except: 
@@ -113,5 +114,4 @@ for lig_ in lig_locations:
     else: 
         results[lig_] = 'Extremely high pose energy encountered.'
 
-    raise Exception('T')
     
