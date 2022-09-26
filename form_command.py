@@ -6,14 +6,16 @@ Created on Sat Sep 24 17:17:13 2022
 @author: akshat
 """
 import os 
+import sys
 import subprocess
+from utils import run_plants_docking
 from lig_process import process_ligand
 
 command = []
 
 # Parameters:  
-program_choice = 'qvina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina
-receptor       = './config/prot_1.pdb'
+program_choice = 'PLANTS' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS
+receptor       = './config/prot_1.mol2'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
@@ -29,6 +31,11 @@ size_z         = 10                        # Define the length of the search spa
 
 results = {}  # Storage for results
 
+
+if program_choice == 'PLANTS': 
+    results = run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
+    sys.exit()
+    
 
 # Assign the right program for docking:  
 command.append('./executables/{}'.format(program_choice))

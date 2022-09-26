@@ -184,6 +184,8 @@ def process_ligand(smi, output_format):
     
     
 if __name__ == '__main__': 
-    process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf')
+    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf')
+    
+    # A = enumerate_sterio('BrC=CC1OC(C2)(F)C2(Cl)C1')
 
     
