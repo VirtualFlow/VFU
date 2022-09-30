@@ -4,4 +4,5 @@ Streamlined version of VirtualFlow combining both VFVS and VFLP
 
 # Using AutoDock-GPU
 Please compile the code using instructions from: [https://github.com/ccsb-scripps/AutoDock-GPU](https://github.com/ccsb-scripps/AutoDock-GPU). 
-Place the entire compiled directory within executables folder. 
+After successfull compilation, within the bin directory, an executable will be made (example name: `autodock_gpu_1wi`). Then, the code is ready to run. 
+We provide an example inside `./executables/vf_gpu_example.zip`. Here
