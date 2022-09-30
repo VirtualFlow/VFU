@@ -22,12 +22,10 @@ def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size
         
     # prepare the ligands:
     process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
-    # os.system('chmod 777 ligands/*') # assign right permisions for PLANTS to access the ligands
     lig_locations = os.listdir('./ligands/')
 
     for lig_ in lig_locations: 
         lig_path = 'ligands/{}'.format(lig_)
-        # os.system('cp {} ./'.format(lig_path))
         
         # Prepare the config file: 
         with open('./config.txt', 'w') as f: 
@@ -54,3 +52,46 @@ def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size
         results[lig_] = [score_, './results/result_{}'.format(lig_.split('.')[0])]
 
     return results        
+
+def run_vina_gpu_docking(receptor, smi, program_choice): 
+
+    print('Note: For use of vina gpu, the receptor needs to be prepared in a specif way. Have a look at the examples provided in https://github.com/ccsb-scripps/AutoDock-GPU & the example dir we provided within executables/vf_gpu_example.zip')
+    command = []
+    
+    # receptor needs to be in mol2 format: 
+    recetor_format = receptor.split('.')
+    if recetor_format[-1] != 'fld' and recetor_format[-2] != 'maps': 
+        raise Exception('Receptor needs to be of file type .maps.fld (example: 1stp_protein.maps.fld). Please try again, after incorporating this correction.')
+    
+    # check for the existence of the executable: 
+    executable = [x for x in os.listdir('./executables') if 'autodock_gpu' in x][0]
+    if len(executable) == 0: 
+        raise Exception('Executable not found. Executable needs to have autodock_gpu in name (example: autodock_gpu_1wi)')
+                        
+    # Assign the right program for docking:  
+    command.append('./executables/{}'.format(program_choice))
+    
+    # Prepare the ligands: 
+    process_ligand(smi, 'pdbqt')
+    lig_locations = os.listdir('./ligands/')
+
+    # Get ready for running the files: 
+        
+    results = {}
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        
+        vina_gpu_cmd = command + ['--ffile', '{}'.format(receptor)]
+        vina_gpu_cmd = vina_gpu_cmd + ['--lfile', '{}'.format(lig_path)]
+
+        vina_gpu_cmd = subprocess.run(vina_gpu_cmd, capture_output=True)
+        vina_gpu_cmd = vina_gpu_cmd.stdout.decode("utf-8").split('\n')[-6]
+            
+        if vina_gpu_cmd[-1] != 'All jobs ran without errors.\n': 
+            print('An error was encountered when executing docking for: ', lig_path)
+            results[lig_] = ['FAIL', vina_gpu_cmd]
+        else: 
+            lines = [x.strip() for x in vina_gpu_cmd if 'best energy' in x][0]
+            docking_score = float(lines.split(',')[1].split(' ')[-2])
+            results[lig_] = [docking_score, vina_gpu_cmd]
+    return 
