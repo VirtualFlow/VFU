@@ -41,7 +41,53 @@ def desalt_smi(smi):
     return smi_
 
 
-def enumerate_sterio(smi): 
+
+def perform_isomer_unique_correction(sterio_smiles_ls): 
+    '''
+    When RDkit enumerates sterio-isomers, some of them can be redundent. 
+    To resolve this, we use obabel to convert them into 3D, convert back to 
+    canonical smiles, and, use this as the final list of sterio smiles for 
+    a particular molecule. 
+
+    Parameters
+    ----------
+    sterio_smiles_ls : list of strings
+        A list of valid SMILE strings.
+
+    Returns
+    -------
+    isomers_canon : list of strings
+        A list of valid SMILE strings, containing the corrected smiles!.
+    '''
+
+    isomers_canon = []
+    
+    for smi in sterio_smiles_ls: 
+        
+        with open('./test.smi', 'w') as f: 
+            f.writelines(smi)
+        
+        os.system('obabel test.smi --gen3D -O test.sdf')
+        os.system('rm test.smi')
+        os.system('obabel test.sdf -O test.smi')
+    
+        with open('./test.smi', 'r') as f: 
+            new_smi = f.readlines()
+        new_smi = new_smi[0].strip()
+        
+        os.system('rm test.smi')
+        os.system('rm test.sdf')
+        
+        mol = Chem.MolFromSmiles(new_smi)
+        new_smi_canon = Chem.MolToSmiles(mol, canonical=True) 
+        
+        isomers_canon.append(new_smi_canon)
+        
+    return list(set(isomers_canon))
+
+
+
+def enumerate_sterio(smi, asigned=True): 
     '''
     Enumerate all sterioisomers of the provided molecule smi. 
     Note: Only unspecified stereocenters are expanded. 
@@ -50,6 +96,11 @@ def enumerate_sterio(smi):
     ----------
     smi : str
          Valid molecule SMILE string.
+    asigned: bool
+         if True, isomers will be generated for only the unasigned sterio-locations 
+                  for a smile (faster)
+         if False, all isomer combinations will be generated, regardless of what is 
+                  specified in the input smile (slower)
 
     Returns
     -------
@@ -59,12 +110,19 @@ def enumerate_sterio(smi):
     '''
 
     m = Chem.MolFromSmiles(smi)
-    opts = StereoEnumerationOptions(unique=True)
+    if asigned == True: # Faster
+        opts = StereoEnumerationOptions(unique=True)
+    else: 
+        opts = StereoEnumerationOptions(unique=True, onlyUnassigned=False)
+
+    
     isomers = tuple(EnumerateStereoisomers(m, options=opts))
     
     sterio_smiles = []
     for smi in sorted(Chem.MolToSmiles(x,isomericSmiles=True) for x in isomers):
         sterio_smiles.append(smi)
+        
+    sterio_smiles = perform_isomer_unique_correction(sterio_smiles)
 
     return sterio_smiles
 
@@ -114,7 +172,7 @@ def neutralize_atoms(mol):
     '''
     pattern = Chem.MolFromSmarts("[+1!h0!$([*]~[-1,-2,-3,-4]),-1!$([*]~[+1,+2,+3,+4])]")
     at_matches = mol.GetSubstructMatches(pattern)
-    at_matches_list = [y[0] for y in at_matches]
+    at_matches_list = [y[0] for y in at_matches] 
     if len(at_matches_list) > 0:
         for at_idx in at_matches_list:
             atom = mol.GetAtomWithIdx(at_idx)
@@ -125,7 +183,7 @@ def neutralize_atoms(mol):
             atom.UpdatePropertyCache()
     return mol
 
-def process_ligand(smi, output_format): 
+def process_ligand(smi, output_format, asigned_sterio=True): 
     '''
     Convert provided smile string into 3-d coordinates, ready for molecular docking. 
     Steps performed include: 
@@ -141,7 +199,11 @@ def process_ligand(smi, output_format):
         valid smile string of a ligand.
     output_format: str
         Type of 3D mol file (pdb, pdbqt, sdf, mol2)
-
+    asigned_sterio: bool
+         if True, isomers will be generated for only the unasigned sterio-locations 
+                  for a smile (faster)
+         if False, all isomer combinations will be generated, regardless of what is 
+                  specified in the input smile (slower)
     Returns
     -------
     None.
@@ -166,7 +228,7 @@ def process_ligand(smi, output_format):
     
     # Enumerate sterio-isomers of the molecules: 
     smi = mol2smi(mol)
-    sterio_smiles = enumerate_sterio(smi)
+    sterio_smiles = enumerate_sterio(smi, asigned_sterio)
     
     # Enumerate all tautomers of the sterio-isomers: 
     smiles_all = []
@@ -184,7 +246,7 @@ def process_ligand(smi, output_format):
     
     
 if __name__ == '__main__': 
-    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf')
+    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf', asigned_sterio=False)
     
     # A = enumerate_sterio('BrC=CC1OC(C2)(F)C2(Cl)C1')
 
