@@ -53,7 +53,7 @@ def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size
 
     return results        
 
-def run_vina_gpu_docking(receptor, smi, program_choice): 
+def run_autodock_gpu_docking(receptor, smi, program_choice): 
 
     print('Note: For use of vina gpu, the receptor needs to be prepared in a specif way. Have a look at the examples provided in https://github.com/ccsb-scripps/AutoDock-GPU & the example dir we provided within executables/vf_gpu_example.zip')
     command = []
@@ -64,9 +64,15 @@ def run_vina_gpu_docking(receptor, smi, program_choice):
         raise Exception('Receptor needs to be of file type .maps.fld (example: 1stp_protein.maps.fld). Please try again, after incorporating this correction.')
     
     # check for the existence of the executable: 
-    executable = [x for x in os.listdir('./executables') if 'autodock_gpu' in x][0]
+    if 'gpu' in program_choice: 
+        executable = [x for x in os.listdir('./executables') if 'autodock_gpu' in x][0]
+    elif 'cpu' in program_choice: 
+        executable = [x for x in os.listdir('./executables') if 'autodock_cpu' in x][0]
+    else: 
+        raise Exception('Executable must be of format autodock_cpu/gpu')
+    
     if len(executable) == 0: 
-        raise Exception('Executable not found. Executable needs to have autodock_gpu in name (example: autodock_gpu_1wi)')
+        raise Exception('Executable not found. Executable needs to have autodock_gpu in name (example: autodock_gpu_1wi/autodock_cpu_1wi)')
                         
     # Assign the right program for docking:  
     command.append('./executables/{}'.format(program_choice))

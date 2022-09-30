@@ -8,13 +8,13 @@ Created on Sat Sep 24 17:17:13 2022
 import os 
 import sys
 import subprocess
-from utils import run_plants_docking, run_vina_gpu_docking
+from utils import run_plants_docking, run_autodock_gpu_docking
 from lig_process import process_ligand
 
 command = []
 
 # Parameters:  
-program_choice = 'vina_gpu' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/vina_gpu
+program_choice = 'autodock_cpu' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu
 receptor       = './config/prot_1.mol2'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -40,10 +40,12 @@ results = {}  # Storage for results
 if program_choice == 'PLANTS': 
     results = run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
     sys.exit()
-if program_choice == 'vina_gpu': 
-    results = run_vina_gpu_docking(receptor, smi, program_choice)
+if program_choice == 'autodock_gpu': 
+    results = run_autodock_gpu_docking(receptor, smi, program_choice)
     sys.exit()
-
+if program_choice == 'autodock_cpu': 
+    results = run_autodock_gpu_docking(receptor, smi, program_choice)
+    sys.exit()
 
 
 # Assign the right program for docking:  
