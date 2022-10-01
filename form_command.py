@@ -14,8 +14,8 @@ from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, ru
 command = []
 
 # Parameters:  
-program_choice = 'rDock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock
-receptor       = './config/prot_1.mol2'
+program_choice = 'gnina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina
+receptor       = './config/prot_1.pdb'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
@@ -64,7 +64,7 @@ command.append('./executables/{}'.format(program_choice))
 file_type_check = receptor.split('.')[-1]
 if not(file_type_check == 'pdb' or file_type_check == 'pdbqt'): 
     raise Exception('invalid receptor file type provided!')
-if program_choice == 'smina': 
+if program_choice == 'smina' or program_choice == 'gnina': 
     command.append('-r')
     command.append(receptor)
 elif program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
@@ -73,7 +73,7 @@ elif program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice 
 
 
 # Assign the right ligand for docking
-if program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina':
+if program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina':
     process_ligand(smi, 'pdbqt')
 lig_locations = os.listdir('./ligands/')
 
@@ -83,7 +83,7 @@ for lig_ in lig_locations:
     # Add in the ligand file and the exhaustiveness setting
     if program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
         cmd = command + ['--ligand', './ligands/{}'.format(lig_), '--exhaustiveness', str(exhaustiveness)]
-    elif program_choice == 'smina': 
+    elif program_choice == 'smina' or program_choice == 'gnina': 
         cmd = command + ['-l', './ligands/{}'.format(lig_), '--exhaustiveness', str(exhaustiveness)]
         
     # Add in the docking parameters: 
@@ -97,7 +97,7 @@ for lig_ in lig_locations:
     # Add in parameters for generating output files: 
     if program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
         cmd = cmd + ['--out', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
-    elif program_choice == 'smina': 
+    elif program_choice == 'smina' or program_choice == 'gnina': 
         cmd = cmd + ['-o', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
     
     cmd = cmd + ['--log', './outputs/log_{}.txt'.format(lig_.split('.')[0])]
@@ -105,6 +105,7 @@ for lig_ in lig_locations:
     # Run the command: 
     command_run = subprocess.run(cmd, capture_output=True)
 
+    raise Exception('T')
 
     # Check the quality of generated structure (some post-processing quality control):
     # TODO: Make a function out of this! 

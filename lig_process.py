@@ -114,7 +114,6 @@ def enumerate_sterio(smi, asigned=True):
         opts = StereoEnumerationOptions(unique=True)
     else: 
         opts = StereoEnumerationOptions(unique=True, onlyUnassigned=False)
-
     
     isomers = tuple(EnumerateStereoisomers(m, options=opts))
     
@@ -123,7 +122,6 @@ def enumerate_sterio(smi, asigned=True):
         sterio_smiles.append(smi)
         
     sterio_smiles = perform_isomer_unique_correction(sterio_smiles)
-
     return sterio_smiles
 
 
@@ -229,7 +227,7 @@ def process_ligand(smi, output_format, asigned_sterio=True):
     # Enumerate sterio-isomers of the molecules: 
     smi = mol2smi(mol)
     sterio_smiles = enumerate_sterio(smi, asigned_sterio)
-    
+
     # Enumerate all tautomers of the sterio-isomers: 
     smiles_all = []
     for item in sterio_smiles: 
@@ -246,7 +244,7 @@ def process_ligand(smi, output_format, asigned_sterio=True):
     
     
 if __name__ == '__main__': 
-    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf', asigned_sterio=False)
+    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf', asigned_sterio=True)
     
     # A = enumerate_sterio('BrC=CC1OC(C2)(F)C2(Cl)C1')
 
