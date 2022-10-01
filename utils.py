@@ -100,4 +100,44 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
             lines = [x.strip() for x in vina_gpu_cmd if 'best energy' in x][0]
             docking_score = float(lines.split(',')[1].split(' ')[-2])
             results[lig_] = [docking_score, vina_gpu_cmd]
-    return 
+    return results
+
+
+
+def run_EquiBind(receptor, smi): 
+    files_ls = os.listdir('./')
+    if not('data' in files_ls and 'inference.py' in files_ls):
+        raise Exception('Please make sure process EquiBind based on the instructions provided in the readme. I could not find the key EquiBind files.')
+    
+    if receptor.split('.')[2] != 'pdb': 
+        raise Exception('For EquiBind, protein file needs to be in pdb file type. Please incorporate this correction')
+    
+    # Process the ligands
+    process_ligand(smi, 'sdf') # mol2 ligand format is supported in plants
+
+    # Make a direcotry containing all the tasks to be performed: 
+    os.sytem('mkdir ./data/to_predict')
+    
+    results = {}
+    lig_locations = os.listdir('./ligands/')
+    for i,lig_ in enumerate(lig_locations): 
+        lig_path = 'ligands/{}'.format(lig_)
+        os.system('./data/to_predict/test{}'.format(i))
+        os.system('cp {} {}'.format(receptor, './data/to_predict/test{}/rec.pdb'.format(i)))    # Copy the protein file: 
+        os.system('cp {} {}'.format(lig_path, './data/to_predict/test{}/ligand.sdf'.format(i))) # Copy the ligand file: 
+        results[lig_path] = './data/results/output/test{}'.format(i)
+            
+    os.system('python inference.py --config=configs_clean/inference.yml')
+    print('Results are saved in: ./data/results/output')
+
+    return results
+
+
+
+
+
+
+
+
+
+
