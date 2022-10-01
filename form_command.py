@@ -9,12 +9,12 @@ import os
 import sys
 import subprocess
 from lig_process import process_ligand
-from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind
+from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock
 
 command = []
 
 # Parameters:  
-program_choice = 'EquiBind' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind
+program_choice = 'rDock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock
 receptor       = './config/prot_1.mol2'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -49,6 +49,10 @@ if program_choice == 'autodock_cpu':
 if program_choice == 'EquiBind': 
     results = run_EquiBind(receptor, smi)
     sys.exit()
+if program_choice == 'rDock':   
+    run_rDock(receptor, smi)
+    sys.exit()
+
 
 
 

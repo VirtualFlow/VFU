@@ -210,7 +210,7 @@ def process_ligand(smi, output_format, asigned_sterio=True):
 
     '''
     output_format = output_format.lower().strip()
-    if not(output_format == 'sdf' or output_format == 'mol2' or output_format == 'pdb' or output_format == 'pdbqt'): 
+    if not(output_format == 'sdf' or output_format == 'mol2' or output_format == 'pdb' or output_format == 'pdbqt' or output_format == 'sd'): 
         print('Unsopported file type requested')
         return 
     

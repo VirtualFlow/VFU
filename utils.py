@@ -133,7 +133,53 @@ def run_EquiBind(receptor, smi):
     return results
 
 
+def run_rDock(receptor, smi): 
+    
+    # receptor needs to be in mol2 format: 
+    recetor_format = receptor.split('.')[-1]
+    if recetor_format != 'mol2': 
+        raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
+    
+    
+    # Create ligands as '.sd' file type: 
+    process_ligand(smi, 'sd') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    ref_lig = '' # TODO!!!
+    raise Exception('Note: a reference ligand file needs to be filled in the line above. Please do so and comment this line!')
+    
+    # Creation of the prm file: 
+    print('Please have a look at the prm parameters. Inside [TODO]; we have assigned some default values.')
+    with open('config.prm', 'a+') as f: 
+        f.writelines('RBT_PARAMETER_FILE_V1.00')
+        f.writelines('TITLE gart_DUD')
+        f.writelines('RECEPTOR_FILE {}'.format(receptor))
+        f.writelines('SECTION MAPPER')
+        f.writelines('    SITE_MAPPER RbtLigandSiteMapper')
+        f.writelines('    REF_MOL {}'.format(ref_lig))
+        f.writelines('    RADIUS 6.0')
+        f.writelines('    SMALL_SPHERE 1.0')
+        f.writelines('    MIN_VOLUME 100')
+        f.writelines('    MAX_CAVITIES 1')
+        f.writelines('    VOL_INCR 0.0')
+        f.writelines('   GRIDSTEP 0.5')
+        f.writelines('END_SECTION')
+        f.writelines('SECTION CAVITY')
+        f.writelines('    SCORING_FUNCTION RbtCavityGridSF')
+        f.writelines('    WEIGHT 1.0')
+        f.writelines('END_SECTION')
 
+    # Cavity generation: 
+    os.system('rbcavity -was -d -r config.prm')
+    
+    # Perform docking: 
+    os.system('mkdir rDock_outputs')
+    for i,lig_ in enumerate(lig_locations): 
+        os.system('mkdir rDock_outputs/{}'.format(i))
+        lig_path = 'ligands/{}'.format(lig_)
+        os.system('rbdock -i {} -o {} -r config.prm -p dock.prm -n 50'.format(lig_path, 'rDock_outputs/{}'.format(i)))
+    
+    return 
 
 
 

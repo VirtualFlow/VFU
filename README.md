@@ -13,3 +13,8 @@ using: `./autodock_gpu_1wi --ffile 1stp_protein.maps.fld --lfile ./1stp_ligand.p
 Please download the code using instructions from: [https://github.com/HannesStark/EquiBind](https://github.com/HannesStark/EquiBind). 
 Please create a conda enviroment per the instructions of the EquiBind repository. 
 Copy paste all files inside the working directory of VF-Unity. 
+
+
+# Using rDock
+Please compile the code using the instruction provided in: [https://rdock.sourceforge.net/installation/](https://rdock.sourceforge.net/installation/). 
+We installed rDock using anacond (with `conda install -c bioconda rdock`)
