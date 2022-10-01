@@ -12,7 +12,4 @@ using: `./autodock_gpu_1wi --ffile 1stp_protein.maps.fld --lfile ./1stp_ligand.p
 # Using EquiBind
 Please download the code using instructions from: [https://github.com/HannesStark/EquiBind](https://github.com/HannesStark/EquiBind). 
 Please create a conda enviroment per the instructions of the EquiBind repository. 
-Copy paste all files inside the working directory of VF-Unity. A zipped up version of the repository is provided within `./executables/EquiBind.zip`.
-
-TODO: 
-Next, inside the `data/to_predict` directory, please create a directory for 
+Copy paste all files inside the working directory of VF-Unity. 
