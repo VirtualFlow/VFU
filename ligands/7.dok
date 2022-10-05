@@ -1,0 +1,131 @@
+REMARK Docking time: 0.0 min
+REMARK Cluster   1 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.057 147.918  27.707
+ATOM      2  C   LIG     0     -14.057 147.918  27.707
+ATOM      3  C   LIG     0     -14.057 147.918  27.707
+ATOM      4  C   LIG     0     -14.057 147.918  27.707
+ATOM      5  CL  LIG     0     -14.057 147.918  27.707
+ATOM      6  C   LIG     0     -14.057 147.918  27.707
+ATOM      7  C   LIG     0     -14.057 147.918  27.707
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.057 147.918  27.707
+END
+REMARK Cluster   2 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.019 147.835  27.748
+ATOM      2  C   LIG     0     -14.019 147.835  27.748
+ATOM      3  C   LIG     0     -14.019 147.835  27.748
+ATOM      4  C   LIG     0     -14.019 147.835  27.748
+ATOM      5  CL  LIG     0     -14.019 147.835  27.748
+ATOM      6  C   LIG     0     -14.019 147.835  27.748
+ATOM      7  C   LIG     0     -14.019 147.835  27.748
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.019 147.835  27.748
+END
+REMARK Cluster   3 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.032 147.850  27.755
+ATOM      2  C   LIG     0     -14.032 147.850  27.755
+ATOM      3  C   LIG     0     -14.032 147.850  27.755
+ATOM      4  C   LIG     0     -14.032 147.850  27.755
+ATOM      5  CL  LIG     0     -14.032 147.850  27.755
+ATOM      6  C   LIG     0     -14.032 147.850  27.755
+ATOM      7  C   LIG     0     -14.032 147.850  27.755
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.032 147.850  27.755
+END
+REMARK Cluster   4 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.011 147.984  27.624
+ATOM      2  C   LIG     0     -14.011 147.984  27.624
+ATOM      3  C   LIG     0     -14.011 147.984  27.624
+ATOM      4  C   LIG     0     -14.011 147.984  27.624
+ATOM      5  CL  LIG     0     -14.011 147.984  27.624
+ATOM      6  C   LIG     0     -14.011 147.984  27.624
+ATOM      7  C   LIG     0     -14.011 147.984  27.624
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.011 147.984  27.624
+END
+REMARK Cluster   5 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.148 147.923  27.693
+ATOM      2  C   LIG     0     -14.148 147.923  27.693
+ATOM      3  C   LIG     0     -14.148 147.923  27.693
+ATOM      4  C   LIG     0     -14.148 147.923  27.693
+ATOM      5  CL  LIG     0     -14.148 147.923  27.693
+ATOM      6  C   LIG     0     -14.148 147.923  27.693
+ATOM      7  C   LIG     0     -14.148 147.923  27.693
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.148 147.923  27.693
+END
+REMARK Cluster   6 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.126 147.807  27.726
+ATOM      2  C   LIG     0     -14.126 147.807  27.726
+ATOM      3  C   LIG     0     -14.126 147.807  27.726
+ATOM      4  C   LIG     0     -14.126 147.807  27.726
+ATOM      5  CL  LIG     0     -14.126 147.807  27.726
+ATOM      6  C   LIG     0     -14.126 147.807  27.726
+ATOM      7  C   LIG     0     -14.126 147.807  27.726
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.126 147.807  27.726
+END
+REMARK Cluster   7 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.086 147.829  27.601
+ATOM      2  C   LIG     0     -14.086 147.829  27.601
+ATOM      3  C   LIG     0     -14.086 147.829  27.601
+ATOM      4  C   LIG     0     -14.086 147.829  27.601
+ATOM      5  CL  LIG     0     -14.086 147.829  27.601
+ATOM      6  C   LIG     0     -14.086 147.829  27.601
+ATOM      7  C   LIG     0     -14.086 147.829  27.601
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.086 147.829  27.601
+END
+REMARK Cluster   8 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.053 147.974  27.700
+ATOM      2  C   LIG     0     -14.053 147.974  27.700
+ATOM      3  C   LIG     0     -14.053 147.974  27.700
+ATOM      4  C   LIG     0     -14.053 147.974  27.700
+ATOM      5  CL  LIG     0     -14.053 147.974  27.700
+ATOM      6  C   LIG     0     -14.053 147.974  27.700
+ATOM      7  C   LIG     0     -14.053 147.974  27.700
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.053 147.974  27.700
+END
+REMARK Cluster   9 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.184 147.976  27.678
+ATOM      2  C   LIG     0     -14.184 147.976  27.678
+ATOM      3  C   LIG     0     -14.184 147.976  27.678
+ATOM      4  C   LIG     0     -14.184 147.976  27.678
+ATOM      5  CL  LIG     0     -14.184 147.976  27.678
+ATOM      6  C   LIG     0     -14.184 147.976  27.678
+ATOM      7  C   LIG     0     -14.184 147.976  27.678
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.184 147.976  27.678
+END
+REMARK Cluster  10 of Poses:  1 Score: -1.99 kcal/mol
+ATOM      1  F   LIG     0     -14.160 147.918  27.745
+ATOM      2  C   LIG     0     -14.160 147.918  27.745
+ATOM      3  C   LIG     0     -14.160 147.918  27.745
+ATOM      4  C   LIG     0     -14.160 147.918  27.745
+ATOM      5  CL  LIG     0     -14.160 147.918  27.745
+ATOM      6  C   LIG     0     -14.160 147.918  27.745
+ATOM      7  C   LIG     0     -14.160 147.918  27.745
+ATOM      8  C   LIG     0        -nan    -nan    -nan
+ATOM      9  C   LIG     0        -nan    -nan    -nan
+ATOM     10  BR  LIG     0        -nan    -nan    -nan
+ATOM     11  O   LIG     0     -14.160 147.918  27.745
+END

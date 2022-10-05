@@ -183,7 +183,75 @@ def run_rDock(receptor, smi):
 
 
 
+def generate_ledock_file(receptor='pro.pdb',rmsd=1.0,x=[0,0],y=[0,0],z=[0,0], n_poses=10, l_list=[],l_list_outfile='',out='dock.in'):
+    rmsd=str(rmsd)
+    x=[str(x) for x in x]
+    y=[str(y) for y in y]
+    z=[str(z) for z in z]
+    n_poses=str(n_poses)
 
+    with open(l_list_outfile,'w') as l_out:
+        for element in l_list:
+            l_out.write(element)
+    l_out.close()
+
+    file=[
+        'Receptor\n',
+        receptor + '\n\n',
+        'RMSD\n',
+        rmsd +'\n\n',
+        'Binding pocket\n',
+        x[0],' ',x[1],'\n',
+        y[0],' ',y[1],'\n',
+        z[0],' ',z[1],'\n\n',
+        'Number of binding poses\n',
+        n_poses + '\n\n',
+        'Ligands list\n',
+        l_list_outfile + '\n\n',
+        'END']
+    
+    with open(out,'w') as output:
+        for line in file:
+            output.write(line)
+    output.close()
+
+
+def run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z): 
+    # Ensure receptor is in the right format
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+
+    # prepare the ligands:
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in ledock
+    lig_locations = os.listdir('./ligands/')
+
+    results = {}
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        
+        generate_ledock_file(receptor=receptor,
+                             x=[center_x-size_x, center_x+size_x],
+                             y=[center_y-size_y, center_y+size_y],
+                             z=[center_z-size_z, center_z+size_z],
+                             n_poses=10,
+                             rmsd=1.0,
+                             l_list= lig_path, 
+                             l_list_outfile='ledock_ligand.list',
+                             out='dock.in')
+        
+        # !../../bin/ledock_linux_x86 {'dock.in'}
+        ledock_cmd = ['./executables/ledock', 'dock.in']
+        ledock_cmd = subprocess.run(ledock_cmd, capture_output=True)
+        
+        if ledock_cmd.returncode == 0: 
+            results[lig_path] = './ligands/{}.dok'.format(lig_.split('.')[0])
+        else: 
+            results[lig_path] = 'FAIL'
+        
+        os.system('rm dock.in ledock_ligand.list')
+        
+    
 
 
 

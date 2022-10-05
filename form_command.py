@@ -9,13 +9,13 @@ import os
 import sys
 import subprocess
 from lig_process import process_ligand
-from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock
+from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock
 
 command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'gnina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina
+program_choice = 'ledock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock
 receptor       = './config/prot_1.pdb'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -47,6 +47,9 @@ size_z         = 10                        # Define the length of the search spa
 results = {}  # Storage for results
 
 
+
+
+
 if program_choice == 'PLANTS': 
     results = run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
     sys.exit()
@@ -62,9 +65,11 @@ if program_choice == 'EquiBind':
 if program_choice == 'rDock':   
     run_rDock(receptor, smi)
     sys.exit()
+if program_choice == 'ledock': 
+    run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
+    sys.exit()
 
-
-
+    
 
 # Assign the right program for docking:  
 command.append('./executables/{}'.format(program_choice))
@@ -114,8 +119,6 @@ for lig_ in lig_locations:
 
     # Run the command: 
     command_run = subprocess.run(cmd, capture_output=True)
-
-    raise Exception('T')
 
     # Check the quality of generated structure (some post-processing quality control):
     # TODO: Make a function out of this! 
