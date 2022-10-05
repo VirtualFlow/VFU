@@ -14,10 +14,20 @@ from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, ru
 command = []
 
 # Parameters:  
+is_selfies     = False 
 program_choice = 'gnina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina
 receptor       = './config/prot_1.pdb'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
+
+
+
+if is_selfies == True: 
+    import selfies 
+    try: 
+        smi = selfies.decoder(smi)
+    except: 
+        raise Exception('Invalid SELFIES provided. Please make sure that the varibale smi contains a valid selfies string. ')
 
 # Check if receptor file exists inside the config directory: 
 files_ls = os.listdir('./config/')
