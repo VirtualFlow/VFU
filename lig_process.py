@@ -87,7 +87,7 @@ def perform_isomer_unique_correction(sterio_smiles_ls):
 
 
 
-def enumerate_sterio(smi, asigned=True): 
+def enumerate_sterio(smi, asigned=True, correct_errors=False ): 
     '''
     Enumerate all sterioisomers of the provided molecule smi. 
     Note: Only unspecified stereocenters are expanded. 
@@ -101,6 +101,10 @@ def enumerate_sterio(smi, asigned=True):
                   for a smile (faster)
          if False, all isomer combinations will be generated, regardless of what is 
                   specified in the input smile (slower)
+    correct_errors: bool
+         if True, a round of error correction will be performed by converting the sterio
+                  smiles to 3D, convert back to canonical smiles for a unique list (slowe)
+         if False, No error correction is performed (faster)
 
     Returns
     -------
@@ -121,7 +125,8 @@ def enumerate_sterio(smi, asigned=True):
     for smi in sorted(Chem.MolToSmiles(x,isomericSmiles=True) for x in isomers):
         sterio_smiles.append(smi)
         
-    sterio_smiles = perform_isomer_unique_correction(sterio_smiles)
+    if correct_errors == True: 
+        sterio_smiles = perform_isomer_unique_correction(sterio_smiles)
     return sterio_smiles
 
 
