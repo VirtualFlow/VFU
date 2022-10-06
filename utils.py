@@ -252,6 +252,40 @@ def run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size
         os.system('rm dock.in ledock_ligand.list')
         
     
+def process_idock_output(results): 
+    poses_ = os.listdir('./')
+    poses_ = [x for x in poses_ if 'pdbqt' in x]
+    
+    for item in poses_: 
+        try: 
+            ob_cmd = ['obenergy', './{}'.format(item)]
+            command_obabel_check = subprocess.run(ob_cmd, capture_output=True)
+            command_obabel_check = command_obabel_check.stdout.decode("utf-8").split('\n')[-2]
+            total_energy         = float(command_obabel_check.split(' ')[-2])
+        except: 
+            total_energy = 10000 # Calculation has failed. 
+        
+        if total_energy < 10000: 
+            
+            # Read the output file: 
+            with open('./log.csv', 'r') as f: 
+                lines = f.readlines()
+            lines = lines[1: ]
+            map_ = {}
+            for item in lines: 
+                A =item.split(',')
+                map_[A[0]] = float(A[2])
+            
+            # Save the result: 
+            results[item] = map_[item.split('.')[0]]
 
+            # Copy the file: 
+            os.system('cp {} ./outputs/{}'.format(item, item))
+        else: 
+            os.system('rm {}'.format(item))
+            
+    os.system('rm log.csv')
+
+    return 
 
 
