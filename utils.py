@@ -288,4 +288,47 @@ def process_idock_output(results):
 
     return 
 
+def run_adfr_docking(receptor, smi): 
+    # receptor needs to be in mol2 format: 
+    recetor_format = receptor.split('.')[-1]
+    if recetor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    
+    files_ls = os.listdir('./')
+    target_file = [x for x in files_ls if '.trg' in x]
+    if len(target_file) == 0: 
+        raise Exception('A trg file containing all the parameters is required for running adfr. Please have a look at the tutorial in: https://ccsb.scripps.edu/adfr/documentation/')
 
+    # prepare the ligands:
+    process_ligand(smi, 'pdbqt') # pdbqt ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    print('Using target file: ', target_file[0])
+    results = {}
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        
+        cmd = ['adfr', '-t', '{}'.format(target_file[0]), '-l', '{}'.format(lig_path), '--jobName', 'rigid']
+        
+        # Perform the docking: 
+        command_run = subprocess.run(cmd, capture_output=True)
+        
+        if command_run.returncode != 0: 
+            results[lig_path] = 'FAIL'
+        
+        docking_out = command_run.stdout.decode("utf-8")
+        
+        docking_scores = []
+        for item in docking_out: 
+            A = item.split(' ')
+            A = [x for x in A if x != '']
+            try: 
+                a_1, a_2, a_3 = float(A[0]), float(A[1]), float(A[2])
+            except: 
+                continue
+            docking_scores.append(float(a_2))
+
+        results[lig_] = docking_scores
+
+    return results

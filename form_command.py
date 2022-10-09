@@ -9,12 +9,12 @@ import os
 import sys
 import subprocess
 from lig_process import process_ligand
-from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output
+from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking
 command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'autodock_vina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina
+program_choice = 'adfr' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr
 receptor       = './config/prot_1.pdb'
 # smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -67,8 +67,11 @@ if program_choice == 'rDock':
 if program_choice == 'ledock': 
     run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
     sys.exit()
+if program_choice == 'adfr': 
+    results = run_adfr_docking(receptor, smi)
+    sys.exit()
 
-    
+
 
 # Assign the right program for docking:  
 command.append('./executables/{}'.format(program_choice))
