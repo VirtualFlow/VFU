@@ -31,7 +31,8 @@ For running a single example (a docking score of a single SMILES/SELFIES), we wi
      - size_y         = 10   
      - size_z         = 10   
 3. Please do not worry. We will be describing these paramters one at a time! :)
-4. 
+4. We begin by looking at the paramter `smi`. The variable needs to be set to a valid smile string. To process the SMILE string, the program uses RdKit to (1) desaults, (2) neutralizes and (3) enumerates sterio-isomers. Subsequently, all molecules will be converted to 3D using OpenBabel. 
+5. 
 
 
 ## Running in batch 
