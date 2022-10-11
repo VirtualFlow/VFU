@@ -35,8 +35,7 @@ For running a single example (a docking score of a single SMILES/SELFIES), we wi
 5. `is_selfies`: If set to True, the program expects the variable `smi` to contain a valied SELFIES string. Please ensure to install SELFIES using `pip install selfies`. 
 6. `receptor`: The name of the receptor file. Note: it is assumed that this file name is located within the config directory. 
 7. `program_choice`: We currently support the docking programs `smina,qvina,qvina-w,vina,vina_carb,vina_xb,gwovina,PLANTS,autodock_gpu,autodock_cpu,EquiBind,rDock,gnina,ledock,idock,autodock_vina,adfr`. The variable `program_choice` can be set to any of these values. <br />Note: There are special instructions for AutoDock-GPU(CPU),EquiBind & rDock. Please have a look at the Special Considerations section below. 
-
-
+8. Finally, there are a few parameters for the docking software: `exhaustiveness, center_x/y/z, size_x/y/z`. The exhaustive parameter describes how many poses to search for (we have set it to 10 for this example). center_x/y/z and size_x/y/z describe where the docking is performed in the protein (i.e., the binding spot for the ligand). 
 
 
 ## Running in batch 
