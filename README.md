@@ -34,13 +34,16 @@ For running a single example (a docking score of a single SMILES/SELFIES), we wi
 4. We begin by looking at the paramter `smi`. The variable needs to be set to a valid smile string. To process the SMILE string, the program uses RdKit to (1) desaults, (2) neutralizes and (3) enumerates sterio-isomers. Subsequently, all molecules will be converted to 3D using OpenBabel. 
 5. `is_selfies`: If set to True, the program expects the variable `smi` to contain a valied SELFIES string. Please ensure to install SELFIES using `pip install selfies`. 
 6. `receptor`: The name of the receptor file. Note: it is assumed that this file name is located within the config directory. 
+7. `program_choice`: We currently support the docking programs `smina,qvina,qvina-w,vina,vina_carb,vina_xb,gwovina,PLANTS,autodock_gpu,autodock_cpu,EquiBind,rDock,gnina,ledock,idock,autodock_vina,adfr`. The variable `program_choice` can be set to any of these values. Note: There are special instructions for AutoDock-GPU(CPU),EquiBind & rDock. Please have a look at the Special Considerations section below. 
+
+
 
 
 ## Running in batch 
 
 
 ## Special Considerations
-### Using AutoDock-GPU
+### Using AutoDock-GPU/CPU
 Please compile the code using instructions from: [https://github.com/ccsb-scripps/AutoDock-GPU](https://github.com/ccsb-scripps/AutoDock-GPU). 
 After successfull compilation, within the bin directory, an executable will be made (example name: `autodock_gpu_1wi`). Then, the code is ready to run. 
 We provide an example inside `./executables/vf_gpu_example.zip`. Inside the directory, a prepared protein-ligand pair is provided and the code can be run 
