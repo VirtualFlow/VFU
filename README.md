@@ -24,13 +24,14 @@ For running a single example (a docking score of a single SMILES/SELFIES), we wi
    - smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
    - Parameters for executing the docking pose search: 
      - exhaustiveness = 10
-     - center_x       = -16  # Define center for search space (x-axis)
-     - center_y       = 145  # Define center for search space (y-axis)
-     - center_z       = 27   # Define center for search space (z-axis)
-     - size_x         = 10   # Define the length of the search space box (x-axis)
-     - size_y         = 10   # Define the length of the search space box (y-axis)
-     - size_z         = 10   # Define the length of the search space box (z-axis)
-
+     - center_x       = -16  
+     - center_y       = 145  
+     - center_z       = 27   
+     - size_x         = 10  
+     - size_y         = 10   
+     - size_z         = 10   
+3. Please do not worry. We will be describing these paramters one at a time! :)
+4. 
 
 
 ## Running in batch 
