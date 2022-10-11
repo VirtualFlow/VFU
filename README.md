@@ -17,8 +17,20 @@ Please ensure that the following packages are installed:
 ## Running a single example
 For running a single example (a docking score of a single SMILES/SELFIES), we will be running `run_single.py`. Specifically, the following steps can be followed: 
 1. Inside the `config` directory, please add a protein file, and a ligand file. We will be performing this demonstration using the protein `prot_1.pdb`, already pasted inside the `config` directory.
-2. Please open the file `run_single.py`. At the top of the file are all the parameters for running the script. Specifically, 
-   *  
+2. Please open the file `run_single.py`. At the top of the file are all the parameters for running the script. The parameters are, 
+   - is_selfies     = False 
+   - program_choice = 'smina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr
+   - receptor       = './config/prot_1.pdb'
+   - smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
+   - Parameters for executing the docking pose search: 
+     - exhaustiveness = 10
+     - center_x       = -16  # Define center for search space (x-axis)
+     - center_y       = 145  # Define center for search space (y-axis)
+     - center_z       = 27   # Define center for search space (z-axis)
+     - size_x         = 10   # Define the length of the search space box (x-axis)
+     - size_y         = 10   # Define the length of the search space box (y-axis)
+     - size_z         = 10   # Define the length of the search space box (z-axis)
+
 
 
 ## Running in batch 
