@@ -9,16 +9,27 @@ import os
 import sys
 import subprocess
 from lig_process import process_ligand
-from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking
+from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, check_energy
 command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'adfr' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr
+program_choice = 'smina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr
 receptor       = './config/prot_1.pdb'
-# smi            = 'C1CC(CCC1NC(=O)COC2=CC=C(C=C2)Cl)NC(=O)COC3=CC=C(C=C3)Cl'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
+
+# Docking search paramters: 
+exhaustiveness = 10
+center_x       = -16                       # Define center for search space (x-axis)
+center_y       = 145                       # Define center for search space (y-axis)
+center_z       = 27                        # Define center for search space (z-axis)
+size_x         = 10                        # Define the length of the search space box (x-axis)
+size_y         = 10                        # Define the length of the search space box (y-axis)
+size_z         = 10                        # Define the length of the search space box (z-axis)
+
+
+results = {}  # Storage for results
 
 
 if is_selfies == True: 
@@ -32,22 +43,6 @@ if is_selfies == True:
 files_ls = os.listdir('./config/')
 if receptor.split('/')[-1] not in files_ls: 
     raise Exception('Receptor file not found inside the config directory. Please makes sure that the designated receptor file ({}) exists inside config'.format(receptor.split('/')[-1]))
-
-
-# Docking search paramters: 
-exhaustiveness = 10
-center_x       = -16                       # Define center for search space (x-axis)
-center_y       = 145                       # Define center for search space (y-axis)
-center_z       = 27                        # Define center for search space (z-axis)
-size_x         = 10                        # Define the length of the search space box (x-axis)
-size_y         = 10                        # Define the length of the search space box (y-axis)
-size_z         = 10                        # Define the length of the search space box (z-axis)
-
-results = {}  # Storage for results
-
-
-
-
 
 if program_choice == 'PLANTS': 
     results = run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
@@ -130,16 +125,9 @@ for lig_ in lig_locations:
     if program_choice == 'idock': 
         process_idock_output(results)
         sys.exit()
-
+        
     # Check the quality of generated structure (some post-processing quality control):
-    # TODO: Make a function out of this! 
-    try: 
-        ob_cmd = ['obenergy', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
-        command_obabel_check = subprocess.run(ob_cmd, capture_output=True)
-        command_obabel_check = command_obabel_check.stdout.decode("utf-8").split('\n')[-2]
-        total_energy         = float(command_obabel_check.split(' ')[-2])
-    except: 
-        total_energy = 10000 # Calculation has failed. 
+    total_energy = check_energy(lig_)
 
     if total_energy < 10000: 
         # Collect the docking output: 

@@ -15,7 +15,8 @@ Please ensure that the following packages are installed:
 
 
 ## Running a single example
-
+For running a single example (a docking score of a single SMILES/SELFIES), we will be running `run_single.py`. Specifically, the following steps can be followed: 
+1. Inside the `config` directory, please add a protein file, and a ligand file. We will be performing this demonstration using the protein `prot_1.pdb`, already pasted inside the `config` directory. 
 
 
 ## Running in batch 

@@ -332,3 +332,16 @@ def run_adfr_docking(receptor, smi):
         results[lig_] = docking_scores
 
     return results
+
+
+def check_energy(lig_): 
+    # Check the quality of generated structure (some post-processing quality control):
+    try: 
+        ob_cmd = ['obenergy', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
+        command_obabel_check = subprocess.run(ob_cmd, capture_output=True)
+        command_obabel_check = command_obabel_check.stdout.decode("utf-8").split('\n')[-2]
+        total_energy         = float(command_obabel_check.split(' ')[-2])
+    except: 
+        total_energy = 10000 # Calculation has failed. 
+        
+    return total_energy
