@@ -9,12 +9,14 @@ import os
 import sys
 import subprocess
 from lig_process import process_ligand
-from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking, check_energy, run_mm_gbsa
+from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking, check_energy, run_mm_gbsa, run_mcdock
 command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'MM-GBSA' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA
+program_choice = 'MCDock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+                           # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock
+                           
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
@@ -25,11 +27,10 @@ if program_choice == 'flexx':
 if program_choice == 'MM-GBSA': 
     results = run_mm_gbsa()
     sys.exit()
-
-    
+if program_choice == 'MCDock': 
+    results = run_mcdock(receptor, smi)
     sys.exit()
-
-
+        
 # Docking search paramters: 
 exhaustiveness = 10
 center_x       = -16                       # Define center for search space (x-axis)

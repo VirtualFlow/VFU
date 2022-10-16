@@ -440,6 +440,46 @@ def run_mm_gbsa():
     
     return output
 
+
+def run_mcdock(receptor, smi): 
+    # Check to ensure receptor is in the right format: 
+    if receptor.split('.')[-1] != 'xyz': 
+        raise Exception('Please provide the receptor in xyz format for MCDock')
+        
+    # Check to ensure MCDock executable exists: 
+    if os.path.exists('./executables/mcdock'): 
+        raise Exception('Executable named mcdock not found in the executables directory')
+        
+    # Process all ligands: 
+    process_ligand(smi, 'xyz') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    results = {}
+
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        
+        # Run docking
+        os.system('./executables/mcdock --target {} --ligand {}'.format(receptor, lig_path))
+        
+        # Read in the results: 
+        with open('./out.xyz', 'r') as f: 
+            lines = f.readlines()
+        lines = [x for x in lines if 'Binding Energy' in x]
+        binding_energies = []
+        for item in lines: 
+            binding_energies.append(float(item.split(' ')[2].split('\t')[0]))    
+            
+        # Delete/move auxillary files: 
+        os.system('rm min.xyz')
+        os.system('cp out.xyz {}'.format(out_path))
+        os.system('rm out.xyz conformers.xyz')
+        
+        results[lig_path] = binding_energies
+        
+    return results
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 

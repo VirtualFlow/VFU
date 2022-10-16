@@ -66,6 +66,11 @@ Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https:/
 Additionally, please note: the variable `chimera_path` should be updated to location of the Chimera on your system. Chimera can be downloaded: [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html).
 
 
+### AutoDockZN
+Requirments
+Please install the ADFR software suite: [https://ccsb.scripps.edu/adfr/downloads/](https://ccsb.scripps.edu/adfr/downloads/). 
+Please install meeko with: `pip install meeko`. 
+Instructions for running AutoDockZN can be found on their official website: [https://autodock-vina.readthedocs.io/en/latest/docking_zinc.html](https://autodock-vina.readthedocs.io/en/latest/docking_zinc.html).
 
 
 ## Questions, problems?
