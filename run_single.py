@@ -14,7 +14,7 @@ command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'AutodockVina_1.2' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr/AutodockVina_1.2
+program_choice = 'AutodockVina_1.2' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr/AutodockVina_1.2/AutodockZN
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
@@ -27,6 +27,10 @@ center_z       = 27                        # Define center for search space (z-a
 size_x         = 10                        # Define the length of the search space box (x-axis)
 size_y         = 10                        # Define the length of the search space box (y-axis)
 size_z         = 10                        # Define the length of the search space box (z-axis)
+
+if program_choice == 'AutodockZN': 
+    print('AutodockZN will be run through AutodockVina_1.2')
+    program_choice = 'AutodockVina_1.2'
 
 
 results = {}  # Storage for results
