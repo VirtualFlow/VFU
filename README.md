@@ -63,7 +63,7 @@ We installed rDock using anacond (with `conda install -c bioconda rdock`)
 
 ### Using MM-GBSA
 Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https://ambermd.org/GetAmber.php#ambertools). We managed performed the download using conda. 
-Additionally, please note: the variable `chimera_path` should be updated to location of the Chimera on your system. Chemera can be downloaded: [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html).
+Additionally, please note: the variable `chimera_path` should be updated to location of the Chimera on your system. Chimera can be downloaded: [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html).
 
 
 
