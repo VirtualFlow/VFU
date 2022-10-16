@@ -61,6 +61,12 @@ Copy paste all files inside the working directory of VF-Unity.
 Please compile the code using the instruction provided in: [https://rdock.sourceforge.net/installation/](https://rdock.sourceforge.net/installation/). 
 We installed rDock using anacond (with `conda install -c bioconda rdock`)
 
+### Using MM-GBSA
+Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https://ambermd.org/GetAmber.php#ambertools). We managed performed the download using conda. 
+Additionally, please note: the variable `chimera_path` should be updated to location of the Chimera on your system. Chemera can be downloaded: [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html).
+
+
+
 
 ## Questions, problems?
 Make a github issue 😄. Please be as clear and descriptive as possible. Please feel free to reach

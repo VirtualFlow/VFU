@@ -342,7 +342,6 @@ def run_flexx_docking(receptor, smi):
     ref_lig = os.listdir('./config')
     if 'ref_lig.mol2' not in ref_lig: 
         raise Exception('A reference ligand by the name of ref_lig.mol2 needs to be copied in the config directory for running flexx')
-
     
     executable_files = os.listdir('./executables')
     if 'flexx' not in executable_files: 
@@ -383,6 +382,63 @@ def run_flexx_docking(receptor, smi):
             
         return results
 
+
+def run_mm_gbsa(): 
+    chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
+    ligand_file   = 'ligand.mol2' 
+    receptor_file = 'receptor.pdb'
+    
+    output = {}
+    
+    # Check if paths exists'
+    if os.path.exists(ligand_file) == False: 
+        raise Exception('Ligand file ligand.mol2 not found. Please add the file to the current working directory')
+    if os.path.exists(receptor_file) == False: 
+        raise Exception('Receptor file receptor.pdb not found. Please add the file to the current working directory')
+
+    # Check to make sure ligand is in mol2 format: 
+    lig_format = ligand_file.split('.')[1]
+    if lig_format != 'mol2': 
+        raise Exception('Please ensure ligand is in mol2 file')
+
+    with open('./GBSA.sh', 'w') as f: 
+        
+        # Getting Ligand Parameters: 
+        f.writelines('export Chimera={}'.format(chimera_path))
+        f.writelines('charge=`$Chimera/bin/chimera --nogui --silent ligand.mol2 ./config/charges.py`')
+        f.writelines('antechamber -i ligand.mol2 -fi mol2 -o ligand_bcc.mol2 -fo mol2 -at gaff2 -c gas -rn LIG -nc $charge -pf y')
+        f.writelines('parmchk2 -i ligand_bcc.mol2 -f mol2 -o ligand.frcmod')
+
+        # Building Topology Files:
+        f.writelines('tleap -f ./config/tleap_r.in')
+        f.writelines('tleap -f ./config/tleap_c.in')
+        
+        # Run MD: 
+        f.writelines('sander -O -i ./config/min.in -p complex.prmtop -c complex.inpcrd -r min.rst -ref complex.inpcrd -o minim.out')
+        
+        # Running MMPBSA.py
+        f.writelines('MMPBSA.py -O -i ./config/gbsa.in -cp complex.prmtop -rp receptor.prmtop -lp ligand.prmtop -y  min.rst')
+
+    os.system('chmod 777 GBSA.sh')
+    os.system('./GBSA.sh') # Run the calculation
+    
+    # Remove auxillary files: 
+    os.system('rm complex.inpcrd complex.prmtop leap.log ligand.frcmod ligand.inpcrd ligand.prmtop ligand_bcc.mol2 mdcrd mdinfo min.rst minim.out receptor.inpcrd receptor.prmtop reference.frc')
+    
+    # Read in the result: 
+    try: 
+        with open('./FINAL_RESULTS_MMPBSA.dat', 'r') as f: 
+            result = f.readlines()
+        result = [x for x in result if 'DELTA TOTAL' in x][0]
+        result = float([x for x in result.split(' ') if x != ''][2])
+        
+        output[ligand_file] = result
+    except: 
+        output[ligand_file] = 'FAIL'
+    
+    os.system('rm FINAL_RESULTS_MMPBSA.dat')
+    
+    return output
 
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
