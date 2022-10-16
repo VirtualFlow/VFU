@@ -334,6 +334,56 @@ def run_adfr_docking(receptor, smi):
     return results
 
 
+def run_flexx_docking(receptor, smi): 
+    import multiprocessing
+    results = {}
+
+    ref_lig = 'ref_lig.mol2' # TODO
+    ref_lig = os.listdir('./config')
+    if 'ref_lig.mol2' not in ref_lig: 
+        raise Exception('A reference ligand by the name of ref_lig.mol2 needs to be copied in the config directory for running flexx')
+
+    
+    executable_files = os.listdir('./executables')
+    if 'flexx' not in executable_files: 
+        raise Exception('The flexx executable was not foung. Please note: the execuatable file (named flexx) needs to be placed inside the directory executables')
+        
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format')
+    
+    # prepare the ligands:
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+        
+    lig_locations = os.listdir('./ligands/')
+
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.sdf'.format(lig_.split('.')[0])
+        
+        os.system('./flexx -i {} -o {} -p {} -r {} --thread-count {}'.format(lig_path, out_path, receptor, './config/ref_lig.mol2', multiprocessing.cpu_count()))
+        
+        # Check energy of docked pose: 
+        total_energy = check_energy(lig_)
+        
+        if total_energy < 10000: 
+
+            # Read in the docking scores: 
+            with open(out_path, 'r') as f: 
+                lines = f.readlines()    
+            
+            for i,item in enumerate(lines): 
+                docking_scores = []
+                if '>  <docking-score>' in item : 
+                    docking_score = float(lines[i+1])
+                    docking_scores.append(docking_score)
+            
+            results[lig_] = [docking_scores, out_path]
+        else: 
+            results[lig_] = 'Extremely high pose energy encountered/Unsuccessfull execution.'
+            
+        return results
+
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
