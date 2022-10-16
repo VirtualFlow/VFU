@@ -14,7 +14,7 @@ command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'smina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr
+program_choice = 'AutodockVina_1.2' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock/autodock_vina/adfr/AutodockVina_1.2
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 
@@ -79,13 +79,13 @@ if not(file_type_check == 'pdb' or file_type_check == 'pdbqt'):
 if program_choice == 'smina' or program_choice == 'gnina': 
     command.append('-r')
     command.append(receptor)
-elif program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
+elif program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
     command.append('--receptor')
     command.append(receptor)
 
 
 # Assign the right ligand for docking
-if  program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina':
+if  program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina':
     process_ligand(smi, 'pdbqt')
 lig_locations = os.listdir('./ligands/')
 
@@ -93,7 +93,7 @@ lig_locations = os.listdir('./ligands/')
 for lig_ in lig_locations: 
     
     # Add in the ligand file and the exhaustiveness setting
-    if program_choice == 'autodock_vina' or program_choice == 'idock' or  program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
+    if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or  program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
         if program_choice == 'idock': 
             cmd = command + ['--ligand', './ligands/{}'.format(lig_)]
         else: 
@@ -110,12 +110,12 @@ for lig_ in lig_locations:
     cmd = cmd + ['--size_z', str(size_z)]
 
     # Add in parameters for generating output files: 
-    if   program_choice == 'autodock_vina' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
+    if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
         cmd = cmd + ['--out', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
     elif program_choice == 'smina' or program_choice == 'gnina': 
         cmd = cmd + ['-o', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
     
-    if program_choice != 'idock' and program_choice != 'autodock_vina': 
+    if program_choice != 'idock' and program_choice != 'autodock_vina' and program_choice != 'AutodockVina_1.2': 
         cmd = cmd + ['--log', './outputs/log_{}.txt'.format(lig_.split('.')[0])]
 
     # Run the command: 
@@ -125,7 +125,7 @@ for lig_ in lig_locations:
     if program_choice == 'idock': 
         process_idock_output(results)
         sys.exit()
-        
+            
     # Check the quality of generated structure (some post-processing quality control):
     total_energy = check_energy(lig_)
 
@@ -150,6 +150,6 @@ for lig_ in lig_locations:
                         # Docking Scores for all poses, Pose file, Log File               
         results[lig_] = [docking_score, './outputs/pose_{}.pdb'.format(lig_.split('.')[0]), './outputs/log_{}.txt'.format(lig_.split('.')[0])]
     else: 
-        results[lig_] = 'Extremely high pose energy encountered.'
+        results[lig_] = 'Extremely high pose energy encountered/Unsuccessfull execution.'
 
     
