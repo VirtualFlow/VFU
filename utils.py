@@ -382,6 +382,62 @@ def run_flexx_docking(receptor, smi):
             
         return results
 
+def run_AutodockZN(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness): 
+    recetor_format = receptor.split('.')[-1]
+    if recetor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')    
+        
+    if os.path.exists('~/ADFRsuite-1.0/bin/pythonsh') == False: 
+        raise Exception('Could not locate ADFRsuite file (ADFRsuite-1.0/bin/pythonsh) in the home directory.')
+    if os.path.exists('~/ADFRsuite-1.0/bin/autogrid4') == False: 
+        raise Exception('Could not locate ADFRsuite file (ADFRsuite-1.0/bin/autogrid4) in the home directory.')
+        
+    # prepare the ligands:
+    process_ligand(smi, 'pdbqt') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    results = {}
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])
+
+
+        # Generate affinity maps: 
+        os.system('~/ADFRsuite-1.0/bin/pythonsh ./config/prepare_gpf4zn.py -l {} -r {} -o receptor_tz.gpf -p npts={},{},{} -p gridcenter={},{},{} –p parameter_file=./config/AD4Zn.dat'.format(lig_path, receptor, size_x, size_y, size_z, center_x, center_y, center_z))
+        os.system('~/ADFRsuite-1.0/bin/autogrid4 -p receptor_tz.gpf -l receptor_tz.glg')
+        
+        # Run AutoDockVina: 
+        cmd = ['./config/AutodockVina_1.2', '--ligand', '{}'.format(lig_path), '--maps', 'receptor_tz', '--scoring', 'ad4', '--exhaustiveness', '{}'.format(exhaustiveness), '--out', '{}'.format(out_path)]
+        command_run = subprocess.run(cmd, capture_output=True)
+
+        # Check the quality of generated structure (some post-processing quality control):
+        total_energy = check_energy(lig_)
+
+        if total_energy < 10000: 
+            # Collect the docking output: 
+            docking_out = command_run.stdout.decode("utf-8")
+            A = docking_out.split('\n')
+            docking_score = []
+            for item in A: 
+                line_split = item.split(' ')
+                line_split = [x for x in line_split if x != '']
+                if len(line_split) == 4: 
+                    try: 
+                        vr_1 = float(line_split[0])
+                        vr_2 = float(line_split[1])
+                        vr_3 = float(line_split[2])
+                        vr_4 = float(line_split[3])
+                        docking_score.append(vr_2)
+                    except: 
+                        continue
+            
+            results[lig_path] = [docking_out, out_path]
+        
+        # Delete auxilarry files: 
+        os.system('rm receptor_tz.gpf receptor_tz.glg')
+        
+    return results
 
 def run_mm_gbsa(): 
     chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
