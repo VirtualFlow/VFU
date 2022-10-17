@@ -480,6 +480,45 @@ def run_mcdock(receptor, smi):
         
     return results
 
+def run_ligand_fit(receptor, smi, center_x, center_y, center_z): 
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide the receptor in pdb format for LigandFit')
+    
+    if os.path.exists('./executables/ligandfit') == False: 
+        raise Exception('Executable named ligandfit not found in the executables directory')
+    if os.path.exists('./config/receptor.mtz') == False: 
+        raise Exception('Receptor mtz file (titled receptor.mtz) not found in config directory. File is required for running LigandFit')
+
+    # Process all ligands: 
+    process_ligand(smi, 'pdb') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+
+    results = {}
+
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+
+        
+        os.system('./executables/ligandfit data=./config/receptor.mtz model={} ligand={} search_center={},{},{}'.format(receptor, lig_path, center_x, center_y, center_z))
+        
+        # Read in results: 
+        with open('./LigandFit_run_1_/ligand_1_1.log', 'r') as f: 
+            lines = f.readlines()
+        lines = [x for x in lines if 'Best score' in x]
+        scores = []
+        for item in lines: 
+            scores.append( float([x for x in item.split(' ') if x != ''][-2]) )
+        
+        # Remove auxillary file: 
+        os.system('rm -rf PDS')
+        os.system('cp ./LigandFit_run_1_/ligand_fit_1.pdb {}'.format(out_path))
+        os.system('rm -rf LigandFit_run_1_')
+        
+        results[lig_] = [scores, out_path]
+    
+    return results
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
