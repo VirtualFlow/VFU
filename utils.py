@@ -575,6 +575,92 @@ def run_ligand_fit(receptor, smi, center_x, center_y, center_z):
     
     return results
 
+def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness): 
+
+    results = {}
+    # Check to ensure receptor is in the right format: 
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide the receptor in pdb format for MCDock')    
+
+    # Check to ensure MCDock executable exists: 
+    if os.path.exists('./executables/GalaxyDock3'): 
+        raise Exception('Executable named GalaxyDock3 not found in the executables directory')
+    
+    # Process all ligands: 
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        
+
+        # grid_n_elem    : Number of grid points for each directioni. This is should be
+        #                  given in odd number. [61 61 61]
+        grid_n_elem = [61, 61, 61]
+        print('Note: i am setting grid_n_elem to [61, 61, 61]. Please change this default behaviour if need be. ')
+        
+        # grid_width     : Grid space between points in angstrom. [0.375]
+        grid_width  = 0.375
+        print('Note: i am setting grid_width to 0.375. Please change this default behaviour if need be. ')
+
+        # Generate the input file: 
+        with open('./galaxydock.in', 'a+') as f: 
+            f.writelines(['!=============================================='])
+            f.writelines(['! I/O Parameters'])
+            f.writelines(['!=============================================='])
+            f.writelines(['data_directory    ./'])
+            f.writelines(['infile_pdb        {}'.format(receptor)])
+            f.writelines(['infile_ligand        {}'.format(lig_path)])
+            f.writelines(['top_type          polarh'])
+            f.writelines(['fix_type          all'])
+            f.writelines(['ligdock_prefix    out'])
+            f.writelines(['!=============================================='])
+            f.writelines(['! Grid Options'])
+            f.writelines(['!=============================================='])
+            f.writelines(['grid_box_cntr     {} {} {}'.format(center_x, center_y, center_z)])
+            f.writelines(['grid_n_elem       {} {} {}'.format(grid_n_elem[0], grid_n_elem[1], grid_n_elem[2])]) 
+            f.writelines(['grid_width        {}'.format(grid_width)])   
+            f.writelines(['!=============================================='])
+            f.writelines(['! Energy Parameters'])
+            f.writelines(['!=============================================='])
+            f.writelines(['weight_type              GalaxyDock3'])
+            f.writelines(['!=============================================='])
+            f.writelines(['! Initial Bank Parameters'])
+            f.writelines(['!=============================================='])    
+            f.writelines(['first_bank               rand'])
+            f.writelines(['max_trial                {}'.format(exhaustiveness)])
+            f.writelines(['e0max                    1000.0'])
+            f.writelines(['e1max                    1000000.0'])
+            f.writelines(['n_proc 1'])
+            
+        # Run the script: 
+        os.system('./executables/GalaxyDock3 galaxydock.in > log')
+        
+        # Read in results: 
+        with open('./out_fb.E.info', 'r') as f: 
+            lines = f.readlines()
+        lines = lines[3: ]
+        docking_scores = []
+        for item in lines: 
+            try: 
+                A = item.split(' ')
+                A = [x for x in A if x != '']
+                docking_scores.append(float(A[5]))
+            except: 
+                continue
+        
+        # Remove auxillary files
+        os.system('rm log out_cl.E.info merged_ligand.mol2 out_cl.size.info out_co.info out_fb.E.info out_cl.mol2 out_ib.E.info out_ib.mol2')
+        
+        # Transfer out_fb.mol2
+        os.system('cp {} {}'.format('out_fb.mol2', out_path))
+        os.system('rm out_fb.mol2')
+        
+        results[lig_path] = [out_path, docking_scores]
+        
+    return results
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 

@@ -10,14 +10,14 @@ import sys
 import subprocess
 from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
-from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN
+from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3
 
 command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'LigandFit' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
-                             # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit
+program_choice = 'GalaxyDock3' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+                             # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3
                            
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -47,10 +47,12 @@ if program_choice == 'LigandFit':
     results = run_ligand_fit(receptor, smi, center_x, center_y, center_z)
     sys.exit()
         
-
-
 if program_choice == 'AutodockZN': 
     results = run_AutodockZN(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness)
+    sys.exit()
+
+if program_choice == 'GalaxyDock3': 
+    results = run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
     sys.exit()
 
 
