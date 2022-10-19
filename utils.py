@@ -446,6 +446,9 @@ def run_mm_gbsa():
     
     output = {}
     
+    if os.path.exists(chimera_path) == False: 
+        raise Exception('Location of Chemira not found (used location from variable chimera_path) when trying to initiate mm_fbsa calculation.')
+    
     # Check if paths exists'
     if os.path.exists(ligand_file) == False: 
         raise Exception('Ligand file ligand.mol2 not found. Please add the file to the current working directory')
@@ -659,6 +662,128 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
         
         results[lig_path] = [out_path, docking_scores]
         
+    return results
+
+def run_dock6(receptor, smi): 
+
+    chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
+    dock6_path    = '/home/akshat/dock6'   # Location to the dock6 directory
+    
+    ref_lig       = '/ref_lig.mol2' # Reference ligand needs to be specified for dock6
+    box_padding   = 12.0
+    
+    results       = {}
+
+    if os.path.exists(chimera_path) == False: 
+        raise Exception('Location of Chemira not found (used location from variable chimera_path) when trying to initiate dock6 calculation.')
+    if os.path.exists(dock6_path) == False: 
+        raise Exception('Location of dock6 not found (used location from variable dock6_path) when trying to initiate dock6 calculation.')
+
+
+    if os.path.exists(ref_lig) == False: 
+        raise Exception('Please specify the location of the reference ligand for dock6 to run')
+
+    # Check to ensure receptor is in the right format: 
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide the receptor in pdb format for dock6')    
+
+    
+    # Prepare the receptor using Chimera: 
+    os.system('{}/bin/chimera --nogui {} ./config/dockprep.py'.format(chimera_path, receptor))
+    
+    # doc6 pre-processing
+    os.system('{}/bin/sphgen INSPH'.format(dock6_path))
+    os.system('{}/bin/sphere_selector rec.sph {} {}'.format(dock6_path, ref_lig, box_padding))
+    os.system('{}/bin/showbox < box.in'.format(dock6_path))
+    os.system('{}/bin/grid -i grid.in'.format(dock6_path))
+    
+    # Process all ligands: 
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        
+        # Generate dock6 input file: 
+        with open('./dock.in', 'a+') as f: 
+            f.writelines(['conformer_search_type                                        flex'])
+            f.writelines(['user_specified_anchor                                        no'])
+            f.writelines(['limit_max_anchors                                            no'])
+            f.writelines(['min_anchor_size                                              40'])
+            f.writelines(['pruning_use_clustering                                       yes'])
+            f.writelines(['pruning_max_orients                                          100'])
+            f.writelines(['pruning_clustering_cutoff                                    100'])
+            f.writelines(['pruning_conformer_score_cutoff                               25.0'])
+            f.writelines(['pruning_conformer_score_scaling_factor                       1.0'])
+            f.writelines(['use_clash_overlap                                            no'])
+            f.writelines(['write_growth_tree                                            no'])
+            f.writelines(['use_internal_energy                                          yes'])
+            f.writelines(['internal_energy_cutoff                                       100.0'])
+            f.writelines(['ligand_atom_file                                             {}'.format(lig_path)])
+            f.writelines(['limit_max_ligands                                            no'])
+            f.writelines(['receptor_site_file                                           selected_spheres.sph'])
+            f.writelines(['max_orientations                                             500'])
+            f.writelines(['chemical_matching                                            no'])
+            f.writelines(['use_ligand_spheres                                           no'])
+            f.writelines(['bump_filter                                                  no'])
+            f.writelines(['score_molecules                                              yes'])
+            f.writelines(['contact_score_primary                                        no'])
+            f.writelines(['contact_score_secondary                                      no'])
+            f.writelines(['grid_score_primary                                           yes'])
+            f.writelines(['grid_score_secondary                                         no'])
+            f.writelines(['grid_score_rep_rad_scale                                     1'])
+            f.writelines(['grid_score_vdw_scale                                         1'])
+            f.writelines(['grid_score_grid_prefix                                       grid'])
+            f.writelines(['dock3.5_score_secondary                                      no'])
+            f.writelines(['continuous_score_secondary                                   no'])
+            f.writelines(['footprint_similarity_score_secondary                         no'])
+            f.writelines(['pharmacophore_score_secondary                                no'])
+            f.writelines(['descriptor_score_secondary                                   no'])
+            f.writelines(['gbsa_zou_score_secondary                                     no'])
+            f.writelines(['gbsa_hawkins_score_secondary                                 no'])
+            f.writelines(['SASA_score_secondary                                         no'])
+            f.writelines(['amber_score_secondary                                        no'])
+            f.writelines(['minimize_ligand                                              yes'])
+            f.writelines(['minimize_anchor                                              yes'])
+            f.writelines(['minimize_flexible_growth                                     yes'])
+            f.writelines(['use_advanced_simplex_parameters                              no'])
+            f.writelines(['simplex_max_cycles                                           1'])
+            f.writelines(['simplex_score_converge                                       0.1'])
+            f.writelines(['simplex_cycle_converge                                       1.0'])
+            f.writelines(['simplex_trans_step                                           1.0'])
+            f.writelines(['simplex_rot_step                                             0.1'])
+            f.writelines(['simplex_tors_step                                            10.0'])
+            f.writelines(['simplex_anchor_max_iterations                                500'])
+            f.writelines(['simplex_grow_max_iterations                                  500'])
+            f.writelines(['simplex_grow_tors_premin_iterations                          0'])
+            f.writelines(['simplex_random_seed                                          0'])
+            f.writelines(['simplex_restraint_min                                        no'])
+            f.writelines(['atom_model                                                   all'])
+            f.writelines(['vdw_defn_file                                                {}/parameters'.format(dock6_path)])
+            f.writelines(['flex_defn_file                                               {}/parameters/flex.defn'.format(dock6_path)])
+            f.writelines(['flex_drive_file                                              {}/parameters/flex_drive.tbl'.format(dock6_path)])
+            f.writelines(['vdw_defn_file                                                {}/parameters/vdw_AMBER_parm99.defn'.format(dock6_path)])
+            f.writelines(['flex_defn_file                                               {}/parameters/flex.defn'.format(dock6_path)])
+            f.writelines(['ligand_outfile_prefix                                        ligand_out'])
+            f.writelines(['write_orientations                                           no'])
+            f.writelines(['num_scored_conformers                                        1'])
+            f.writelines(['rank_ligands                                                 no'])
+            
+        # Run the docking: 
+        os.system('{}/bin/dock6 -i dock.in'.format(dock6_path))
+        
+        
+        # Remove aux files: 
+        os.system('rm dock.in')
+        dock_file = [x for x in os.listdir('./') if 'ligand_out' in x]
+        dock_file = [x for x in dock_file if 'mol2' in x][0]
+        os.system('cp {} {}'.format(dock_file, out_path))
+        os.system('rm dock_file')
+        
+        # Save the results: 
+        results[lig_path] = [out_path, docking_score]
+    
     return results
 
 def check_energy(lig_): 
