@@ -782,8 +782,13 @@ def run_dock6(receptor, smi):
         os.system('rm dock_file')
         
         # Save the results: 
+        with open('./ligand_out_scored.mol2', 'r') as f: 
+            lines = f.readlines()
+        docking_score = float(lines[2].split(' ')[-1])
+            
         results[lig_path] = [out_path, docking_score]
-    
+        os.system('rm ligand_out_scored.mol2')
+        
     return results
 
 def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness): 
