@@ -773,7 +773,6 @@ def run_dock6(receptor, smi):
         # Run the docking: 
         os.system('{}/bin/dock6 -i dock.in'.format(dock6_path))
         
-        
         # Remove aux files: 
         os.system('rm dock.in')
         dock_file = [x for x in os.listdir('./') if 'ligand_out' in x]
