@@ -10,17 +10,18 @@ import sys
 import subprocess
 from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
-from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking
+from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock
 
 command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'dock6' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
-                             # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED
+program_choice = 'iGemDock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+                             # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock
                            
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
+exhaustiveness = 10
 
 
 if program_choice == 'flexx': 
@@ -35,9 +36,12 @@ if program_choice == 'MCDock':
 if program_choice == 'dock6': 
     results = run_dock6(receptor, smi)
     sys.exit()
+if program_choice == 'iGemDock': 
+    results = run_iGemDock(receptor, smi, exhaustiveness)
+    sys.exit()
+
 
 # Docking search paramters: 
-exhaustiveness = 10
 center_x       = -16                       # Define center for search space (x-axis)
 center_y       = 145                       # Define center for search space (y-axis)
 center_z       = 27                        # Define center for search space (z-axis)

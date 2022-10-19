@@ -809,6 +809,40 @@ def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y
         results[lig_path] = [out_path, docking_score]
     
     return results
+
+def run_iGemDock(receptor, smi, exhaustiveness): 
+    if os.path.exists('./executables/mod_ga'): 
+        raise Exception('iGemDock executable mod_ga not found in the executables folder')
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide the receptor in pdb format for dock6')    
+        
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    
+    lig_locations = os.listdir('./ligands/')
+
+    results = {}
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        
+        # Perform Docking: 
+        os.system('./executables/mod_ga {} {} {} -d ./'.format(exhaustiveness, receptor, lig_path))
+                
+        # Read in the poses: 
+        docked_pose = os.listdir('./docked_Pose/')[0]
+        os.system('cp {} {}'.format(docked_pose, out_path))
+        
+        with open(out_path, 'r') as f: 
+            lines = f.readlines()
+        docking_score = lines[4]
+        docking_score = float([x for x in docking_score.split(' ') if x!=''][1])
+        
+        os.system('rm -rf docked_Pose')
+            
+        results[lig_path] = [out_path, docking_score]
+    
+    return results
         
 
 def check_energy(lig_): 
