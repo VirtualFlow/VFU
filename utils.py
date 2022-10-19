@@ -786,6 +786,27 @@ def run_dock6(receptor, smi):
     
     return results
 
+def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness): 
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide the receptor in pdb format for dock6')    
+    
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    
+    results = {}
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        
+        # Run docking: 
+        os.system('python ./config/dock_fred.py --receptor-fn {} --ligand-fn {} --center-x {} --center-y {} --center-z {} --radius {} --num-poses {} --output-fn {}'.format(receptor, lig_path, center_x, center_y, center_z, max([size_x, size_y, size_z]), exhaustiveness, out_path))
+        
+        results[lig_path] = [out_path, docking_score]
+    
+    return results
+        
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
