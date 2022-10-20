@@ -150,7 +150,7 @@ def run_rDock(receptor, smi):
     
     # Creation of the prm file: 
     print('Please have a look at the prm parameters. Inside [TODO]; we have assigned some default values.')
-    with open('config.prm', 'a+') as f: 
+    with open('config.prm', 'w') as f: 
         f.writelines('RBT_PARAMETER_FILE_V1.00')
         f.writelines('TITLE gart_DUD')
         f.writelines('RECEPTOR_FILE {}'.format(receptor))
@@ -608,7 +608,7 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
         print('Note: i am setting grid_width to 0.375. Please change this default behaviour if need be. ')
 
         # Generate the input file: 
-        with open('./galaxydock.in', 'a+') as f: 
+        with open('./galaxydock.in', 'w') as f: 
             f.writelines(['!=============================================='])
             f.writelines(['! I/O Parameters'])
             f.writelines(['!=============================================='])
@@ -706,7 +706,7 @@ def run_dock6(receptor, smi):
         out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
         
         # Generate dock6 input file: 
-        with open('./dock.in', 'a+') as f: 
+        with open('./dock.in', 'w') as f: 
             f.writelines(['conformer_search_type                                        flex'])
             f.writelines(['user_specified_anchor                                        no'])
             f.writelines(['limit_max_anchors                                            no'])
@@ -844,7 +844,98 @@ def run_iGemDock(receptor, smi, exhaustiveness):
     
     return results
         
+def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center_y, center_z): 
+    if os.path.exists('./executables/gold_auto'): 
+        raise Exception('Gold executable gold_auto not found in the executables folder')
+    if receptor.split('.')[-1] != 'mol2': 
+        raise Exception('Please provide the receptor in mol2 format for gold')        
 
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    
+    lig_locations = os.listdir('./ligands/')
+
+    results = {}
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+
+        with open('input.conf', 'a+') as f: 
+            f.writelines(['  GOLD CONFIGURATION FILE\n'])        
+            f.writelines(['  AUTOMATIC SETTINGS'])        
+            f.writelines(['autoscale = 1\n'])        
+            f.writelines(['  POPULATION']) 
+            f.writelines(['popsiz = auto'])        
+            f.writelines(['select_pressure = auto'])        
+            f.writelines(['n_islands = auto'])        
+            f.writelines(['maxops = auto'])        
+            f.writelines(['niche_siz = auto\n'])        
+            f.writelines(['  GENETIC OPERATORS'])        
+            f.writelines(['pt_crosswt = auto'])        
+            f.writelines(['allele_mutatewt = auto'])        
+            f.writelines(['migratewt = auto\n'])        
+            f.writelines(['  FLOOD FILL'])        
+            f.writelines(['radius = {}'.format(max([size_x, size_y, size_z]))])        
+            f.writelines(['origin = {}   {}   {}'.format(center_x, center_y, center_z)])
+            f.writelines(['do_cavity = 0'])        
+            f.writelines(['floodfill_center = point\n'])        
+            f.writelines(['   DATA FILES'])        
+            f.writelines(['ligand_data_file {} 10'.format(lig_path)])        
+            f.writelines(['param_file = DEFAULT'])        
+            f.writelines(['set_ligand_atom_types = 1'])        
+            f.writelines(['set_protein_atom_types = 0'])        
+            f.writelines(['directory = out'])        
+            f.writelines(['tordist_file = DEFAULT'])        
+            f.writelines(['make_subdirs = 0'])        
+            f.writelines(['save_lone_pairs = 1'])        
+            f.writelines(['fit_points_file = fit_pts.mol2'])        
+            f.writelines(['read_fitpts = 0'])        
+            f.writelines(['bestranking_list_filename = bestranking.lst\n'])        
+            f.writelines(['   FLAGS'])        
+            f.writelines(['internal_ligand_h_bonds = 1'])        
+            f.writelines(['flip_free_corners = 1'])        
+            f.writelines(['match_ring_templates = 1'])        
+            f.writelines(['flip_amide_bonds = 0'])        
+            f.writelines(['flip_planar_n = 1 flip_ring_NRR flip_ring_NHR'])        
+            f.writelines(['flip_pyramidal_n = 0'])        
+            f.writelines(['rotate_carboxylic_oh = flip'])        
+            f.writelines(['use_tordist = 1'])        
+            f.writelines(['postprocess_bonds = 1'])        
+            f.writelines(['rotatable_bond_override_file = DEFAULT'])        
+            f.writelines(['solvate_all = 1\n'])        
+            f.writelines(['   TERMINATION'])        
+            f.writelines(['early_termination = 1'])        
+            f.writelines(['n_top_solutions = 3'])        
+            f.writelines(['rms_tolerance = 1.5\n'])        
+            f.writelines(['   CONSTRAINTS'])        
+            f.writelines(['force_constraints = 0\n']) 
+            f.writelines(['   COVALENT BONDING'])        
+            f.writelines(['covalent = 0\n']) 
+            f.writelines(['   SAVE OPTIONS'])        
+            f.writelines(['save_score_in_file = 1'])        
+            f.writelines(['save_protein_torsions = 1\n'])        
+            f.writelines(['  FITNESS FUNCTION SETTINGS'])        
+            f.writelines(['initial_virtual_pt_match_max = 4'])        
+            f.writelines(['relative_ligand_energy = 1'])        
+            f.writelines(['gold_fitfunc_path = goldscore'])        
+            f.writelines(['score_param_file = DEFAULT\n'])        
+            f.writelines(['  PROTEIN DATA'])    
+            f.writelines(['protein_datafile = {}'.format(receptor)])  
+        
+        # Run docking
+        os.system('./executables/gold_auto input.conf')
+        
+        os.system('cp out/gold_ligand_m1.mol2 {}'.format(out_path))
+        
+        with open('./out/ligand_m1.rnk', 'r') as f: 
+            lines = f.readlines()
+            
+        docking_score = float([x for x in lines[-1].split(' ') if x!=''][1])
+        
+        results[lig_path] = [out_path, docking_score]
+    
+    return results
+    
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
