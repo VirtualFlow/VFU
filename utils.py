@@ -1030,7 +1030,7 @@ def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, si
             docking_scores.append(float(A[5]))
 
         # Delete aux files: 
-        os.system('rm glide-dock.csv glide-dock.log; cp glide-dock_pv.maegz {}; rm glide-dock_pv.maegz'.format(out_path))
+        os.system('rm glide-dock.csv glide-dock.log receptor.log glide-grid.log; cp glide-dock_pv.maegz {}; rm glide-dock_pv.maegz'.format(out_path))
 
         results[smi] = [docking_scores, out_path]
     return results
