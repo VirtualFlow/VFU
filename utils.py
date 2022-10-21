@@ -6,6 +6,7 @@ Created on Sun Sep 25 20:01:20 2022
 @author: akshat
 """
 import os 
+import time 
 import subprocess
 from lig_process import process_ligand
 
@@ -934,6 +935,104 @@ def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center
         
         results[lig_path] = [out_path, docking_score]
     
+    return results
+
+def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi): 
+
+    print('Note: The path to Schrodinger is specified via the $SCHRODINGER variable, which is assigned during installation.')    
+    
+    # Receptor prparation with Glide: 
+    os.system('$SCHRODINGER/utilities/prepwizard {} receptor.maegz -fillsidechains -addOXT -epik_pH 7 -minimize_adj_h'.format(receptor))
+    
+    # Create grid file: 
+    with open('./glide-grid.in', 'w') as f: 
+        f.writelines(['FORCEFIELD   OPLS_2005'])
+        f.writelines(['GRID_CENTER   {}, {}, {}'.format(center_x, center_y, center_z)])
+        f.writelines(['GRIDFILE   receptor.zip'])
+        f.writelines(['INNERBOX   {}, {}, {}'.format(size_x, size_y, size_z)])
+        f.writelines(['OUTERBOX   {}, {}, {}'.format(size_x+15, size_y+15, size_z+15)])
+        f.writelines(['RECEP_FILE   receptor.maegz'])
+        
+    # Run LigPrep; ligand processing with Glide: 
+    with open('./grid_prep.sh', 'w') as f: 
+        f.writelines(['while :'])
+        f.writelines(['\tdo'])
+        f.writelines(["\tif [[ `tail -n1 receptor.log|awk '{print $1}'` != 'DONE.' ]]; then"])
+        f.writelines(['\t\tcontinue'])
+        f.writelines(['\tfi'])
+        f.writelines(["\tif [[ `tail -n1 receptor.log|awk '{print $1}'` == 'DONE.' ]]; then"])
+        f.writelines(['\t\t$SCHRODINGER/glide glide-grid.in'])
+        f.writelines(['\t\tbreak'])
+        f.writelines(['\tfi'])
+        f.writelines(['done'])
+        
+    # Wait 3mins for protein preparation to finish: 
+    time.sleep(180) 
+    os.system('chmod 777 ./grid_prep.sh')
+    os.system('./grid_prep.sh')
+    # Wait 3mins for grid preparation to finish: 
+    time.sleep(180) 
+
+    process_ligand(smi, 'sd') # mol2 ligand format is supported in plants
+    
+    lig_locations = os.listdir('./ligands/')
+
+    results = {}
+    
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/complex_{}.maegz'.format(lig_.split('.')[0])
+        
+        # Run LigPrep; ligand processing with Glide: 
+        with open('./lig_prep.sh', 'w') as f: 
+            f.writelines(['while :'])
+            f.writelines(['\tdo'])
+            f.writelines(["\tif [[ `tail -n1 glide-grid.log|awk '{print $1}'` != 'Total' ]]; then"])
+            f.writelines(['\t\tcontinue'])
+            f.writelines(['\tfi'])
+            f.writelines(["\tif [[ `tail -n1 glide-grid.log|awk '{print $1}'` != 'Total' ]]; then"])
+            f.writelines(['\t\t$SCHRODINGER/ligprep -isd {} -omae ligand.mae -epik -ph 7'.format(lig_path)])
+            f.writelines(['\t\tbreak'])
+            f.writelines(['\tfi'])
+            f.writelines(['done'])
+            
+        os.system('chmod 777 ./lig_prep.sh; ./lig_prep.sh')
+        # Wait 30seconds for ligand preparation to finish: 
+        time.sleep(30) 
+        
+        # Perform molecular docking: 
+        with open('./glide-dock.in', 'w') as f: 
+            f.writelines(['FORCEFIELD   OPLS_2005'])
+            f.writelines(['GRIDFILE   receptor.zip'])
+            f.writelines(['LIGANDFILE   ligand.mae'])
+            f.writelines(['PRECISION   SP'])
+        
+        with open('./docking_run.sh', 'w') as f: 
+            f.writelines(['while :'])
+            f.writelines(['\tdo'])
+            f.writelines(["\tif [[ `tail -n1 ligand.log|awk '{print $1}'` != 'backend' ]]; then"])
+            f.writelines(['\t\tcontinue'])
+            f.writelines(['\tfi'])
+            f.writelines(["\tif [[ `tail -n1 ligand.log|awk '{print $1}'` != 'backend' ]]; then"])
+            f.writelines(['\t\t$SCHRODINGER/glide glide-grid.in'])
+            f.writelines(['\t\tbreak'])
+            f.writelines(['\tfi'])
+
+        os.system('chmod 777 ./docking_run.sh; ./docking_run.sh')
+        # Wait 60seconds for docking to finish: 
+        time.sleep(60) 
+
+        with open('./glide-dock.csv', 'r') as f: 
+            lines = f.readlines()
+        docking_scores = [] # Collect the docking score
+        for item in lines[1: ]: 
+            A = item.split(',')
+            docking_scores.append(float(A[5]))
+
+        # Delete aux files: 
+        os.system('rm glide-dock.csv glide-dock.log; cp glide-dock_pv.maegz {}; rm glide-dock_pv.maegz'.format(out_path))
+
+        results[smi] = [docking_scores, out_path]
     return results
     
 def check_energy(lig_): 

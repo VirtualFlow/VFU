@@ -7,10 +7,12 @@ Created on Sat Sep 24 17:17:13 2022
 """
 import os 
 import sys
+import time 
 import subprocess
 from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
+from utils import run_glide_docking
 
 command = []
 
@@ -18,6 +20,7 @@ command = []
 is_selfies     = False 
 program_choice = 'gold' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
+                             # glide
                            
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -69,6 +72,10 @@ if program_choice == 'gold':
     results = perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center_y, center_z)
     sys.exit()
 
+if program_choice == 'glide':
+    
+    results = run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
+    sys.exit()
 
 results = {}  # Storage for results
 
