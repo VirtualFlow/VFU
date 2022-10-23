@@ -18,9 +18,9 @@ command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'gold' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'rosetta-ligand' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
-                             # glide
+                             # glide/rosetta-ligand
                            
 receptor       = './config/prot_1.pdb'
 smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
@@ -73,8 +73,48 @@ if program_choice == 'gold':
     sys.exit()
 
 if program_choice == 'glide':
-    
     results = run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
+    sys.exit()
+if program_choice == 'rosetta-ligand':
+
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+        
+    if os.path.exists('$ROSETTA/source/scripts/python/public/molfile_to_params.py') == False: 
+        raise Exception('Rosetta file, located in $ROSETTA/source/scripts/python/public/molfile_to_params.py could not be found.')
+    if os.path.exists('$ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease') == False: 
+        raise Exception('Rosetta file, located in $ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease could not be found.')
+
+
+    # prepare the ligands:
+    process_ligand(smi, 'pdb') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+    os.system('cp ./config/dock.xml ./')
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.sdf'.format(lig_.split('.')[0])
+        
+        os.system('cat {} {} > complex.pdb'.format(receptor, lig_)) # Concatenate the receptor & ligand
+        os.system('echo "END" >> complex.pdb') 
+        
+        
+        
+        with open('./run_docking.sh', 'w') as f: 
+            f.writelines(["$ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease  \\"])
+            f.writelines(["	-database $ROSETTA/database \\"])
+            f.writelines(["\t@ options \\"])
+            f.writelines(["\t\t-parser:protocol dock.xml \\"])
+            f.writelines(["\t\t-parser:script_vars X={} Y={} Z={} \\".format(center_x, center_y, center_z)])
+            f.writelines(["\t\t-in:file:s complex.pdb \\"])
+            f.writelines(["\t\t-in:file:extra_res_fa LIG.params \\"])
+            f.writelines(["\t\t-out:nstruct 10 \\"])
+            f.writelines(["\t\t-out:level {} \\".format(exhaustiveness)])
+            f.writelines(["\t\t-out:suffix out"])
+            
+        os.system('chmod 777 ./run_docking.sh')
+        os.system('./run_docking.sh')
+            
     sys.exit()
 
 results = {}  # Storage for results

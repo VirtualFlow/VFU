@@ -1,0 +1,46 @@
+<ROSETTASCRIPTS>
+  <SCOREFXNS>
+    <ScoreFunction name="ligand_soft_rep" weights="ligand_soft_rep.wts"/>
+    <ScoreFunction name="ligand_hard_rep" weights="ligand.wts"/>
+  </SCOREFXNS>
+  <LIGAND_AREAS>
+    <LigandArea name="docking_sidechain" chain="X" cutoff="5.0" add_nbr_radius="true" all_atom_mode="true" minimize_ligand="10"/>
+    <LigandArea name="final_sidechain" chain="X" cutoff="5.0" add_nbr_radius="true" all_atom_mode="true"/>
+    <LigandArea name="final_backbone" chain="X" cutoff="6.0" add_nbr_radius="false" all_atom_mode="true" Calpha_restraints="0.3"/>
+  </LIGAND_AREAS>
+  <INTERFACE_BUILDERS>
+    <InterfaceBuilder name="side_chains_dock" ligand_areas="docking_sidechain"/>
+    <InterfaceBuilder name="side_chains_final" ligand_areas="final_sidechain"/>
+    <InterfaceBuilder name="backbone" ligand_areas="final_backbone" extension_window="3"/>
+  </INTERFACE_BUILDERS>
+  <MOVEMAP_BUILDERS>
+    <MoveMapBuilder name="docking" sc_interface="side_chains_dock" minimize_water="true"/>
+    <MoveMapBuilder name="final" sc_interface="side_chains_final" bb_interface="backbone" minimize_water="true"/>
+  </MOVEMAP_BUILDERS>
+  <MOVERS>
+    <StartFrom name="start_pos" chain="X">
+      <Coordinates x="%%X%%" y="%%Y%%" z="%%Z%%"/>
+    </StartFrom>
+    <Translate name="translate" chain="X" distribution="uniform" angstroms="2.0" cycles="50"/>
+    <Rotate name="rotate" chain="X" distribution="uniform" degrees="160" cycles="1000"/>
+    <SlideTogether name="slide_together" chains="X"/>
+    <HighResDocker name="high_res_docker" cycles="6" repack_every_Nth="3" scorefxn="ligand_soft_rep" movemap_builder="docking"/>
+    <FinalMinimizer name="final" scorefxn="ligand_hard_rep" movemap_builder="final"/>
+    <InterfaceScoreCalculator name="add_scores" chains="X" scorefxn="ligand_hard_rep"/>
+    <ParsedProtocol name="low_res_dock">
+      <Add mover_name="start_pos"/>
+      <Add mover_name="translate"/>
+      <Add mover_name="rotate"/>
+      <Add mover_name="slide_together"/>
+    </ParsedProtocol>
+    <ParsedProtocol name="high_res_dock">
+      <Add mover_name="high_res_docker"/>
+      <Add mover_name="final"/>
+    </ParsedProtocol>
+  </MOVERS>
+  <PROTOCOLS>
+    <Add mover_name="low_res_dock"/>
+    <Add mover_name="high_res_dock"/>
+    <Add mover_name="add_scores"/>
+    </PROTOCOLS>
+</ROSETTASCRIPTS>
