@@ -17,14 +17,35 @@ command = []
 
 # Parameters:  
 is_selfies     = False 
-program_choice = 'rosetta-ligand' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+is_peptide     = True
+program_choice = 'smina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
                              # glide/rosetta-ligand
                            
 receptor       = './config/prot_1.pdb'
-smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
+smi            = 'AAAA' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 exhaustiveness = 10
 
+
+if is_selfies == True: 
+    import selfies 
+    try: 
+        smi = selfies.decoder(smi)
+    except: 
+        raise Exception('Invalid SELFIES provided. Please make sure that the varibale smi contains a valid selfies string. ')
+if is_peptide == True: 
+    
+    amino_acids = {'G', 'A', 'L', 'M', 'F', 'W', 'K', 'Q', 'E', 'S', 'P', 'V', 'I', 'C', 'Y', 'H', 'R', 'N', 'D', 'T'}    
+    for aa in smi:
+        if aa not in amino_acids:
+            raise Exception('Non-standard/missing amino acid:', aa)
+    import rdkit 
+    from rdkit import Chem
+    mol = Chem.MolFromSequence(smi)
+    if mol == None: 
+        raise Exception('RDKit unable to recognize amino acid sequence:', smi)
+    smi = Chem.MolToSmiles(mol)
+    
 
 if program_choice == 'flexx': 
     results = run_flexx_docking(receptor, smi)
@@ -81,12 +102,7 @@ if program_choice == 'rosetta-ligand':
 results = {}  # Storage for results
 
 
-if is_selfies == True: 
-    import selfies 
-    try: 
-        smi = selfies.decoder(smi)
-    except: 
-        raise Exception('Invalid SELFIES provided. Please make sure that the varibale smi contains a valid selfies string. ')
+
 
 # Check if receptor file exists inside the config directory: 
 files_ls = os.listdir('./config/')
