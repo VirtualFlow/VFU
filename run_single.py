@@ -7,12 +7,11 @@ Created on Sat Sep 24 17:17:13 2022
 """
 import os 
 import sys
-import time 
 import subprocess
 from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
-from utils import run_glide_docking
+from utils import run_glide_docking, run_rosetta_docking
 
 command = []
 
@@ -76,45 +75,7 @@ if program_choice == 'glide':
     results = run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
     sys.exit()
 if program_choice == 'rosetta-ligand':
-
-    receptor_format = receptor.split('.')[-1]
-    if receptor_format != 'pdb': 
-        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
-        
-    if os.path.exists('$ROSETTA/source/scripts/python/public/molfile_to_params.py') == False: 
-        raise Exception('Rosetta file, located in $ROSETTA/source/scripts/python/public/molfile_to_params.py could not be found.')
-    if os.path.exists('$ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease') == False: 
-        raise Exception('Rosetta file, located in $ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease could not be found.')
-
-
-    # prepare the ligands:
-    process_ligand(smi, 'pdb') # mol2 ligand format is supported in plants
-    lig_locations = os.listdir('./ligands/')
-    os.system('cp ./config/dock.xml ./')
-    for lig_ in lig_locations: 
-        lig_path = 'ligands/{}'.format(lig_)
-        out_path = './outputs/pose_{}.sdf'.format(lig_.split('.')[0])
-        
-        os.system('cat {} {} > complex.pdb'.format(receptor, lig_)) # Concatenate the receptor & ligand
-        os.system('echo "END" >> complex.pdb') 
-        
-        
-        
-        with open('./run_docking.sh', 'w') as f: 
-            f.writelines(["$ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease  \\"])
-            f.writelines(["	-database $ROSETTA/database \\"])
-            f.writelines(["\t@ options \\"])
-            f.writelines(["\t\t-parser:protocol dock.xml \\"])
-            f.writelines(["\t\t-parser:script_vars X={} Y={} Z={} \\".format(center_x, center_y, center_z)])
-            f.writelines(["\t\t-in:file:s complex.pdb \\"])
-            f.writelines(["\t\t-in:file:extra_res_fa LIG.params \\"])
-            f.writelines(["\t\t-out:nstruct 10 \\"])
-            f.writelines(["\t\t-out:level {} \\".format(exhaustiveness)])
-            f.writelines(["\t\t-out:suffix out"])
-            
-        os.system('chmod 777 ./run_docking.sh')
-        os.system('./run_docking.sh')
-            
+    results = run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiveness)
     sys.exit()
 
 results = {}  # Storage for results

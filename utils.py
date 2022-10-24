@@ -1035,6 +1035,68 @@ def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, si
         results[smi] = [docking_scores, out_path]
     return results
     
+def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiveness): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+        
+    if os.path.exists('$ROSETTA/source/scripts/python/public/molfile_to_params.py') == False: 
+        raise Exception('Rosetta file, located in $ROSETTA/source/scripts/python/public/molfile_to_params.py could not be found.')
+    if os.path.exists('$ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease') == False: 
+        raise Exception('Rosetta file, located in $ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease could not be found.')
+
+
+    # prepare the ligands:
+    with open('./test.smi', 'w') as f: 
+        f.writelines([smi])
+    os.system('obabel ./test.smi --gen3D -O ligand.mol2')
+    os.system('rm ./test.smi')
+    # Generate conformational library for ligand: 
+    os.syetem('obabel ligand.mol2 -O conformers.sdf --conformer --score rmsd --writeconformers --nconf 30')
+    os.system('rm ./ligand.mol2')
+
+    os.system('$ROSETTA/source/scripts/python/public/molfile_to_params.py -n LIG -p LIG --conformers-in-one-file conformers.sdf')
+    
+        
+    # run molecular docking: 
+    with open('./run_docking.sh', 'w') as f: 
+        f.writelines(["$ROSETTA/source/bin/rosetta_scripts.default.linuxgccrelease  \\"])
+        f.writelines(["	-database $ROSETTA/database \\"])
+        f.writelines(["\t@ options \\"])
+        f.writelines(["\t\t-parser:protocol dock.xml \\"])
+        f.writelines(["\t\t-parser:script_vars X={} Y={} Z={} \\".format(center_x, center_y, center_z)])
+        f.writelines(["\t\t-in:file:s complex.pdb \\"])
+        f.writelines(["\t\t-in:file:extra_res_fa LIG.params \\"])
+        f.writelines(["\t\t-out:nstruct 10 \\"])
+        f.writelines(["\t\t-out:level {} \\".format(exhaustiveness)])
+        f.writelines(["\t\t-out:suffix out"])
+        
+    os.system('chmod 777 ./run_docking.sh')
+    os.system('./run_docking.sh')
+            
+    # Collect output files: 
+    results = {}
+    results[smi] = []
+    
+    out_files = [x for x in os.listdir('./') if 'complexout' in x]    
+    for file in out_files: 
+        os.system('cp {} ./outputs/{}'.format(file, file))
+        os.system('rm {}'.format(file))
+        results[smi].append('./outputs/{}'.format(file))
+    
+    with open('./scoreout.sc', 'r') as f: 
+        lines = f.readlines()
+    lines = lines[2: ]
+    docking_scores = []
+    for item in lines: 
+        A = item.split(' ')
+        A = [x for x in A if x!='']
+        docking_scores.append(float(A[44]))
+    
+    results[smi].append(docking_scores)
+
+    return results
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
