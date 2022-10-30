@@ -77,6 +77,9 @@ Instructions for running AutoDockZN can be found on their official website: [htt
 Requirments
 Please install the OpenEye software suite: [https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html](https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html). 
 
+### SEED
+Requirments
+Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https://ambermd.org/GetAmber.php#ambertools).
 
 ## Questions, problems?
 Make a github issue 😄. Please be as clear and descriptive as possible. Please feel free to reach
