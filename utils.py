@@ -1097,6 +1097,61 @@ def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiven
 
     return results
 
+def run_mdock_docking(receptor, smi): 
+    recetor_format = receptor.split('.')[-1]
+    if recetor_format != 'sph': 
+        raise Exception('Receptor needs to be in sph format. Please try again, after incorporating this correction.')
+    
+    ref_lig = './config/ref_lig.pdb'
+    if os.path.exists(ref_lig) == False: 
+        raise Exception('Reference ligand {} not found. Please try again, after incorporating this correction.'.format(ref_lig))
+
+    mdock_path = '/home/MDock'
+
+    if os.path.exists('{}/bin/MDock_Linux'.format(mdock_path)) == False: 
+        raise Exception('MDock path {} not found. Please try again, after incorporating this correction.'.format(mdock_path))
+
+    os.system('{}/bin/get_sph_Linux {} {}'.format(mdock_path, ref_lig, receptor))
+    
+    # prepare the ligands:
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+      
+    results = {}
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.mol2'.format(lig_.split('.')[0])
+        
+        with open('./mdock_dock.par', 'w') as f: 
+            f.writelines('clash_potential_penalty      |      3.0')
+            f.writelines('orient_ligand (yes/no)       |      yes')
+            f.writelines('minimize_ligand (yes/no)     |      yes')
+            f.writelines('maximum_orientations         |      100')
+            f.writelines('gridded_score (yes/no)       |      yes')
+            f.writelines('grid_spacing (0.3~0.5)       |      0.4')
+            f.writelines('sort_orientations (yes/no)   |      yes')
+            f.writelines('write_score_total            |      100')
+            f.writelines('write_orientations (yes/no)  |      yes')
+            f.writelines('minimization_cycles (1~3)    |      1')
+            f.writelines('ligand_selectivity (yes/no)  |      no')
+            f.writelines('box_filename (optional)      |      ')
+            f.writelines('grid_box_size                |      10.0')
+            f.writelines('sphere_point_filename        |      recn.sph')
+
+        os.system('{}/bin/MDock_Linux protein {} -param mdock_dock.par'.format(lig_path, mdock_path))
+
+        os.system('cp ./mdock_dock.mol2 {}'.format(out_path))
+
+        docking_scores = []
+        with open('./mdock_dock.out', 'r') as f: 
+            lines = f.readlines()
+        for item in lines: 
+            docking_scores.append( float([x for x in item.split(' ') if x != ''][4]))
+            
+        results[lig_path] = [out_path, docking_scores]
+            
+    return results 
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
