@@ -11,19 +11,19 @@ import subprocess
 from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
-from utils import run_glide_docking, run_rosetta_docking, run_mdock_docking
+from utils import run_glide_docking, run_rosetta_docking, run_mdock_docking, run_seed_docking
 
 command = []
 
 # Parameters:  
 is_selfies     = False 
 is_peptide     = False
-program_choice = 'M-Dock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'SEED' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
-                             # glide/rosetta-ligand/M-Dock
+                             # glide/rosetta-ligand/M-Dock/SEED
                            
 receptor       = './config/prot_1.pdb'
-smi            = 'AAAA' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
+smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
 exhaustiveness = 10
 
 
@@ -65,7 +65,9 @@ if program_choice == 'iGemDock':
 if program_choice == 'M-Dock': 
     results = run_mdock_docking(receptor, smi)
     sys.exit()
-
+if program_choice == 'SEED': 
+    results = run_seed_docking(receptor, smi)
+    sys.exit()
 
 # Docking search paramters: 
 center_x       = -16                       # Define center for search space (x-axis)

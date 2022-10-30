@@ -1,0 +1,34 @@
+#           Parameter filename
+seed4_gaff.par
+seed4_kw.par
+#           Receptor coordinates (in mol2 format) filename
+receptor_seed.mol2
+#           Binding site residue list
+#           First line:  number of residues
+2
+31
+70
+#           Modification of February 2002:
+#           List of points (e.g. ligand heavy atoms of a known ligand-receptor 
+#           complex structure) in the binding site used to select polar and apolar 
+#           rec. vectors which satisfy the angle criterion (see parameters file)
+#           First line:  number of points (0: no removal of vectors using the angle criterion)
+#           Following lines:  coordinates of the points
+0
+#           Metals in the binding site
+#           Make sure that the residue number of the metal is in the
+#           binding site residue list. 
+#           First line:  total number of coordination points 
+#           Following lines:  atom number of metal / x y z of coordination point
+0
+#           Spherical cutoff for docking (y,n / sphere center / sphere radius)
+y	9 14 7	25
+#           Fragment library specifications
+#           First line: Number of fragments / dock+energy (d), only energy (e)
+#           Following lines: Fragment filename /
+#           apolar docking, polar docking, or both (a,p,b) /
+#           energy cutoff in kcal/mol / 2nd clustering cutoff in kcal/mol
+d
+ligand_seed.mol2       b     2.0   2.0
+single
+end

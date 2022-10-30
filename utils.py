@@ -1152,6 +1152,50 @@ def run_mdock_docking(receptor, smi):
             
     return results 
 
+def run_seed_docking(receptor, smi): 
+    chimera_path = '/home/chimera'
+    seed_path    = '/home/SEED'
+    if os.path.exists(chimera_path) == False: 
+        raise Exception('Chimera path {} not found. Please try again, after updating the Chimera path. '.format(chimera_path))
+    if os.path.exists(seed_path) == False: 
+        raise Exception('SEED path {} not found. Please try again, after updating the SEED path. '.format(seed_path))
+    if os.path.exists(seed_path+'/bin/seed_4') == False: 
+        raise Exception('SEED executable {} not found. Please try again, after updating the SEED executable path. '.format(seed_path+'/bin/seed_4'))
+
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'mol2': 
+        raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
+
+    # Prepare receptor for SEED        
+    os.system('python ./config/mol2seed4_receptor.py {} {} receptor_seed.mol2'.format(receptor, receptor))
+
+    # prepare the ligands:
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+      
+    results = {}
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.mol2'.format(lig_.split('.')[0])
+        
+        # Preparing Ligand for SEED: 
+        os.system('charge=`{}/bin/chimera --nogui --silent {} ./config/charges.py`; antechamber -i {} -fi mol2 -o ligand_gaff.mol2 -fo mol2 -at gaff2 -c gas -rn LIG -nc $charge -pf y'.format(chimera_path, lig_path, lig_path))
+        os.system('python ./config/mol2seed4_receptor.py ligand_gaff.mol2 ligand_gaff.mol2 ligand_seed.mol2')
+        
+        os.system('cp ./config/seed4_gaff.par ./; cp ./config/seed4_kw.par ./; cp ./config/seed.inp ./')
+        os.system('{}/bin/seed_4 seed.inp > log'.format(seed_path))
+        
+        os.system('cp ./ligand_seed_best.mol2 {}'.format(out_path))
+        
+        with open('./seed_best.dat', 'r') as f: 
+            lines = f.readlines()
+        docking_score = float([x for x in lines[1].split(' ') if x != ''][4])
+        results[lig_path] = [docking_score, out_path]
+        
+        os.system('rm apolar_rec.mol2 apolar_rec_reduc.mol2 length_hb.gen ligand_seed_best.mol2 polar_rec.mol2 polar_rec_reduc.mol2 sas_apolar.pdb seed.out seed_best.dat seed_clus.dat')
+
+    return results
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 

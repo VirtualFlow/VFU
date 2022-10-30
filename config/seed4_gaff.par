@@ -1,0 +1,464 @@
+#seed.param v4.0
+#           Dielectric constant of the solute (receptor and fragment)
+2.0
+#           Ratio of kept vectors for docking : polar / apolar
+1.0 1.0
+#           First value: write *_clus.mol2 file (y/n)
+#           Second value: write *_best.mol2 file (y/n) 
+n y
+#	    First value: write *_clus.dat summary table file (y/n)
+#           Second value: write *_best.dat summary table file (y/n)
+y y
+#           First value: maximum number of cluster members saved in *_clus* 
+#           output files. Note that this value determines the maximum number
+#           of poses per cluster that go through slow energy evaluation.
+#	    Second value: maximum number of poses saved in *_best* output files.
+5 1  
+#           The docked fragments are saved in the dir ./outputs         
+#           Filename for output log file. This is the main SEED output file.
+./outputs/seed.out
+#           write (w) or read (r) Coulombic grid / grid filename
+w  ./scratch/coulomb.grid
+#           write (w) or read (r) van der Waals grid / grid filename
+w  ./scratch/vanderwaals.grid
+#           write (w) or read (r) receptor desolvation grid / grid filename 
+w  ./scratch/desolvation.grid
+#
+#           Bump checking: used only if fast energy is switched off
+#           n x atoms = maximum tolerated bumps / 
+#           scaling factor for interatomic distance /
+#           severe overlap factor (beta factor in PROTEINS paper)
+2.0 0.89 0.6
+#           van der Waals energy cutoff (kcal/mol): 
+#           used if fast energy is switched on
+1.0
+#           Angle (deg) and number of points on the sphere around the HB vectors
+50.0 100
+#           Number of fragment rotations around each axis
+72
+#           -  angle_rmin  if distance <= (multipl_fact_rmin*minDist)
+#           -  angle_rmax  if distance >= (multipl_fact_rmax*maxDist)
+#           -  linear dependence (range between angle_rmin and angle_rmax)
+#              for other distances
+70.0 10.0 1.2 0.8
+#           Removal of the rec. polar vect.: vdW radius probe
+1.83
+#           Coulombic fast energy: 1=distance dept diel / grid margin / grid spacing
+1 20.0 0.5
+#           van der Waals fast energy: grid margin / grid spacing
+20.0 0.3
+#           accurate energy: Coulombic cutoff for formal charges is automatically
+#                            set to 1.3 x van_der_Waals_cutoff
+#           accurate energy (vdWaals): nonbonding cutoff / grid spacing 
+12.0 1.0
+#           Multiplicative factor (k) for apolar docking to skip evaluation of 
+#           electrostatics. The vdW energy cutoff is:
+#           k x Number of fragment atoms, including hydrogen atoms
+-0.333333
+#           Solvation grid: grid margin / grid spacing
+24.0 0.25
+#           Solvation: water radius / # points per sphere to generate SAS / 
+#                       solvent dielectric constant
+1.4 500 78.5
+#           Hydrophobicity maps: point densities (A^-2) on the SAS for apolar
+#                    vectors on the receptor / on the fragment /
+#                    probe radius to generate SAS for apolar vectors /
+#                    scaling factor for desolvation and / vdW interactions
+1.0 1.0 1.4 1.0 1.0
+#           Scaling factors for fast and also accurate energy evaluation:
+#           van der Waals / electrostatic interaction / receptor desolvation /
+#           fragment desolvation
+1.0 1.0 1.0 1.0
+#      ----------------------------------------------------------------------
+#           Clustering parameters
+#           Clustering parameters
+#           Clustering parameters
+#      ----------------------------------------------------------------------
+#           GSEAL : sim. weight factors (150 atom el.) 0 or # non-default + list
+4
+6  6  2.0
+7  7 10.0
+8  8 10.0
+16 16 10.0
+#           The clustering with GSEAL proceeds in two steps: the
+#           first clustering yields large clusters which contain almost 
+#           overlapping as well as more distant fragments; the second
+#           clustering is done on each cluster found in the first clustering
+#           to eliminate fragments which are very close in space.
+#
+#           First clustering:  overall clustering
+#           GSEAL similarity exponential factor / cutoff factor
+0.9 0.4
+#
+#           Second clustering: to discard redundant positions 
+#           GSEAL similarity exponential factor / cutoff factor
+0.9 0.9
+#           Maximal number of positions to be clustered
+20
+#           Number of lines to be written in the output file for the sorted 
+#           energies and the two clustering procedures / 
+#           Printlevel (0=lean, 1=adds sorting before postprocessing, 2=adds 2nd clustering)
+100 1
+#      ----------------------------------------------------------------------
+#           Forcefield parameters from now on
+#           Forcefield parameters from now on
+#           Forcefield parameters from now on
+#      ----------------------------------------------------------------------
+# parameters are cgenff v4 (2016) and param36 (2012) with water and ions as per toppar_water_ions.str
+#
+# NB: if the user includes metal ions in the binding site, appropriate hydrogen bond distances with these ions should 
+# be provided in the "Hydrogen bond distances between donor and acceptor" section below
+#
+# Hydrogen bond distances were specified for charge-charge and charge-neutral hydrogen bonding pairs according to the following:
+#
+# (+) charge H-bond donor of protein[4]: NR3, NC2, NP, NH3
+# neutral H-bond donor of protein [7]: NR1, NH1, NH2, NY, OH1, S, OT [water]
+# neutral H-bond acceptor of protein [8]: OH1, S, O, OB, OS, NR2, OT [water], OX
+# (-) charge H-bond acceptor of protein [1]: OC
+# (+) charge H-bond donor of ligand [5]: NG2P1, NG2R52, NG3P1, NG3P2, NG3P3
+# neutral H-bond donor of ligand [13]: NG2S1, NG2S2, NG2S3, NG2R43, NG2R51, NG2R53, NG2R61, NG311, NG321, NG331, NG3C51, OG311, SG311
+# neutral H-bond acceptor of ligand [29]: NG1T1, NG2D1, NG2S0, NG2R50, NG2R57, NG2R60, NG2R62, NG2R67, NG2RC0,  NG301, NG3N1, OG2D1, OG2D3, OG2D4, OG2D5, OG2R50, OG3R60, OG301, OG302, OG303, OG304, OG311, OG3C31, OG3C51, OG3C61, SG2D1, SG2R50, SG311, SG301
+# (-) charge H-bond acceptor of ligand [5]: OG2D2, OG2N1, OG2P1, OG312, SG302
+# Polar atoms, none of above categories NG3P0, NG2O1, SG3O2, SG3O1, SG3O3
+#
+#     Atom  element  van der Waals
+#     type  number  radius energy_min (absolute value)
+#   -----------------------------------
+175
+1	C	6	1.908	0.086	# 60  ! sp2 C carbonyl group
+2	CA	6	1.908	0.086	# 00  sp2 C pure aromatic (benzene)
+3	CB	6	1.908	0.086	# 00  sp2 aromatic C, 5&6 membered ring junction
+4	CC	6	1.908	0.086	# 00  sp2 aromatic C, 5 memb. ring HIS
+5	CD	6	1.908	0.086	# 00  sp2 C atom in the middle of: C=CD-CD=C
+6	CI	6	1.908	0.1094	# 00  parmbsc0
+7	CK	6	1.908	0.086	# 00  sp2 C 5 memb.ring in purines (dA,dG)
+8	CP	6	1.908	0.086	# 00  sp2 C 5 memb.ring in purines (G)
+9	CM	6	1.908	0.086	# 00  sp2 C pyrimidines in pos. 5 & 6 (dT,dC)
+10	CS	6	1.908	0.086	# 00  sp2 C pyrimidines in pos. 5 & 6 (U)
+11	CN	6	1.908	0.086	# 00  sp2 C aromatic 5&6 memb.ring junct.(TRP)
+12	CQ	6	1.908	0.086	# 00  sp2 C in 5 mem.ring of purines between 2 N
+13	CR	6	1.908	0.086	# 00  sp2 arom as CQ but in HIS
+14	CT	6	1.908	0.1094	# 80  sp3 aliphatic C
+15	CV	6	1.908	0.086	# 00  sp2 arom. 5 memb.ring w/1 N and 1 H (HIS)
+16	CW	6	1.908	0.086	# 00  sp2 arom. 5 memb.ring w/1 N-H and 1 H (HIS)
+17	C*	6	1.908	0.086	# 00  sp2 arom. 5 memb.ring w/1 subst. (TRP)
+18	CX	6	1.908	0.1094	# 00  protein C-alpha (new to ff10)
+19	CY	6	1.908	0.086	# 00  nitrile C (Howard et al.JCC,16,243,1995)
+20	CZ	6	1.908	0.086	# 00  sp C (Howard et al.JCC,16,243,1995)
+21	C5	6	1.908	0.086	# 00  sp2 C 5 memb.ring in purines (A)
+22	C4	6	1.908	0.086	# 00  sp2 C pyrimidines in pos. 5 & 6 (C)
+23	C0	20	1.7131	0.459789	# 00  calcium
+24	H	1	0.7296	0.0157	# 10  H bonded to nitrogen atoms
+25	HC	1	1.487	0.0157	# 50  H aliph. bond. to C without electrwd.group
+26	H1	1	1.387	0.0157	# 50  H aliph. bond. to C with 1 electrwd. group
+27	H2	1	1.287	0.0157	# 50  H aliph. bond. to C with 2 electrwd.groups
+28	H3	1	1.187	0.0157	# 50  H aliph. bond. to C with 3 eletrwd.groups
+29	HA	1	1.459	0.015	# 70  H arom. bond. to C without elctrwd. groups
+30	H4	1	1.409	0.015	# 70  H arom. bond. to C with 1 electrwd. group
+31	H5	1	1.359	0.015	# 70  H arom.at C with 2 elctrwd. gr,+HCOO group
+32	HO	1	0.0	0.0	# 50  hydroxyl group
+33	HS	1	0.6	0.0157	# 50  hydrogen bonded to sulphur (pol?)
+34	HP	1	1.1	0.0157	# 50  H bonded to C next to positively charged gr
+35	HZ	1	1.459	0.015	# 10  H bond sp C (Howard et al.JCC,16,243,1995)
+36	F	9	1.75	0.061	# 00  fluorine (not fluoride!)
+37	Cl	17	1.948	0.265	# 00  chlorine (Applequist) (not chloride!)
+38	Br	35	2.22	0.32	# 00  bromine (Applequist) (not bromide!)
+39	I	53	2.35	0.4	# 00  iodine (Applequist) (not iodide!)
+40	MG	12	0.7926	0.8947	# 00  magnesium
+41	N	7	1.824	0.17	# 00  sp2 nitrogen in amide groups
+42	NA	7	1.824	0.17	# 00  sp2 N in 5 memb.ring w/H atom (HIS)
+43	NB	7	1.824	0.17	# 00  sp2 N in 5 memb.ring w/LP (HIS,ADE,GUA)
+44	NC	7	1.824	0.17	# 00  sp2 N in 6 memb.ring w/LP (ADE,GUA)
+45	N2	7	1.824	0.17	# 00  sp2 N in amino groupsARG/HIP/LYS>!PRO
+46	N3	7	1.824	0.17	# 00  sp3 N for charged amino groups (Lys, etc)
+47	NT	7	1.824	0.17	# 00  sp3 N for amino groups amino groups
+48	N*	7	1.824	0.17	# 00  sp2 N
+49	NY	7	1.824	0.17	# 00  nitrile N (Howard et al.JCC,16,243,1995)
+50	O	8	1.6612	0.21	# 40  carbonyl group oxygen
+51	O2	8	1.6612	0.21	# 40  carboxyl and phosphate group oxygen
+52	OH	8	1.721	0.2104	# 50  oxygen in hydroxyl group
+53	OS	8	1.6837	0.17	# 50  ether and ester oxygen
+54	OP	8	1.85	0.17	# 50  2- phosphate oxygen
+55	P	15	2.1	0.2	# 80  phosphate,pol:JACS,112,8543,90,K.J.Miller
+56	S	16	2.0	0.25	# 00  S in disulfide linkage,pol:JPC,102,2399,98
+57	SH	16	2.0	0.25	# 00  S in cystine
+58	CU	29	0.0	0.0	# 00  copper
+59	FE	26	0.0	0.0	# 00  iron
+60	Zn	30	1.1	0.0125	# 00  Zn2+
+61	CO	6	1.908	0.086	# 60  ! sp2 C carboxylate group
+62	2C	6	1.908	0.1094	# 80  sp3 aliphatic C with two (duo) heavy atoms
+63	3C	6	1.908	0.1094	# 80  sp3 aliphatic C with three (tres) heavy atoms
+64	C8	6	1.908	0.1094	# 80  sp3 aliphatic C basic AA side chain
+65	O3	8	1.6612	0.21	# 40  ASP/GLU carboxylate O; backbone C-terminus
+66	OD	8	1.6612	0.21	# 40  ASN/GLN amide O; backbone
+67	ND	7	1.824	0.17	# 00  ASN/GLN amide O; NHE
+68	OA	8	1.721	0.2104	# 50  SER/THR/TYR hydroxyl O
+69	NL	7	1.824	0.17	# 00  LYS ammonium N; backbone N-terminus
+70	TN	7	1.824	0.17	# 00  PRO backbone N
+71	TJ	6	1.908	0.1094	# 00  PRO backbone CA
+72	TG	6	1.908	0.1094	# 00  GLY backbone CA
+73	TP	6	1.908	0.1094	# 00  ARG/HIP/LYS backbone CA
+74	TM	6	1.908	0.1094	# 00  ASP/CYM/GLU backbone CA
+75	TH	1	0.841847	0.0157	# 10  ARG nitrogen-attached H
+76	TA	6	1.908	0.1094	# 00  HID/HIE/PHE/TRP/TYR CB
+77	EP	0	1.0	0.0	# 00  Extra point
+78	c	6	1.8606	0.0988	# Sp2 C carbonyl group 
+79	cs	6	1.8606	0.0988	# Sp2 C in c=S
+80	c1	6	1.9525	0.1596	# Sp C
+81	c2	6	1.8606	0.0988	# Sp2 C  
+82	c3	6	1.9069	0.1078	# Sp3 C
+83	ca	6	1.8606	0.0988	# Sp2 C in pure aromatic systems
+84	cp	6	1.8606	0.0988	# Head Sp2 C that connect two rings in biphenyl sys. 
+85	cq	6	1.8606	0.0988	# Head Sp2 C that connect two rings in biphenyl sys. identical to cp 
+86	cc	6	1.8606	0.0988	# Sp2 carbons in non-pure aromatic systems
+87	cd	6	1.8606	0.0988	# Sp2 carbons in non-pure aromatic systems, identical to cc
+88	ce	6	1.8606	0.0988	# Inner Sp2 carbons in conjugated systems
+89	cf	6	1.8606	0.0988	# Inner Sp2 carbons in conjugated systems, identical to ce
+90	cg	6	1.9525	0.1596	# Inner Sp carbons in conjugated systems
+91	ch	6	1.9525	0.1596	# Inner Sp carbons in conjugated systems, identical to cg
+92	cx	6	1.9069	0.1078	# Sp3 carbons in triangle systems
+93	cy	6	1.9069	0.1078	# Sp3 carbons in square systems
+94	cu	6	1.8606	0.0988	# Sp2 carbons in triangle systems
+95	cv	6	1.8606	0.0988	# Sp2 carbons in square systems
+96	cz	6	1.8606	0.0988	# Sp2 carbon in guanidine group
+97	h1	1	1.3593	0.0208	# H bonded to aliphatic carbon with 1 electrwd. group  
+98	h2	1	1.2593	0.0208	# H bonded to aliphatic carbon with 2 electrwd. group 
+99	h3	1	1.1593	0.0208	# H bonded to aliphatic carbon with 3 electrwd. group 
+100	h4	1	1.4235	0.0161	# H bonded to non-sp3 carbon with 1 electrwd. group 
+101	h5	1	1.3735	0.0161	# H bonded to non-sp3 carbon with 2 electrwd. group 
+102	ha	1	1.4735	0.0161	# H bonded to aromatic carbon  
+103	hc	1	1.4593	0.0208	# H bonded to aliphatic carbon without electrwd. group 
+104	hn	1	0.621	0.01	# H bonded to nitrogen atoms
+105	ho	1	0.3019	0.0047	# Hydroxyl group
+106	hp	1	0.6031	0.0144	# H bonded to phosphate 
+107	hs	1	0.6112	0.0124	# Hydrogen bonded to sulphur 
+108	hw	1	0.0	0.0	# Hydrogen in water 
+109	hx	1	1.0593	0.0208	# H bonded to C next to positively charged group  
+110	f	9	1.7029	0.0832	# Fluorine
+111	cl	17	1.9452	0.2638	# Chlorine 
+112	br	35	2.0275	0.3932	# Bromine 
+113	i	53	2.1558	0.4955	# Iodine 
+114	n	7	1.7852	0.1636	# Sp2 nitrogen in amide groups
+115	n1	7	1.8372	0.1098	# Sp N  
+116	n2	7	1.8993	0.0941	# aliphatic Sp2 N with two connected atoms 
+117	n3	7	1.8886	0.0858	# Sp3 N with three connected atoms
+118	n4	7	1.4028	3.8748	# Sp3 N with four connected atoms 
+119	na	7	1.7992	0.2042	# Sp2 N with three connected atoms 
+120	nb	7	1.8993	0.0941	# Sp2 N in pure aromatic systems 
+121	nc	7	1.8993	0.0941	# Sp2 N in non-pure aromatic systems
+122	nd	7	1.8993	0.0941	# Sp2 N in non-pure aromatic systems, identical to nc
+123	ne	7	1.8993	0.0941	# Inner Sp2 N in conjugated systems
+124	nf	7	1.8993	0.0941	# Inner Sp2 N in conjugated systems, identical to ne
+125	nh	7	1.7903	0.215	# Amine N connected one or more aromatic rings 
+126	no	7	1.8886	0.0858	# Nitro N  
+127	ns	7	1.8352	0.1174	# amind N, with 1 attached hydrogen atom
+128	nt	7	1.8852	0.0851	# amide N, with 2 attached hydrogen atoms
+129	nx	7	1.4528	2.5453	# like n4, but only has one hydrogen atom
+130	ny	7	1.5028	1.6959	# like n4, but only has two hydrogen atoms
+131	nz	7	1.5528	1.145	# like n4, but only has three three hydrogen atoms
+132	n+	7	1.6028	0.7828	# NH4+
+133	nu	7	1.8403	0.1545	# like nh, but only has one attached hydrogen atom
+134	nv	7	1.8903	0.112	# like nh, but only has two attached hydrogen atoms
+135	n7	7	1.9686	0.0522	# like n3, but only has one attached hydrogen atom 
+136	n8	7	2.0486	0.0323	# like n3, but only has two attached hydrogen atoms
+137	n9	7	2.27	0.0095	# NH3
+138	ni	7	1.7852	0.1636	# like n in RG3 
+139	nj	7	1.7852	0.1636	# like n in RG4
+140	nk	7	1.4528	2.5453	# like n4/nx/ny in RG3 
+141	nl	7	1.4528	2.5453	# like n4/nx/ny in RG4
+142	nm	7	1.7903	0.215	# like nh in RG3 
+143	nn	7	1.7903	0.215	# like nh in RG4
+144	np	7	1.8886	0.0858	# like n3 in RG3 
+145	nq	7	1.8886	0.0858	# like n3 in RG4
+146	n5	7	1.9686	0.0522	# like n7 in RG3 
+147	n6	7	1.9686	0.0522	# like n7 in RG4
+148	o	8	1.7107	0.1463	# Oxygen with one connected atom
+149	oh	8	1.82	0.093	# Oxygen in hydroxyl group
+150	os	8	1.7713	0.0726	# Ether and ester oxygen
+151	op	8	1.7713	0.0726	# os in 3-memberred rings
+152	oq	8	1.7713	0.0726	# os in 4-memberred rings
+153	ow	8	1.7683	0.152	# Oxygen in water 
+154	p2	15	2.0732	0.2295	# Phosphate with two connected atoms 
+155	p3	15	2.0732	0.2295	# Phosphate with three connected atoms, such as PH3
+156	p4	15	2.0732	0.2295	# Phosphate with three connected atoms, such as O=P(CH3)2
+157	p5	15	2.0732	0.2295	# Phosphate with four connected atoms, such as O=P(OH)3
+158	pb	15	2.0732	0.2295	# Sp2 P in pure aromatic systems 
+159	pc	15	2.0732	0.2295	# Sp2 P in non-pure aromatic systems
+160	pd	15	2.0732	0.2295	# Sp2 P in non-pure aromatic systems, identical to pc
+161	pe	15	2.0732	0.2295	# Inner Sp2 P in conjugated systems
+162	pf	15	2.0732	0.2295	# Inner Sp2 P in conjugated systems, identical to pe
+163	px	15	2.0732	0.2295	# Special p4 in conjugated systems
+164	py	15	2.0732	0.2295	# Special p5 in conjugated systems
+165	s	16	1.9825	0.2824	# S with one connected atom 
+166	s2	16	1.9825	0.2824	# S with two connected atom, involved at least one double bond  
+167	s4	16	1.9825	0.2824	# S with three connected atoms 
+168	s6	16	1.9825	0.2824	# S with four connected atoms 
+169	sh	16	1.9825	0.2824	# Sp3 S connected with hydrogen 
+170	ss	16	1.9825	0.2824	# Sp3 S in thio-ester and thio-ether
+171	sp	16	1.9825	0.2824	# ss in 3-memberred rings
+172	sq	16	1.9825	0.2824	# ss in 4-memberred rings
+173	sx	16	1.9825	0.2824	# Special s4 in conjugated systems
+174	sy	16	1.9825	0.2824	# Special s6 in conjugated systems
+175	Cu	29	2.21	0.1729	# Copper 
+#
+# Hydrogen bond distances between donor and acceptor
+#
+# The table cannot be separated
+#       
+# First  line: Default distance for all atom and element types
+#       
+# First block:
+# element  donor
+# number   acceptor
+# i  j     distance
+# ------------------
+#
+# Second block:
+# atom     donor
+# type     acceptor
+# i  j     distance
+# ------------------
+#
+#
+#
+2.9
+9
+7    7    3.1
+7    8    2.9
+7   16    2.9
+8    8    2.7
+8   16    2.9
+16  16    2.9
+30   7    2.1
+30   8    2.05
+30  16    2.36
+1
+41 148	  2.9 # this is redundant, just to add 1 entry
+#
+# List of relative atomic weights
+#
+# First line: number of elements (without element 0)
+# element_name element_number atomic_weight
+#
+118
+LPH  0       0.000   # Lone Pair Hole
+H    1       1.008   # Hydrogen
+He   2       4.002   # Helium
+Li   3        6.94   # Lithium
+Be   4       9.012   # Beryllium
+B    5       10.81   # Boron
+C    6      12.011   # Carbon
+N    7      14.007   # Nitrogen
+O    8      15.999   # Oxygen
+F    9      18.998   # Fluorine
+Ne  10    20.17976   # Neon
+Na  11      22.989   # Sodium
+Mg  12      24.305   # Magnesium
+Al  13      26.981   # Aluminium
+Si  14      28.085   # Silicon
+P   15      30.973   # Phosphorus
+S   16       32.06   # Sulfur
+Cl  17       35.45   # Chlorine
+Ar  18     39.9481   # Argon
+K   19    39.09831   # Potassium
+Ca  20     40.0784   # Calcium
+Sc  21      44.955   # Scandium
+Ti  22     47.8671   # Titanium
+V   23    50.94151   # Vanadium
+Cr  24    51.99616   # Chromium
+Mn  25      54.938   # Manganese
+Fe  26     55.8452   # Iron
+Co  27      58.933   # Cobalt
+Ni  28    58.69344   # Nickel
+Cu  29     63.5463   # Copper
+Zn  30      65.382   # Zinc
+Ga  31     69.7231   # Gallium
+Ge  32     72.6308   # Germanium
+As  33      74.921   # Arsenic
+Se  34     78.9718   # Selenium
+Br  35      79.904   # Bromine
+Kr  36     83.7982   # Krypton
+Rb  37    85.46783   # Rubidium
+Sr  38      87.621   # Strontium
+Y   39      88.905   # Yttrium
+Zr  40     91.2242   # Zirconium
+Nb  41      92.906   # Niobium
+Mo  42      95.951   # Molybdenum
+Tc  43          97   # Technetium
+Ru  44     101.072   # Ruthenium
+Rh  45     102.905   # Rhodium
+Pd  46     106.421   # Palladium
+Ag  47   107.86822   # Silver
+Cd  48    112.4144   # Cadmium
+In  49    114.8181   # Indium
+Sn  50    118.7107   # Tin
+Sb  51    121.7601   # Antimony
+Te  52     127.603   # Tellurium
+I   53     126.904   # Iodine
+Xe  54    131.2936   # Xenon
+Cs  55     132.905   # Caesium
+Ba  56    137.3277   # Barium
+La  57     138.905   # Lanthanum
+Ce  58    140.1161   # Cerium
+Pr  59     140.907   # Praseodymium
+Nd  60    144.2423   # Neodymium
+Pm  61         145   # Promethium
+Sm  62     150.362   # Samarium
+Eu  63    151.9641   # Europium
+Gd  64     157.253   # Gadolinium
+Tb  65     158.925   # Terbium
+Dy  66    162.5001   # Dysprosium
+Ho  67     164.930   # Holmium
+Er  68    167.2593   # Erbium
+Tm  69     168.934   # Thulium
+Yb  70   173.04510   # Ytterbium
+Lu  71   174.96681   # Lutetium
+Hf  72     178.492   # Hafnium
+Ta  73     180.947   # Tantalum
+W   74     183.841   # Tungsten
+Re  75    186.2071   # Rhenium
+Os  76     190.233   # Osmium
+Ir  77    192.2173   # Iridium
+Pt  78    195.0849   # Platinum
+Au  79     196.966   # Gold
+Hg  80    200.5923   # Mercury
+Tl  81      204.38   # Thallium
+Pb  82      207.21   # Lead
+Bi  83     208.980   # Bismuth
+Po  84         209   # Polonium
+At  85         210   # Astatine
+Rn  86         222   # Radon
+Fr  87         223   # Francium
+Ra  88         226   # Radium
+Ac  89         227   # Actinium
+Th  90   232.03774   # Thorium
+Pa  91     231.035   # Protactinium
+U   92     238.028   # Uranium
+Np  93         237   # Neptunium
+Pu  94         244   # Plutonium
+Am  95         243   # Americium
+Cm  96         247   # Curium
+Bk  97         247   # Berkelium
+Cf  98         251   # Californium
+Es  99         252   # Einsteinium
+Fm 100         257   # Fermium
+Md 101         258   # Mendelevium
+No 102         259   # Nobelium
+Lr 103         262   # Lawrencium
+Rf 104         267   # Rutherfordium
+Db 105         270   # Dubnium
+Sg 106         269   # Seaborgium
+Bh 107         270   # Bohrium
+Hs 108         270   # Hassium
+Mt 109         278   # Meitnerium
+Ds 110         281   # Darmstadtium
+Rg 111         281   # Roentgenium
+Cn 112         285   # Copernicium
+Nh 113         286   # Nihonium
+Fl 114         289   # Flerovium
+Mc 115         289   # Moscovium
+Lv 116         293   # Livermorium
+Ts 117         293   # Tennessine
+Og 118         294   # Oganesson
+#
+end

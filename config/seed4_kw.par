@@ -1,0 +1,23 @@
+#	Do MC refinement?
+do_mc = n
+#       Starting temperature of MC run
+mc_temp = 600.0
+#	Max rigid body translation step (in Angstrom): coarse and fine moves
+mc_max_xyz_step = 0.7 0.1 
+#       Max rigid body rotation step (in degrees): coarse and fine moves
+mc_max_rot_step = 3.0 0.5
+#       MC MOVE SET FREQUENCIES:
+#       Freq of rigid body rotation moves p (q = 1 - p is the freq of rigid body translation move)
+mc_rot_freq = 0.5
+#       Relative freq. (wrt number of rot moves) of fine rotation moves:
+mc_rot_fine_freq = 0.75
+#       Relative freq. (wrt number of tran move) of fine translation moves:
+mc_xyz_fine_freq = 0.75
+#       Number of iterations / Frequency on which to calculate elec interactions
+mc_niter = 500 5 
+#       Annealing parameter (alpha)
+mc_sa_alpha = 0.995
+#           Seed for pseudo-random number generator
+mc_rseed = -1 # -1 uses the current time
+#	Do rigid body minimization? not functional at the moment
+do_sd = n
