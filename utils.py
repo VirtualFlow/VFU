@@ -1196,6 +1196,29 @@ def run_seed_docking(receptor, smi):
 
     return results
 
+
+def run_nnscore2(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/ligand.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+
+    # Perform the calculation: 
+    vina_loc = os.getcwd() + '/executables/vina'
+    os.system('export VINA_EXEC={}; python ./config/NNScore2.py -receptor {} -ligand {} -vina_executable $VINA_EXEC > output.txt'.format(vina_loc, receptor, lig_path))
+
+    os.system('cp ./output.txt ./outputs/{}.txt'.format(lig_path.split('/')[-1].split('.')[0]))
+    os.system('rm output.txt')
+    return 
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
