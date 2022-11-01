@@ -81,6 +81,9 @@ Please install the OpenEye software suite: [https://docs.eyesopen.com/toolkits/p
 Requirments
 Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https://ambermd.org/GetAmber.php#ambertools).
 
+### RF-score
+Please paste the executable from [https://github.com/oddt/rfscorevs_binary](https://github.com/oddt/rfscorevs_binary) in the executables directory. 
+
 ## Questions, problems?
 Make a github issue 😄. Please be as clear and descriptive as possible. Please feel free to reach
 out in person: (TODO)

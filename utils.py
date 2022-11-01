@@ -1219,6 +1219,34 @@ def run_nnscore2(receptor):
     os.system('rm output.txt')
     return 
 
+def run_rf_scoring(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/ligand.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+
+    # Perform the calculation: 
+    os.system('./executables/rf-score-vs --receptor {} {} -O ./outputs/ligands_rescored.pdbqt'.format(receptor, lig_path))
+    os.system('./executables/rf-score-vs --receptor {} {} -ocsv > temp.csv'.format(receptor, lig_path))
+
+    with open('./temp.csv', 'r') as f: 
+        lines = f.readlines()
+    rf_scores = []
+    for item in lines[1: ]: 
+        rf_scores.append( float(item.split(',')[-1]) )
+    
+    os.system('rm temp.csv')
+    return ['./outputs/ligands_rescored.pdbqt', rf_scores]
+    
+
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):
     try: 
