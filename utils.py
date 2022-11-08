@@ -793,7 +793,7 @@ def run_dock6(receptor, smi):
 
 def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness): 
     if receptor.split('.')[-1] != 'pdb': 
-        raise Exception('Please provide the receptor in pdb format for dock6')    
+        raise Exception('Please provide the receptor in pdb format for FRED')    
     
     process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
     lig_locations = os.listdir('./ligands/')
