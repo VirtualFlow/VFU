@@ -176,14 +176,25 @@ def run_rDock(receptor, smi):
     # Cavity generation: 
     os.system('rbcavity -was -d -r config.prm')
     
+    results = {}
+    
     # Perform docking: 
     os.system('mkdir rDock_outputs')
     for i,lig_ in enumerate(lig_locations): 
         os.system('mkdir rDock_outputs/{}'.format(i))
         lig_path = 'ligands/{}'.format(lig_)
-        os.system('rbdock -i {} -o {} -r config.prm -p dock.prm -n 50'.format(lig_path, 'rDock_outputs/{}'.format(i)))
+        os.system('rbdock -i {} -o {} -r config.prm -p dock.prm -n 50'.format(lig_path, 'rDock_outputs/{}.sd'.format(i)))
     
-    return 
+        # Read the docking scores: 
+        with open('rDock_outputs/{}.sd'.format(i), 'r') as f: 
+            lines = f.readlines()
+        score = []
+        for i,item in enumerate(lines):
+            if item.strip() == '>  <SCORE>': 
+                score.append(float(lines[i+1]))
+        docking_score = min(score)
+        results[lig_] = docking_score
+    return results
 
 
 

@@ -132,7 +132,7 @@ if program_choice == 'EquiBind':
     results = run_EquiBind(receptor, smi)
     sys.exit()
 if program_choice == 'rDock':   
-    run_rDock(receptor, smi)
+    results = run_rDock(receptor, smi)
     sys.exit()
 if program_choice == 'ledock': 
     run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)
