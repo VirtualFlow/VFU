@@ -56,7 +56,7 @@ def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size
 
 def run_autodock_gpu_docking(receptor, smi, program_choice): 
 
-    print('Note: For use of vina gpu, the receptor needs to be prepared in a specif way. Have a look at the examples provided in https://github.com/ccsb-scripps/AutoDock-GPU & the example dir we provided within executables/vf_gpu_example.zip')
+    print('Note: For use of vina gpu, the receptor needs to be prepared in a specific way. Have a look at the examples provided in https://github.com/ccsb-scripps/AutoDock-GPU & the example dir we provided within executables/vf_gpu_example.zip')
     command = []
     
     # receptor needs to be in mol2 format: 
@@ -90,6 +90,9 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
         
         vina_gpu_cmd = command + ['--ffile', '{}'.format(receptor)]
         vina_gpu_cmd = vina_gpu_cmd + ['--lfile', '{}'.format(lig_path)]
+        
+        print('cmd is: ', vina_gpu_cmd)
+        raise Exception('T')
 
         vina_gpu_cmd = subprocess.run(vina_gpu_cmd, capture_output=True)
         vina_gpu_cmd = vina_gpu_cmd.stdout.decode("utf-8").split('\n')[-6]
@@ -114,7 +117,7 @@ def run_EquiBind(receptor, smi):
         raise Exception('For EquiBind, protein file needs to be in pdb file type. Please incorporate this correction')
     
     # Process the ligands
-    process_ligand(smi, 'sdf') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'sdf') 
 
     # Make a direcotry containing all the tasks to be performed: 
     os.sytem('mkdir ./data/to_predict')
@@ -143,7 +146,7 @@ def run_rDock(receptor, smi):
     
     
     # Create ligands as '.sd' file type: 
-    process_ligand(smi, 'sd') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'sd') 
     lig_locations = os.listdir('./ligands/')
     
     ref_lig = '' # TODO!!!
@@ -301,7 +304,7 @@ def run_adfr_docking(receptor, smi):
         raise Exception('A trg file containing all the parameters is required for running adfr. Please have a look at the tutorial in: https://ccsb.scripps.edu/adfr/documentation/')
 
     # prepare the ligands:
-    process_ligand(smi, 'pdbqt') # pdbqt ligand format is supported in plants
+    process_ligand(smi, 'pdbqt') 
     lig_locations = os.listdir('./ligands/')
     
     print('Using target file: ', target_file[0])
@@ -352,7 +355,7 @@ def run_flexx_docking(receptor, smi):
         raise Exception('Receptor needs to be in pdb format')
     
     # prepare the ligands:
-    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'mol2') 
         
     lig_locations = os.listdir('./ligands/')
 
@@ -394,7 +397,7 @@ def run_AutodockZN(receptor, smi, center_x, center_y, center_z, size_x, size_y, 
         raise Exception('Could not locate ADFRsuite file (ADFRsuite-1.0/bin/autogrid4) in the home directory.')
         
     # prepare the ligands:
-    process_ligand(smi, 'pdbqt') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'pdbqt') 
     lig_locations = os.listdir('./ligands/')
     
     results = {}
@@ -511,7 +514,7 @@ def run_mcdock(receptor, smi):
         raise Exception('Executable named mcdock not found in the executables directory')
         
     # Process all ligands: 
-    process_ligand(smi, 'xyz') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'xyz') 
     lig_locations = os.listdir('./ligands/')
     
     results = {}
@@ -550,7 +553,7 @@ def run_ligand_fit(receptor, smi, center_x, center_y, center_z):
         raise Exception('Receptor mtz file (titled receptor.mtz) not found in config directory. File is required for running LigandFit')
 
     # Process all ligands: 
-    process_ligand(smi, 'pdb') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'pdb') 
     lig_locations = os.listdir('./ligands/')
 
     results = {}
@@ -591,7 +594,7 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
         raise Exception('Executable named GalaxyDock3 not found in the executables directory')
     
     # Process all ligands: 
-    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'mol2') 
     lig_locations = os.listdir('./ligands/')
     
     for lig_ in lig_locations: 
@@ -699,7 +702,7 @@ def run_dock6(receptor, smi):
     os.system('{}/bin/grid -i grid.in'.format(dock6_path))
     
     # Process all ligands: 
-    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'mol2') 
     lig_locations = os.listdir('./ligands/')
     
     for lig_ in lig_locations: 
@@ -795,7 +798,7 @@ def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y
     if receptor.split('.')[-1] != 'pdb': 
         raise Exception('Please provide the receptor in pdb format for FRED')    
     
-    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'mol2') 
     lig_locations = os.listdir('./ligands/')
     
     results = {}
@@ -817,7 +820,7 @@ def run_iGemDock(receptor, smi, exhaustiveness):
     if receptor.split('.')[-1] != 'pdb': 
         raise Exception('Please provide the receptor in pdb format for dock6')    
         
-    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'mol2') 
     
     lig_locations = os.listdir('./ligands/')
 
@@ -851,7 +854,7 @@ def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center
     if receptor.split('.')[-1] != 'mol2': 
         raise Exception('Please provide the receptor in mol2 format for gold')        
 
-    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'mol2') 
     
     lig_locations = os.listdir('./ligands/')
 
@@ -973,7 +976,7 @@ def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, si
     # Wait 3mins for grid preparation to finish: 
     time.sleep(180) 
 
-    process_ligand(smi, 'sd') # mol2 ligand format is supported in plants
+    process_ligand(smi, 'sd') 
     
     lig_locations = os.listdir('./ligands/')
 
