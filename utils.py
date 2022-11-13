@@ -255,16 +255,26 @@ def run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size
                              l_list_outfile='ledock_ligand.list',
                              out='dock.in')
         
-        # !../../bin/ledock_linux_x86 {'dock.in'}
         ledock_cmd = ['./executables/ledock', 'dock.in']
         ledock_cmd = subprocess.run(ledock_cmd, capture_output=True)
         
         if ledock_cmd.returncode == 0: 
-            results[lig_path] = './ligands/{}.dok'.format(lig_.split('.')[0])
+            os.system('cp ./ligands/{}.dok ./outputs/'.format(lig_.split('.')[0]))
+            with open('./outputs/{}.dok'.format(lig_.split('.')[0]), 'r') as f: 
+                lines = f.readlines()
+            lines = [x for x in lines if 'Score' in x]
+            scores = []
+            for item in lines: 
+                A = item.split('Score')[-1].strip().split(': ')[1].split(' ')[0]
+                scores.append(float(A))
+            results[lig_path] = ['./outputs/{}.dok'.format(lig_.split('.')[0]), min(scores)]
+        
         else: 
             results[lig_path] = 'FAIL'
         
         os.system('rm dock.in ledock_ligand.list')
+        
+        
         
     
 def process_idock_output(results): 
@@ -573,7 +583,6 @@ def run_ligand_fit(receptor, smi, center_x, center_y, center_z):
         lig_path = 'ligands/{}'.format(lig_)
         out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
 
-        
         os.system('./executables/ligandfit data=./config/receptor.mtz model={} ligand={} search_center={},{},{}'.format(receptor, lig_path, center_x, center_y, center_z))
         
         # Read in results: 
