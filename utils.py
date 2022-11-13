@@ -1151,8 +1151,10 @@ def run_mdock_docking(receptor, smi):
             f.writelines('box_filename (optional)      |      ')
             f.writelines('grid_box_size                |      10.0')
             f.writelines('sphere_point_filename        |      recn.sph')
-
-        os.system('{}/bin/MDock_Linux protein {} -param mdock_dock.par'.format(lig_path, mdock_path))
+            
+            
+        # $MDock/bin/MDock_Linux protein ligand.mol2 -param mdock_dock.par
+        os.system('{}/bin/MDock_Linux protein {} -param mdock_dock.par'.format(mdock_path, lig_path))
 
         os.system('cp ./mdock_dock.mol2 {}'.format(out_path))
 
