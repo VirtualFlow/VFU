@@ -18,7 +18,7 @@ command = []
 # Parameters:  
 is_selfies     = False 
 is_peptide     = False
-program_choice = 'gnina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'idock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
                              # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score
                            
@@ -194,9 +194,7 @@ for lig_ in lig_locations:
         cmd = cmd + ['--log', './outputs/log_{}.txt'.format(lig_.split('.')[0])]
 
     # Run the command: 
-        
-    raise Exception('TES')
-        
+                
     command_run = subprocess.run(cmd, capture_output=True)
     
     
