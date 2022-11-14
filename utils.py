@@ -101,6 +101,7 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
             lines = [x.strip() for x in vina_gpu_cmd if 'best energy' in x][0]
             docking_score = float(lines.split(',')[1].split(' ')[-2])
             results[lig_] = [docking_score, vina_gpu_cmd]
+            
     return results
 
 
