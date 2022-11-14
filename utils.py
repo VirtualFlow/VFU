@@ -65,16 +65,16 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
         raise Exception('Receptor needs to be of file type .maps.fld (example: 1stp_protein.maps.fld). Please try again, after incorporating this correction.')
     
     # check for the existence of the executable: 
-    if 'gpu' in program_choice: 
-        executable = [x for x in os.listdir('./executables') if 'autodock_gpu' in x][0]
-    elif 'cpu' in program_choice: 
-        executable = [x for x in os.listdir('./executables') if 'autodock_cpu' in x][0]
-    else: 
-        raise Exception('Executable must be of format autodock_cpu/gpu')
-    
-    if len(executable) == 0: 
-        raise Exception('Executable not found. Executable needs to have autodock_gpu in name (example: autodock_gpu_1wi/autodock_cpu_1wi)')
-                        
+    try:
+        if 'gpu' in program_choice: 
+            executable = [x for x in os.listdir('./executables') if 'autodock_gpu' in x][0]
+        elif 'cpu' in program_choice: 
+            executable = [x for x in os.listdir('./executables') if 'autodock_cpu' in x][0]
+        else: 
+            raise Exception('Executable must be of format autodock_cpu/gpu')
+    except: 
+        raise Exception('Executable file autodock_cpu/gpu not found in executables directory')
+           
     # Assign the right program for docking:  
     command.append('./executables/{}'.format(program_choice))
     
