@@ -90,9 +90,6 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
         
         vina_gpu_cmd = command + ['--ffile', '{}'.format(receptor)]
         vina_gpu_cmd = vina_gpu_cmd + ['--lfile', '{}'.format(lig_path)]
-        
-        print('cmd is: ', vina_gpu_cmd)
-        raise Exception('T')
 
         vina_gpu_cmd = subprocess.run(vina_gpu_cmd, capture_output=True)
         vina_gpu_cmd = vina_gpu_cmd.stdout.decode("utf-8").split('\n')[-6]
