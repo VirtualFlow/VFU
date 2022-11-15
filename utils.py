@@ -83,6 +83,7 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
     lig_locations = os.listdir('./ligands/')
 
     # Get ready for running the files: 
+    dlg_file = [x for x in os.listdir('./') if '.dlg' in x][0]
         
     results = {}
     for lig_ in lig_locations: 
@@ -99,8 +100,10 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
             results[lig_] = ['FAIL', vina_gpu_cmd]
         else: 
             lines = [x.strip() for x in vina_gpu_cmd if 'best energy' in x][0]
+            
+            
             docking_score = float(lines.split(',')[1].split(' ')[-2])
-            results[lig_] = [docking_score, vina_gpu_cmd]
+            results[lig_] = [docking_score, dlg_file]
             
     return results
 
