@@ -18,11 +18,11 @@ command = []
 # Parameters:  
 is_selfies     = False 
 is_peptide     = False
-program_choice = 'idock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'gwovina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
                              # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score
                            
-receptor       = './config/prot_1.pdb'
+receptor       = './config/5wiu_test.pdbqt'
 if program_choice == 'nnscore2': 
     run_nnscore2(receptor)
 if program_choice == 'rf-score': 
@@ -75,12 +75,12 @@ if program_choice == 'SEED':
     sys.exit()
 
 # Docking search paramters: 
-center_x       = -16                       # Define center for search space (x-axis)
-center_y       = 145                       # Define center for search space (y-axis)
-center_z       = 27                        # Define center for search space (z-axis)
-size_x         = 10                        # Define the length of the search space box (x-axis)
-size_y         = 10                        # Define the length of the search space box (y-axis)
-size_z         = 10                        # Define the length of the search space box (z-axis)
+center_x       = -17.820                      # Define center for search space (x-axis)
+center_y       = 16.140                       # Define center for search space (y-axis)
+center_z       = -18.643                      # Define center for search space (z-axis)
+size_x         = 18.75                        # Define the length of the search space box (x-axis)
+size_y         = 17.25                        # Define the length of the search space box (y-axis)
+size_z         = 18.75                        # Define the length of the search space box (z-axis)
 
 if program_choice == 'LigandFit': 
     results = run_ligand_fit(receptor, smi, center_x, center_y, center_z)
@@ -222,10 +222,23 @@ for lig_ in lig_locations:
                     docking_score.append(vr_2)
                 except: 
                     continue
-                        
+            if program_choice == 'vina_carb': 
+                line_split = item.split(' ')
+                line_split = [x for x in line_split if x != '']
+                if len(line_split) == 6: 
+                    try: 
+                        line_split = item.split(' ')
+                        line_split = [x for x in line_split if x != '']
+                        docking_score.append(float(line_split[1]))
+                    except: 
+                        continue 
                         # Docking Scores for all poses, Pose file, Log File               
         results[lig_] = [docking_score, './outputs/pose_{}.pdb'.format(lig_.split('.')[0]), './outputs/log_{}.txt'.format(lig_.split('.')[0])]
     else: 
         results[lig_] = 'Extremely high pose energy encountered/Unsuccessfull execution.'
 
     
+    if 'VC_log.txt' in os.listdir(): 
+        os.system('rm VC_log.txt')
+
+
