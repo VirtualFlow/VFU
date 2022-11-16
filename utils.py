@@ -489,20 +489,20 @@ def run_mm_gbsa():
     with open('./GBSA.sh', 'w') as f: 
         
         # Getting Ligand Parameters: 
-        f.writelines('export Chimera={}'.format(chimera_path))
-        f.writelines('charge=`$Chimera/bin/chimera --nogui --silent ligand.mol2 ./config/charges.py`')
-        f.writelines('antechamber -i ligand.mol2 -fi mol2 -o ligand_bcc.mol2 -fo mol2 -at gaff2 -c gas -rn LIG -nc $charge -pf y')
-        f.writelines('parmchk2 -i ligand_bcc.mol2 -f mol2 -o ligand.frcmod')
+        f.writelines('export Chimera={}\n'.format(chimera_path))
+        f.writelines('charge=`$Chimera/bin/chimera --nogui --silent ligand.mol2 ./config/charges.py`\n')
+        f.writelines('antechamber -i ligand.mol2 -fi mol2 -o ligand_bcc.mol2 -fo mol2 -at gaff2 -c gas -rn LIG -nc $charge -pf y\n')
+        f.writelines('parmchk2 -i ligand_bcc.mol2 -f mol2 -o ligand.frcmod\n')
 
         # Building Topology Files:
-        f.writelines('tleap -f ./config/tleap_r.in')
-        f.writelines('tleap -f ./config/tleap_c.in')
+        f.writelines('tleap -f ./config/tleap_r.in\n')
+        f.writelines('tleap -f ./config/tleap_c.in\n')
         
         # Run MD: 
-        f.writelines('sander -O -i ./config/min.in -p complex.prmtop -c complex.inpcrd -r min.rst -ref complex.inpcrd -o minim.out')
+        f.writelines('sander -O -i ./config/min.in -p complex.prmtop -c complex.inpcrd -r min.rst -ref complex.inpcrd -o minim.out\n')
         
         # Running MMPBSA.py
-        f.writelines('MMPBSA.py -O -i ./config/gbsa.in -cp complex.prmtop -rp receptor.prmtop -lp ligand.prmtop -y  min.rst')
+        f.writelines('MMPBSA.py -O -i ./config/gbsa.in -cp complex.prmtop -rp receptor.prmtop -lp ligand.prmtop -y  min.rst\n')
 
     os.system('chmod 777 GBSA.sh')
     os.system('./GBSA.sh') # Run the calculation
