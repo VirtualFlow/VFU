@@ -193,10 +193,7 @@ for lig_ in lig_locations:
     if program_choice != 'idock' and program_choice != 'autodock_vina' and program_choice != 'AutodockVina_1.2': 
         cmd = cmd + ['--log', './outputs/log_{}.txt'.format(lig_.split('.')[0])]
 
-    # Run the command: 
-    print('idock: ', cmd)
-    raise Exception('T')
-                
+    # Run the command:     
     command_run = subprocess.run(cmd, capture_output=True)
     
     
