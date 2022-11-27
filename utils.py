@@ -819,6 +819,9 @@ def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y
     if receptor.split('.')[-1] != 'pdb': 
         raise Exception('Please provide the receptor in pdb format for FRED')    
     
+    if os.path.exists('./oe_license.txt') == False: 
+        raise Exception('OpenEye licence file (oe_license.txt) not found in working directory')
+
     process_ligand(smi, 'mol2') 
     lig_locations = os.listdir('./ligands/')
     
@@ -826,12 +829,12 @@ def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y
     
     for lig_ in lig_locations: 
         lig_path = 'ligands/{}'.format(lig_)
-        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        out_path = './outputs/pose_{}.mol2'.format(lig_.split('.')[0])
         
         # Run docking: 
         os.system('python ./config/dock_fred.py --receptor-fn {} --ligand-fn {} --center-x {} --center-y {} --center-z {} --radius {} --num-poses {} --output-fn {}'.format(receptor, lig_path, center_x, center_y, center_z, max([size_x, size_y, size_z]), exhaustiveness, out_path))
         
-        results[lig_path] = [out_path, docking_score]
+        results[lig_path] = out_path
     
     return results
 
