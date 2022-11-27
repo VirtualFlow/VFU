@@ -84,6 +84,11 @@ Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https:/
 ### RF-score
 Please paste the executable from [https://github.com/oddt/rfscorevs_binary](https://github.com/oddt/rfscorevs_binary) in the executables directory. 
 
+### FRED
+Requirments
+Please install OpenEye: [https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html](https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html).
+Additionally, a valid OpenEye licence is required. Namely, a file named oe_license.txt needs to be placed in the working directory. 
+
 ## Questions, problems?
 Make a github issue 😄. Please be as clear and descriptive as possible. Please feel free to reach
 out in person: (TODO)
