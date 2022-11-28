@@ -613,6 +613,8 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
     # Check to ensure MCDock executable exists: 
     if os.path.exists('./executables/GalaxyDock3'): 
         raise Exception('Executable named GalaxyDock3 not found in the executables directory')
+    if os.path.exists('./data'): 
+        raise Exception('Data directory (./data) not found. Please have a look at the data directory in https://galaxy.seoklab.org/files/by2hsnvxjf/softwares/galaxydock.html (click the link galaxydock3)')
     
     # Process all ligands: 
     process_ligand(smi, 'mol2') 
@@ -620,7 +622,7 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
     
     for lig_ in lig_locations: 
         lig_path = 'ligands/{}'.format(lig_)
-        out_path = './outputs/pose_{}.xyz'.format(lig_.split('.')[0])
+        out_path = './outputs/pose_{}.mol2'.format(lig_.split('.')[0])
         
 
         # grid_n_elem    : Number of grid points for each directioni. This is should be
@@ -637,7 +639,7 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
             f.writelines(['!==============================================\n'])
             f.writelines(['! I/O Parameters\n'])
             f.writelines(['!==============================================\n'])
-            f.writelines(['data_directory    ./\n'])
+            f.writelines(['data_directory    ./data\n'])
             f.writelines(['infile_pdb        {}\n'.format(receptor)])
             f.writelines(['infile_ligand        {}\n'.format(lig_path)])
             f.writelines(['top_type          polarh\n'])
