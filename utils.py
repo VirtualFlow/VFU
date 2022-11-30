@@ -1213,7 +1213,6 @@ def run_seed_docking(receptor, smi):
         os.system('charge=`{}/bin/chimera --nogui --silent {} ./config/charges.py`; antechamber -i {} -fi mol2 -o ligand_gaff.mol2 -fo mol2 -at gaff2 -c gas -rn LIG -nc $charge -pf y'.format(chimera_path, lig_path, lig_path))
         os.system('python ./config/mol2seed4_receptor.py ligand_gaff.mol2 ligand_gaff.mol2 ligand_seed.mol2')
         
-        os.system('cp ./config/seed4_gaff.par ./; cp ./config/seed4_kw.par ./; cp ./config/seed.inp ./')
         os.system('{}/bin/seed_4 seed.inp > log'.format(seed_path))
         
         os.system('cp ./ligand_seed_best.mol2 {}'.format(out_path))
@@ -1227,6 +1226,67 @@ def run_seed_docking(receptor, smi):
 
     return results
 
+
+def run_molegro_docking(receptor, smi): 
+    
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+    
+    molegro_path = '$HOME/MVD'
+    if os.path.exists(molegro_path) == False: 
+        raise Exception('Molegro directory path {} not found. Please try again, after updating the location for Molegro. '.format(molegro_path))
+        
+    ref_ligand = ''
+    if os.path.exists(ref_ligand) == False: 
+        raise Exception('Molegro requires a reference ligand for docking. Reference ligand pat {} was not found. Please try again, after updating the path.'.format(ref_ligand))
+        
+    # prepare the ligands:
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+      
+    results = {}
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.mol2'.format(lig_.split('.')[0])
+        
+        os.system('cat {} {} > ligands.mol2'.format(ref_ligand, lig_path))
+        
+        with open('docking.mvdscript', 'a+') as f: 
+            f.writelines(['// Molegro Script Job.\n\n'])
+            f.writelines(['IMPORT Proteins;Waters;Cofactors FROM {}\n\n'.format(receptor)])
+            f.writelines(['PREPARE Bonds=IfMissing;BondOrders=IfMissing;Hydrogens=IfMissing;Charges=Always; TorsionTrees=Always\n\n'])
+            f.writelines(['IMPORT All FROM ligands.mol2\n\n'])
+            f.writelines(['SEARCHSPACE radius=12;center=Ligand[0]\n\n'])
+            f.writelines(['DOCK Ligand[1]\n\n\n'])
+            f.writelines(['EXIT'])
+
+        os.system('$Molegro/bin/mvd docking.mvdscript -nogui')
+        
+        cmd_ = [molegro_path, '.docking.mvdscript', '-nogui']
+        cmd_run = subprocess.run(cmd_, capture_output=True)
+        cmd_run = cmd_run.stdout.decode("utf-8").split('\n')[-2]
+        cmd_run = [x for x in cmd_run if 'Pose:' in x]
+        scores = []
+        for item in cmd_run: 
+            scores.append( float(item.split('Energy')[-1].split(' ')[1][:-2]) )
+
+        out_path_all = []
+        mol_files = [x for x in os.listdir('./') if 'mol2' in x]
+        for i,item in mol_files: 
+            out_path_aug = out_path.split('.mol2')[0] + '_{}_'.format(i) + '.mol2'
+            out_path_all.append(out_path_aug)
+            os.system('cp {} {}'.format(item, out_path_aug))
+        
+        del_files = [x for x in os.listdir('./') if '.txt' in x or '.mvdresults' in x]
+        for item in del_files: os.system('rm {}'.format(item))
+        
+        results[lig_path] = [scores, out_path_all]
+        
+    return results
+        
 
 def run_nnscore2(receptor): 
     receptor_format = receptor.split('.')[-1]
@@ -1253,7 +1313,7 @@ def run_nnscore2(receptor):
 def run_rf_scoring(receptor): 
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdb': 
-        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
         
@@ -1276,6 +1336,9 @@ def run_rf_scoring(receptor):
     
     os.system('rm temp.csv')
     return ['./outputs/ligands_rescored.pdbqt', rf_scores]
+
+
+
     
 
 def check_energy(lig_): 
