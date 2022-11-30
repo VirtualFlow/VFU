@@ -18,9 +18,9 @@ command = []
 # Parameters:  
 is_selfies     = False 
 is_peptide     = False
-program_choice = 'idock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'RPDSOVina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
-                             # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock
+                             # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/RPDSOVina
                            
 receptor       = './config/5wiu_test.pdbqt'
 if program_choice == 'nnscore2': 
@@ -160,13 +160,13 @@ if not(file_type_check == 'pdb' or file_type_check == 'pdbqt'):
 if program_choice == 'smina' or program_choice == 'gnina': 
     command.append('-r')
     command.append(receptor)
-elif program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
+elif program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina'  or program_choice == 'RPDSOVina': 
     command.append('--receptor')
     command.append(receptor)
 
 
 # Assign the right ligand for docking
-if  program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina':
+if  program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'RPDSOVina':
     process_ligand(smi, 'pdbqt')
 lig_locations = os.listdir('./ligands/')
 
@@ -174,7 +174,7 @@ lig_locations = os.listdir('./ligands/')
 for lig_ in lig_locations: 
     
     # Add in the ligand file and the exhaustiveness setting
-    if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or  program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
+    if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or  program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'RPDSOVina': 
         if program_choice == 'idock': 
             cmd = command + ['--ligand', './ligands/{}'.format(lig_)]
         else: 
@@ -191,7 +191,7 @@ for lig_ in lig_locations:
     cmd = cmd + ['--size_z', str(size_z)]
 
     # Add in parameters for generating output files: 
-    if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina': 
+    if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'RPDSOVina': 
         cmd = cmd + ['--out', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
     elif program_choice == 'smina' or program_choice == 'gnina': 
         cmd = cmd + ['-o', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
