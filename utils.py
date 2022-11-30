@@ -1286,6 +1286,50 @@ def run_molegro_docking(receptor, smi):
         results[lig_path] = [scores, out_path_all]
         
     return results
+
+def run_fitdock_docking(receptor, smi): 
+
+    fitdock_executable = './execuatable/FitDock'
+    if os.path.exists(fitdock_executable) == False: 
+        raise Exception('FitDock executable path {} not found. Please try again, after adding the executable (named FitDock) in the right directory.'.format(fitdock_executable))
+        
+    results = {}
+
+    receptor_template = ''
+    if os.path.exists(receptor_template) == False: 
+        raise Exception('Receptor template path {} not found. Please try again, after specifying the location for the template receptor (right above this line).'.format(fitdock_executable))
+
+    ligand_reference = ''
+    if os.path.exists(ligand_reference) == False: 
+        raise Exception('Ligand reference path {} not found. Please try again, after specifying the location for the reference ligand (right above this line).'.format(ligand_reference))
+        
+    if receptor_template.split('.')[-1] != 'pdb': 
+        raise Exception('Receptor template needs to be in pdb format. Please try again, after incorporating this correction.')
+    if ligand_reference.split('.')[-1] != 'mol2': 
+        raise Exception('Reference ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+    if receptor.split('.')[-1] != 'pdb': 
+        raise Exception('Processed protein needs to be in pdb format. Please try again, after incorporating this correction.')
+
+    # prepare the ligands:
+    process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
+    lig_locations = os.listdir('./ligands/')
+
+    for lig_ in lig_locations: 
+        lig_path = 'ligands/{}'.format(lig_)
+        out_path = './outputs/pose_{}.mol2'.format(lig_.split('.')[0])
+        
+        os.system('./execuatable/FitDock -Tprot {} -Tlig {} -Qprot {} -Qlig {} -ot ot.mol2 -os os.mol2 -o o.mol2 > out.log'.format(receptor_template, ligand_reference, receptor, lig_path))
+        os.system('cp o.mol2 {}'.format(out_path))
+        
+        with open('./out.log', 'r') as f: 
+            lines = f.readlines()
+        lines = [x for x in lines if 'Binding Score after  EM' in x]
+        docking_score = float(lines[0].split(' ')[-2])
+            
+        results[lig_path] = [out_path, docking_score]
+        os.system('rm o.mol2 os.mol2 ot.mol2 out.log')
+    
+    return results 
         
 
 def run_nnscore2(receptor): 
