@@ -1383,6 +1383,60 @@ def run_rf_scoring(receptor):
 
 
 
+def run_smina_scoring(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/pose_ligand_1.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+
+    # ./smina --receptor ./config/5wiu_test.pdbqt -l ./outputs/pose_ligand_1.pdbqt --score_only
+    cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = float([x for x in command_out if 'Affinity' in x][0].split(' ')[1])
+
+    return command_out
+
+
+def run_gnina_scoring(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/pose_ligand_1.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+    if os.path.exists('./executables/gnina') == False: 
+        raise Exception('Gnina executable {} not found.'.format('./executables/gnina'))
+
+    cmd = ['./executables/gnina', '--receptor', receptor, '-l', lig_path, '--score_only']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    score = command_out[-8:-4]
+    key_ = {}
+    for item in score: 
+        A = item.split(':')
+        key_[A[0]] = float(A[1].split(' ')[1])
+
+    return key_
+    
     
 
 def check_energy(lig_): 
