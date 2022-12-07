@@ -6,10 +6,11 @@ Created on Fri Sep 23 15:43:49 2022
 @author: akshat
 """
 import os 
+import subprocess
 import numpy as np 
 from rdkit import Chem
-from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem import MolToSmiles as mol2smi
+from rdkit.Chem.MolStandardize import rdMolStandardize
 from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers, StereoEnumerationOptions
 
 
@@ -41,53 +42,7 @@ def desalt_smi(smi):
     return smi_
 
 
-
-def perform_isomer_unique_correction(sterio_smiles_ls): 
-    '''
-    When RDkit enumerates sterio-isomers, some of them can be redundent. 
-    To resolve this, we use obabel to convert them into 3D, convert back to 
-    canonical smiles, and, use this as the final list of sterio smiles for 
-    a particular molecule. 
-
-    Parameters
-    ----------
-    sterio_smiles_ls : list of strings
-        A list of valid SMILE strings.
-
-    Returns
-    -------
-    isomers_canon : list of strings
-        A list of valid SMILE strings, containing the corrected smiles!.
-    '''
-
-    isomers_canon = []
-    
-    for smi in sterio_smiles_ls: 
-        
-        with open('./test.smi', 'w') as f: 
-            f.writelines(smi)
-        
-        os.system('obabel test.smi --gen3D -O test.sdf')
-        os.system('rm test.smi')
-        os.system('obabel test.sdf -O test.smi')
-    
-        with open('./test.smi', 'r') as f: 
-            new_smi = f.readlines()
-        new_smi = new_smi[0].strip()
-        
-        os.system('rm test.smi')
-        os.system('rm test.sdf')
-        
-        mol = Chem.MolFromSmiles(new_smi)
-        new_smi_canon = Chem.MolToSmiles(mol, canonical=True) 
-        
-        isomers_canon.append(new_smi_canon)
-        
-    return list(set(isomers_canon))
-
-
-
-def enumerate_sterio(smi, asigned=True, correct_errors=False ): 
+def enumerate_sterio(smi, asigned=True): 
     '''
     Enumerate all sterioisomers of the provided molecule smi. 
     Note: Only unspecified stereocenters are expanded. 
@@ -101,10 +56,6 @@ def enumerate_sterio(smi, asigned=True, correct_errors=False ):
                   for a smile (faster)
          if False, all isomer combinations will be generated, regardless of what is 
                   specified in the input smile (slower)
-    correct_errors: bool
-         if True, a round of error correction will be performed by converting the sterio
-                  smiles to 3D, convert back to canonical smiles for a unique list (slowe)
-         if False, No error correction is performed (faster)
 
     Returns
     -------
@@ -125,8 +76,6 @@ def enumerate_sterio(smi, asigned=True, correct_errors=False ):
     for smi in sorted(Chem.MolToSmiles(x,isomericSmiles=True) for x in isomers):
         sterio_smiles.append(smi)
         
-    if correct_errors == True: 
-        sterio_smiles = perform_isomer_unique_correction(sterio_smiles)
     return sterio_smiles
 
 
@@ -186,7 +135,7 @@ def neutralize_atoms(mol):
             atom.UpdatePropertyCache()
     return mol
 
-def process_ligand(smi, output_format, asigned_sterio=True): 
+def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_tautomer=2): 
     '''
     Convert provided smile string into 3-d coordinates, ready for molecular docking. 
     Steps performed include: 
@@ -232,18 +181,21 @@ def process_ligand(smi, output_format, asigned_sterio=True):
     # Enumerate sterio-isomers of the molecules: 
     smi = mol2smi(mol)
     sterio_smiles = enumerate_sterio(smi, asigned_sterio)
+    sterio_smiles = sterio_smiles[0: max_sterio]
 
     # Enumerate all tautomers of the sterio-isomers: 
     smiles_all = []
     for item in sterio_smiles: 
         tautomers = reorderTautomers(Chem.MolFromSmiles(item))
         tautomers = [mol2smi(x) for x in tautomers]
-        smiles_all.extend(tautomers)
+        smiles_all.extend(tautomers[0:max_tautomer])
 
     for i,smi in enumerate(smiles_all): 
         with open('./test.smi', 'w') as f: 
             f.writelines(smi)        
-        os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
+        # os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
+        cmd = ['obabel', 'test.smi', '--gen3d', '-O', './ligands/{}.{}'.format(i, output_format), '-p', '3.0']
+        command_run = subprocess.run(cmd, capture_output=True)
         
     os.system('rm test.smi')    
     
