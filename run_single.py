@@ -56,6 +56,8 @@ if is_peptide == True:
         raise Exception('RDKit unable to recognize amino acid sequence:', smi)
     smi = Chem.MolToSmiles(mol)
     
+if 'Si' in smi or 'Sn' in smi or 'B' in smi: 
+    raise Exception('Si/Sn/B found. Please be careful when using these for docking. Namely, the original AutoDock programs do not suport these atom types. Please make sure that the selected docking program support these atoms. Please remove this exception if everything is fine :)')
 
 if program_choice == 'flexx': 
     results = run_flexx_docking(receptor, smi)
