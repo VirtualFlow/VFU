@@ -19,9 +19,9 @@ command = []
 # Parameters:  
 is_selfies     = False 
 is_peptide     = False
-program_choice = 'gnina-scoring' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'AutoDock-Koto' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                              # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
-                             # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/RPDSOVina/smina-scoring/gnina-scoring
+                             # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/RPDSOVina/smina-scoring/gnina-scoring/AutoDock-Koto
                            
 receptor       = './config/5wiu_test.pdbqt'
 if program_choice == 'nnscore2': 
@@ -156,7 +156,8 @@ if program_choice == 'adfr':
 
 # Assign the right program for docking:  
 command.append('./executables/{}'.format(program_choice))
-
+if program_choice == 'AutoDock-Koto': 
+    program_choice = 'AutodockVina_1.2' # Run everything in the same setting as AutodockVina1.2
 
 # Assign the receptor for docking:  
 file_type_check = receptor.split('.')[-1]
