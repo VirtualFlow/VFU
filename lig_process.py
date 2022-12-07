@@ -65,6 +65,8 @@ def enumerate_sterio(smi, asigned=True):
     '''
 
     m = Chem.MolFromSmiles(smi)
+    # m = Chem.AddHs(m) # TODO
+    
     if asigned == True: # Faster
         opts = StereoEnumerationOptions(unique=True)
     else: 
@@ -94,6 +96,7 @@ def reorderTautomers(m):
     res : list of mol objects
         A collection of all tautomers of input molecule, returned as mol objects.
     '''
+    # m = Chem.AddHs(m) # TODO
     enumerator = rdMolStandardize.TautomerEnumerator()
     canon = enumerator.Canonicalize(m)
     csmi = Chem.MolToSmiles(canon)
@@ -180,6 +183,7 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
     
     # Enumerate sterio-isomers of the molecules: 
     smi = mol2smi(mol)
+    
     sterio_smiles = enumerate_sterio(smi, asigned_sterio)
     sterio_smiles = sterio_smiles[0: max_sterio]
 
@@ -189,20 +193,20 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
         tautomers = reorderTautomers(Chem.MolFromSmiles(item))
         tautomers = [mol2smi(x) for x in tautomers]
         smiles_all.extend(tautomers[0:max_tautomer])
-
+    
     for i,smi in enumerate(smiles_all): 
+        
         with open('./test.smi', 'w') as f: 
             f.writelines(smi)        
         # os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
-        cmd = ['obabel', 'test.smi', '--gen3d', '-O', './ligands/{}.{}'.format(i, output_format), '-p', '3.0']
+        cmd = ['obabel', 'test.smi', '--gen3d', '-O', './ligands/{}.{}'.format(i, output_format), '-p', '7.4']
         command_run = subprocess.run(cmd, capture_output=True)
-        
     os.system('rm test.smi')    
     
     
 if __name__ == '__main__': 
     A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf', asigned_sterio=True)
+    # A = process_ligand('[H]C(Br)=C([H])C1([H])OC2(F)C([H])([H])C2(Cl)C1([H])[H]', 'sdf', asigned_sterio=True)
     
-    # A = enumerate_sterio('BrC=CC1OC(C2)(F)C2(Cl)C1')
 
     
