@@ -138,6 +138,19 @@ def neutralize_atoms(mol):
             atom.UpdatePropertyCache()
     return mol
 
+def check_energy(lig_): 
+    # Check the quality of generated structure (some post-processing quality control):
+    try: 
+        ob_cmd = ['obenergy', lig_]
+        command_obabel_check = subprocess.run(ob_cmd, capture_output=True)
+        command_obabel_check = command_obabel_check.stdout.decode("utf-8").split('\n')[-2]
+        total_energy         = float(command_obabel_check.split(' ')[-2])
+    except: 
+        total_energy = 10000 # Calculation has failed. 
+        
+    return total_energy
+
+
 def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_tautomer=2): 
     '''
     Convert provided smile string into 3-d coordinates, ready for molecular docking. 
@@ -201,11 +214,16 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
         # os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
         cmd = ['obabel', 'test.smi', '--gen3d', '-O', './ligands/{}.{}'.format(i, output_format), '-p', '7.4']
         command_run = subprocess.run(cmd, capture_output=True)
+        
+        energy_val = check_energy('./ligands/{}.{}'.format(i, output_format))
+        if energy_val >= 10000: 
+            raise Exception('Bad ligand conformer encountered. The provided molecule possesses extremely high energy, or, contains atoms not parameterizable by the obenergy force-feild. Please raise a GitHub issue if (with the smile) if this seems incorrect.')
+        
     os.system('rm test.smi')    
     
     
 if __name__ == '__main__': 
-    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'sdf', asigned_sterio=True)
+    A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'pdbqt', asigned_sterio=True)
     # A = process_ligand('[H]C(Br)=C([H])C1([H])OC2(F)C([H])([H])C2(Cl)C1([H])[H]', 'sdf', asigned_sterio=True)
     
 
