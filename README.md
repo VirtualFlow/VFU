@@ -96,6 +96,16 @@ Note a data directory (name 'data') is required for successfuly
 ### SMINA Scoring
 Please not that the ligand to be scored must be the sole ligand in the file. 
 
+### LightDock
+We suggest downloading LightDock from: [https://github.com/lightdock/lightdock](https://github.com/lightdock/lightdock). Within the current working directory (VF-Unity), please run: 
+```
+git clone https://github.com/lightdock/lightdock.git
+virtualenv venv
+source venv/bin/activate
+cd lightdock
+pip install -e .
+```
+
 
 ## Questions, problems?
 Make a github issue 😄. Please be as clear and descriptive as possible. Please feel free to reach
