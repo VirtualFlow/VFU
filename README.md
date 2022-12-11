@@ -91,7 +91,7 @@ Additionally, a valid OpenEye licence is required. Namely, a file named oe_licen
 
 ### GalaxyDock3
 Please paste the executable from [https://galaxy.seoklab.org/files/by2hsnvxjf/softwares/galaxydock.html](https://galaxy.seoklab.org/files/by2hsnvxjf/softwares/galaxydock.html) in the executables directory. 
-Note a data directory (name 'data') is required for successfuly 
+Note a data directory (name 'data') is required for successful runs. 
 
 ### SMINA Scoring
 Please not that the ligand to be scored must be the sole ligand in the file. 
