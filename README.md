@@ -97,7 +97,7 @@ Note a data directory (name 'data') is required for successful runs.
 Please not that the ligand to be scored must be the sole ligand in the file. 
 
 ### LightDock
-We suggest downloading LightDock from: [https://github.com/lightdock/lightdock](https://github.com/lightdock/lightdock). Within the current working directory (VF-Unity), please run: 
+We suggest downloading LightDock from: [https://github.com/lightdock/lightdock](https://github.com/lightdock/lightdock). For this, within the current working directory (VF-Unity), please run: 
 ```
 git clone https://github.com/lightdock/lightdock.git
 virtualenv venv

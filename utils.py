@@ -1437,7 +1437,59 @@ def run_gnina_scoring(receptor):
 
     return key_
     
+def run_lightdock_docking(receptor, smi, exhaustiveness): 
+    results = {}
     
+    # receptor needs to be in mol2 format: 
+    recetor_format = receptor.split('.')[-1]
+    if recetor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')    
+
+    if os.path.exists('./lightdock') == False: 
+        raise Exception('Directory ./lightdock not found. Please try again, after incorporating this correction.')
+        
+    # prepare the ligands:
+    process_ligand(smi, 'pdb') 
+    lig_locations = os.listdir('./ligands/')
+    
+    os.system('cp {} ./'.format(receptor))
+    receptor_short = receptor.split('/')[-1]
+    
+    for i,lig_ in enumerate(lig_locations): 
+        lig_path = 'ligands/{}'.format(lig_)
+        os.system('cp {} ./'.format(lig_path))
+        lig_short = lig_path.split('/')[1]
+        
+        # LightDock setup:         
+        os.system('./lightdock/bin/lightdock3_setup.py {} {} --noxt --noh --now -anm'.format(receptor_short, lig_short))
+        # Docking: 
+        os.system('./lightdock/bin/lightdock3.py setup.json 100 -c 1 -l 0')
+        # Save poses: 
+        os.system('./lightdock/bin/lgd_generate_conformations.py {} {} swarm_0/gso_100.out {}'.format(receptor_short, lig_short ,exhaustiveness))
+
+        dir_ls = os.listdir('./swarm_0/')
+        complex_all = [x for x in dir_ls if '.pdb' in x]
+        
+        with open('./swarm_0/gso_100.out', 'r') as f: 
+            lines = f.readlines()
+        lines = lines[1: ]
+        scoring = []
+        for item in lines: 
+            A = item.split(' ')
+            scoring.append(float(A[-1]))
+
+        os.system('cp -a swarm_0 ./outputs/{}'.format(i))
+        results[lig_] = [scoring, ['./outputs/{}/'.format(i)+x for x in complex_all]]
+        print(results)
+
+        os.system('rm -rf swarm* init')
+        os.system('rm lightdock_lig.nm.npy lightdock_peptide.pdb lightdock_peptide_mask.npy lightdock_rec.nm.npy lightdock_receptor.pdb lightdock_receptor_mask.npy setup.json lightdock.info lightdock.info.1 {}'.format(lig_short))
+        rem_files = [x for x in os.listdir('./') if 'lightdock' in x and x != 'lightdock']
+        for x in rem_files: os.system('rm {}'.format(x))        
+
+    os.system('rm {}'.format(receptor_short))
+    return results
+
 
 def check_energy(lig_): 
     # Check the quality of generated structure (some post-processing quality control):

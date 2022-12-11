@@ -12,18 +12,19 @@ from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
 from utils import run_glide_docking, run_rosetta_docking, run_mdock_docking, run_seed_docking, run_nnscore2, run_rf_scoring, run_molegro_docking, run_fitdock_docking
-from utils import run_smina_scoring, run_gnina_scoring
+from utils import run_smina_scoring, run_gnina_scoring, run_lightdock_docking
 
 command = []
 
 # Parameters:  
 is_selfies     = False 
-is_peptide     = False
-program_choice = 'AutoDock-Koto' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
-                             # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
-                             # glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/RPDSOVina/smina-scoring/gnina-scoring/AutoDock-Koto
+is_peptide     = True
+program_choice = 'LightDock' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+                                 # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
+                                 # /glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/RPDSOVina/smina-scoring/gnina-scoring/AutoDock-Koto
+                                 # /LightDock
                            
-receptor       = './config/5wiu_test.pdbqt'
+receptor       = './config/receptor.pdb'
 if program_choice == 'nnscore2': 
     run_nnscore2(receptor)
 if program_choice == 'rf-score': 
@@ -33,7 +34,7 @@ if program_choice == 'smina-scoring':
 if program_choice == 'gnina-scoring': 
     score = run_gnina_scoring(receptor)
 
-smi            = 'C=C=C=C' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
+smi            = 'SQETFSDLWKLLPEN' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'C=C=C=C'
 exhaustiveness = 10
 
 
@@ -86,6 +87,10 @@ if program_choice == 'molegro':
 if program_choice == 'FitDock': 
     results = run_fitdock_docking(receptor, smi)
     sys.exit()
+if program_choice == 'LightDock': 
+    results = run_lightdock_docking(receptor, smi, exhaustiveness)
+    sys.exit()
+
 
 # Docking search paramters: 
 center_x       = -17.820                      # Define center for search space (x-axis)
