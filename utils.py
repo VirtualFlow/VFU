@@ -8,6 +8,7 @@ Created on Sun Sep 25 20:01:20 2022
 import os 
 import time 
 import subprocess
+import multiprocessing
 from lig_process import process_ligand
 
 def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z): 
@@ -1488,6 +1489,36 @@ def run_lightdock_docking(receptor, smi, exhaustiveness):
         for x in rem_files: os.system('rm {}'.format(x))        
 
     os.system('rm {}'.format(receptor_short))
+    return results
+
+def run_RLDock_docking(receptor, smi, exhaustiveness): 
+    
+    if receptor.split('.')[2] != 'mol2': 
+        raise Exception('Receptor file needs to be mol2 pdb file type. Please incorporate this correction')
+        
+    # Process the ligands
+    process_ligand(smi, 'mol2')
+    
+    results = {}
+    lig_locations = os.listdir('./ligands/')
+    for i,lig_ in enumerate(lig_locations): 
+        lig_path = 'ligands/{}'.format(lig_)
+        output_path = './outputs/{}'.format(lig_)
+        
+        os.system('./executables/RLDOCK -i {} -l {} -c {} -n {} -s config/sphere.dat'.format(receptor, lig_path, exhaustiveness, multiprocessing.cpu_count()))
+        
+        with open('./output_cluster.mol2', 'r') as f: 
+            lines = f.readlines()
+        lines = [x for x in lines if '# Total_Energy:' in x]
+        docking_scores = []
+        for item in lines: 
+            docking_scores.append(float(item.split(' ')[-1]))
+        
+        del_files = [x for x in os.listdir('./') if 'output' in x and x != 'outputs']
+        os.system('cp output_cluster.mol2 {}'.format(output_path))
+        for file_ in del_files: os.system('rm {}'.format(file_))
+        results[lig_path] = [output_path, docking_scores]
+        
     return results
 
 
