@@ -106,6 +106,16 @@ cd lightdock
 pip install -e .
 ```
 
+### MpSDockZN
+
+Please add the executable (of name `MpSDock`) in executables directory.
+Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https://ambermd.org/GetAmber.php#ambertools).
+We managed performed the download using conda. 
+Please note: the variable `chimera_path` should be updated to location of the Chimera on your system. Chimera can be downloaded: [https://www.cgl.ucsf.edu/chimera/download.html](https://www.cgl.ucsf.edu/chimera/download.html).
+A working dock6 download (with a valid licence) is required. The variable `dock6_path` should be updated to location of the Chimera on your system.
+A `box.in` input file is required for the program. Please specify the path in variable `box_in_file`.
+A `grid.in` input file is required for the program. Please specify the path in variable `grid_in_file`.
+A `dock.in` input file is required for the program. Please specify the path in variable `dock_in_file`.
 
 ## Questions, problems?
 Make a github issue 😄. Please be as clear and descriptive as possible. Please feel free to reach

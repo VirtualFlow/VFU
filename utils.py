@@ -1494,7 +1494,7 @@ def run_lightdock_docking(receptor, smi, exhaustiveness):
 def run_RLDock_docking(receptor, smi, exhaustiveness): 
     
     if receptor.split('.')[2] != 'mol2': 
-        raise Exception('Receptor file needs to be mol2 pdb file type. Please incorporate this correction')
+        raise Exception('Receptor file needs to be mol2 file type. Please incorporate this correction')
         
     # Process the ligands
     process_ligand(smi, 'mol2')
@@ -1520,6 +1520,64 @@ def run_RLDock_docking(receptor, smi, exhaustiveness):
         results[lig_path] = [output_path, docking_scores]
         
     return results
+
+
+def run_MpSDockZN_docking(receptor, smi): 
+    results = {}
+    
+    dock6_path   = ''
+    chimera_path = ''    
+    box_in_file  = ''
+    grid_in_file  = ''
+    dock_in_file  = ''
+
+    if receptor.split('.')[2] != 'pdb': 
+        raise Exception('Receptor file needs to be pdb file type. Please incorporate this correction')
+    
+    if os.path.exists(dock6_path) == False: 
+        raise Exception('dock6 path not found. Please incorporate this correction')
+    if os.path.exists(chimera_path) == False: 
+        raise Exception('chimera path not found. Please incorporate this correction')
+    if os.path.exists(grid_in_file) == False: 
+        raise Exception('grid.in file not found. Please incorporate this correction')
+    if os.path.exists(dock_in_file) == False: 
+        raise Exception('dock.in file not found. Please incorporate this correction')
+        
+    # Process the ligands
+    process_ligand(smi, 'mol2')
+    
+    results = {}
+    lig_locations = os.listdir('./ligands/')
+    for i,lig_ in enumerate(lig_locations): 
+        lig_path = 'ligands/{}'.format(lig_)
+        output_path = './outputs/{}'.format(lig_)
+        
+        with open('./run.sh', 'w') as f: 
+            f.writelines(['export Chimera={}\n'.format(chimera_path)])
+            f.writelines(['export DOCK6={}\n'.format(dock6_path)])
+            f.writelines(['charge=`$Chimera/bin/chimera --nogui --silent {} charges.py`\n'.format(lig_path)])
+            f.writelines(['antechamber -i {} -fi mol2 -o ligand_input.mol2 -fo mol2 -at sybyl -c gas -rn LIG -nc $charge -pf y\n'.format(lig_path)])
+            f.writelines(['$DOCK6/bin/showbox < {} \n'.format(box_in_file)])
+            f.writelines(['$DOCK6/bin/grid -i {} \n'.format(grid_in_file)])
+            f.writelines(['./executables/MpSDock -i {} \n'.format(dock_in_file)])
+            
+        os.system('chmod 777 ./run.sh; ./run.sh')
+        os.system('cp receptor_input_docked_result.mol2 {}'.format(output_path))
+        
+        score_all = []
+        with open('./receptor_input_docked_result.list', 'r') as f: 
+            lines = f.readlines()
+        for item in lines: 
+            A = item.split(' ')
+            A = [x for x in A if x != '']
+            try: score_1, score_2, score_3, score_4, score_5 = float(A[0]), float(A[1]), float(A[2]),float(A[3]), float(A[4])
+            except: continue 
+            final_score = score_1 + score_2 + score_3 + score_4 + score_5
+            score_all.append(final_score)
+        
+        results[lig_path] = [output_path, score_all]
+        
+    return results 
 
 
 def check_energy(lig_): 
