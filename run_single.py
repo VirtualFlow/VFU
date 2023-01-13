@@ -12,7 +12,7 @@ from lig_process import process_ligand
 from utils import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from utils import check_energy, run_mm_gbsa, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
 from utils import run_glide_docking, run_rosetta_docking, run_mdock_docking, run_seed_docking, run_nnscore2, run_rf_scoring, run_molegro_docking, run_fitdock_docking
-from utils import run_smina_scoring, run_gnina_scoring, run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_docking
+from utils import run_smina_scoring, run_gnina_scoring, run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_docking, run_ad4_scoring, run_vinandro_scoring, run_vina_scoring
 
 command = []
 
@@ -22,18 +22,29 @@ is_peptide     = False
 program_choice = 'qvina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                                 # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
                                  # /glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/PSOVina/smina-scoring/gnina-scoring/AutoDock-Koto
-                                 # /LightDock/RLDock/MpSDockZN
+                                 # /LightDock/RLDock/MpSDockZN/ad4_scoring/vinandro_scoring/vina_scoring
                            
 receptor       = './config/5wiu_test.pdbqt'
 if program_choice == 'nnscore2': 
     run_nnscore2(receptor)
+    sys.exit()
 if program_choice == 'rf-score': 
     rescored_pose, rf_scores = run_rf_scoring(receptor)
 if program_choice == 'smina-scoring': 
     score = run_smina_scoring(receptor)
+    sys.exit()
 if program_choice == 'gnina-scoring': 
     score = run_gnina_scoring(receptor)
-
+    sys.exit()
+if program_choice == 'ad4_scoring': 
+    score = run_ad4_scoring(receptor)
+    sys.exit()
+if program_choice == 'vinandro_scoring': 
+    score = run_vinandro_scoring(receptor)
+    sys.exit()
+if program_choice == 'vina_scoring': 
+    score = run_vina_scoring(receptor)
+    sys.exit()
 
 smi            = 'C=C=C=C' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'C=C=C=C', 'SQETFSDLWKLLPEN'
 exhaustiveness = 10

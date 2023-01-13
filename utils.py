@@ -1382,8 +1382,6 @@ def run_rf_scoring(receptor):
     os.system('rm temp.csv')
     return ['./outputs/ligands_rescored.pdbqt', rf_scores]
 
-
-
 def run_smina_scoring(receptor): 
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
@@ -1398,7 +1396,6 @@ def run_smina_scoring(receptor):
     if os.path.exists(lig_path) == False: 
         raise Exception('Ligand path {} not found.'.format(lig_path))
 
-    # ./smina --receptor ./config/5wiu_test.pdbqt -l ./outputs/pose_ligand_1.pdbqt --score_only
     cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only']    
     
     command_run = subprocess.run(cmd, capture_output=True)
@@ -1408,6 +1405,74 @@ def run_smina_scoring(receptor):
 
     return command_out
 
+def run_ad4_scoring(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/pose_ligand_1.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+
+    cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only', '--scoring', 'ad4_scoring']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = float([x for x in command_out if 'Affinity' in x][0].split(' ')[1])
+
+    return command_out
+
+def run_vinandro_scoring(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/pose_ligand_1.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+
+    cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only', '--scoring', 'vinardo']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = float([x for x in command_out if 'Affinity' in x][0].split(' ')[1])
+
+    return command_out
+
+def run_vina_scoring(receptor): 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if os.path.exists(receptor) == False: 
+        raise Exception('Recpetion path {} not found.'.format(receptor))
+        
+    lig_path = './config/pose_ligand_1.pdbqt'
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+
+    cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only', '--scoring', 'vina']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = float([x for x in command_out if 'Affinity' in x][0].split(' ')[1])
+
+    return command_out
 
 def run_gnina_scoring(receptor): 
     receptor_format = receptor.split('.')[-1]
@@ -1437,6 +1502,123 @@ def run_gnina_scoring(receptor):
         key_[A[0]] = float(A[1].split(' ')[1])
 
     return key_
+
+def contact_score(receptor_file, chimera_path, dock6_path, ligand_file): 
+
+    recetor_format = receptor_file.split('.')[-1]
+    if recetor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    
+    with open('./dock6_sript.sh', 'w') as f: 
+        f.writelines(['export Chimera={}\n'.format(chimera_path)])
+        f.writelines(['export DOCK6={}\n'.format(dock6_path)])
+        f.writelines(['$Chimera/bin/chimera --nogui {} dockprep.py\n'.format(receptor_file)])
+        f.writelines(['$DOCK6/bin/sphgen INSPH\n']) # Del: rm OUTSPH rec.sph temp1.ms temp3.atc
+        f.writelines(['$DOCK6/bin/sphere_selector rec.sph {} 12.0\n'.format(ligand_file)])
+        f.writelines(['$DOCK6/bin/showbox < box.in\n'])
+        f.writelines(['$DOCK6/bin/grid -i grid.in\n'])
+        f.writelines(['$DOCK6/bin/dock6 -i Contact_Score.in\n'])
+    
+    os.system('chmod 777 dock6_sript.sh')
+    
+    # Create INSPH File: 
+    with open('./INSPH', 'w') as f: 
+        f.writelines('rec.ms\n')
+        f.writelines('R\n')
+        f.writelines('X\n')
+        f.writelines('0.0\n')
+        f.writelines('4.0\n')
+        f.writelines('1.4\n')
+        f.writelines('rec.sph\n')
+    
+    # Create box.in File: 
+    with open('./box.in', 'w') as f: 
+        f.writelines('N\n')
+        f.writelines('U\n')
+        f.writelines('{}   {}    {}\n'.format(9, 14, 7))
+        f.writelines('25 25 25\n')
+        f.writelines('rec_box.pdb\n')
+    
+    with open('./grid.in', 'w') as f: 
+        f.writelines('compute_grids                  yes\n')
+        f.writelines('energy_score                   yes\n')
+        f.writelines('energy_cutoff_distance         9999\n')
+        f.writelines('atom_model                     a\n')
+        f.writelines('bump_filter                    yes\n')
+        f.writelines('receptor_file                  {}\n'.format(receptor_file))
+        f.writelines('box_file                       rec_box.pdb\n')
+        f.writelines('vdw_definition_file            {}/parameters/vdw_AMBER_parm99.defn\n'.format(dock6_path))
+        f.writelines('score_grid_prefix              grid\n')
+        f.writelines('grid_spacing                   0.3\n')
+        f.writelines('output_molecule                no\n')
+        f.writelines('contact_score                  yes\n')
+        f.writelines('attractive_exponent            6\n')
+        f.writelines('repulsive_exponent             12\n')
+        f.writelines('distance_dielectric            yes\n')
+        f.writelines('dielectric_factor              4\n')
+        f.writelines('bump_overlap                   0.75\n')
+        f.writelines('contact_cutoff_distance        4.5\n')
+    
+    with open('./Contact_Score.in', 'w') as f: 
+        f.writelines(['conformer_search_type                                        rigid\n'])
+        f.writelines(['use_internal_energy                                          yes\n'])
+        f.writelines(['internal_energy_rep_exp                                      12\n'])
+        f.writelines(['internal_energy_cutoff                                       100.0\n'])
+        f.writelines(['ligand_atom_file                                             {}\n'.format(ligand_file)])
+        f.writelines(['limit_max_ligands                                            no\n'])
+        f.writelines(['skip_molecule                                                no\n'])
+        f.writelines(['read_mol_solvation                                           no\n'])
+        f.writelines(['calculate_rmsd                                               no\n'])
+        f.writelines(['use_database_filter                                          no\n'])
+        f.writelines(['orient_ligand                                                no\n'])
+        f.writelines(['bump_filter                                                  no\n'])
+        f.writelines(['score_molecules                                              yes\n'])
+        f.writelines(['contact_score_primary                                        yes\n'])
+        f.writelines(['contact_score_secondary                                      no\n'])
+        f.writelines(['contact_score_cutoff_distance                                4.5\n'])
+        f.writelines(['contact_score_clash_overlap                                  0.75\n'])
+        f.writelines(['contact_score_clash_penalty                                  50\n'])
+        f.writelines(['contact_score_grid_prefix                                    grid\n'])
+        f.writelines(['grid_score_secondary                                         no\n'])
+        f.writelines(['multigrid_score_secondary                                    no\n'])
+        f.writelines(['dock3.5_score_secondary                                      no\n'])
+        f.writelines(['continuous_score_secondary                                   no\n'])
+        f.writelines(['footprint_similarity_score_secondary                         no\n'])
+        f.writelines(['pharmacophore_score_secondary                                no\n'])
+        f.writelines(['descriptor_score_secondary                                   no\n'])
+        f.writelines(['gbsa_zou_score_secondary                                     no\n'])
+        f.writelines(['gbsa_hawkins_score_secondary                                 no\n'])
+        f.writelines(['SASA_score_secondary                                         no\n'])
+        f.writelines(['amber_score_secondary                                        no\n'])
+        f.writelines(['minimize_ligand                                              yes\n'])
+        f.writelines(['simplex_max_iterations                                       1000\n'])
+        f.writelines(['simplex_tors_premin_iterations                               0\n'])
+        f.writelines(['simplex_max_cycles                                           1\n'])
+        f.writelines(['simplex_score_converge                                       0.1\n'])
+        f.writelines(['simplex_cycle_converge                                       1.0\n'])
+        f.writelines(['simplex_trans_step                                           1.0\n'])
+        f.writelines(['simplex_rot_step                                             0.1\n'])
+        f.writelines(['simplex_tors_step                                            10.0\n'])
+        f.writelines(['simplex_random_seed                                          0\n'])
+        f.writelines(['simplex_restraint_min                                        no\n'])
+        f.writelines(['atom_model                                                   all\n'])
+        f.writelines(['vdw_defn_file                                                {}/parameters/vdw_AMBER_parm99.defn\n'.format(dock6_path)])
+        f.writelines(['flex_defn_file                                               {}/parameters/flex.defn\n'.format(dock6_path)])
+        f.writelines(['flex_drive_file                                              {}/parameters/flex_drive.tbl\n'.format(dock6_path)])
+        f.writelines(['ligand_outfile_prefix                                        ligand_out\n'])
+        f.writelines(['write_orientations                                           no\n'])
+        f.writelines(['num_scored_conformers                                        1\n'])
+        f.writelines(['rank_ligands                                                 no\n'])
+    
+    os.system('./dock6_sript.sh')
+    
+    os.system('rm box.in Contact_Score.in dock6_sript.sh dockprep.py dockprep.pyc grid.bmp grid.cnt grid.in grid.nrg INSPH OUTSPH rec.ms rec.sph rec_box.pdb rec_charged.mol2 rec_noH.pdb selected_spheres.sph')
+    
+    with open('./ligand_out_scored.mol2', 'r') as f: 
+        lines = f.readlines()
+    score = float([x for x in lines[2].split(' ') if x!= ''][-1])
+    
+    return score
     
 def run_lightdock_docking(receptor, smi, exhaustiveness): 
     results = {}
