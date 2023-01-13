@@ -96,7 +96,6 @@ def reorderTautomers(m):
     res : list of mol objects
         A collection of all tautomers of input molecule, returned as mol objects.
     '''
-    # m = Chem.AddHs(m) # TODO
     enumerator = rdMolStandardize.TautomerEnumerator()
     canon = enumerator.Canonicalize(m)
     csmi = Chem.MolToSmiles(canon)

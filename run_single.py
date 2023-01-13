@@ -20,9 +20,9 @@ command = []
 is_selfies     = False 
 is_peptide     = False
 program_choice = 'qvina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
-                                 # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
+                                # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
                                  # /glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/PSOVina/smina-scoring/gnina-scoring/AutoDock-Koto
-                                 # /LightDock/RLDock
+                                 # /LightDock/RLDock/MpSDockZN
                            
 receptor       = './config/5wiu_test.pdbqt'
 if program_choice == 'nnscore2': 
@@ -34,9 +34,9 @@ if program_choice == 'smina-scoring':
 if program_choice == 'gnina-scoring': 
     score = run_gnina_scoring(receptor)
 
+
 smi            = 'C=C=C=C' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'C=C=C=C', 'SQETFSDLWKLLPEN'
 exhaustiveness = 10
-
 
 if os.path.exists('./ligands') == False: 
     subprocess.run(['mkdir', './ligands'])
@@ -97,8 +97,10 @@ if program_choice == 'LightDock':
 if program_choice == 'RLDock': 
     results = run_RLDock_docking(receptor, smi, exhaustiveness)
     sys.exit()
-
-
+if program_choice == 'MpSDockZN': 
+    score = run_MpSDockZN_docking(receptor, smi)
+    sys.exit()
+    
 # Docking search paramters: 
 center_x       = -17.820                      # Define center for search space (x-axis)
 center_y       = 16.140                       # Define center for search space (y-axis)
