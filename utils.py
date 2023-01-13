@@ -1520,6 +1520,7 @@ def contact_score(receptor_file, chimera_path, dock6_path, ligand_file):
         f.writelines(['$DOCK6/bin/dock6 -i Contact_Score.in\n'])
     
     os.system('chmod 777 dock6_sript.sh')
+    os.system('cp config/dockprep.py ./dockprep.py')
     
     # Create INSPH File: 
     with open('./INSPH', 'w') as f: 
@@ -1619,6 +1620,93 @@ def contact_score(receptor_file, chimera_path, dock6_path, ligand_file):
     score = float([x for x in lines[2].split(' ') if x!= ''][-1])
     
     return score
+
+
+def continuous_score(receptor_file, chimera_path, dock6_path, ligand_file): 
+
+    recetor_format = receptor_file.split('.')[-1]
+    if recetor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    
+    with open('./dock6_sript.sh', 'w') as f: 
+        f.writelines(['export Chimera={}\n'.format(chimera_path)])
+        f.writelines(['export DOCK6={}\n'.format(dock6_path)])
+        f.writelines(['$Chimera/bin/chimera --nogui {} dockprep.py\n'.format(receptor_file)])
+        f.writelines(['$DOCK6/bin/dock6 -i Continuous_Score.in\n'])
+        
+    os.system('cp config/dockprep.py ./dockprep.py')
+    os.system('chmod 777 dock6_sript.sh')
+    
+    with open('./Continuous_Score.in', 'w') as f: 
+        f.writelines(['conformer_search_type                                        rigid\n'])
+        f.writelines(['use_internal_energy                                          yes\n'])
+        f.writelines(['internal_energy_rep_exp                                      12\n'])
+        f.writelines(['internal_energy_cutoff                                       100.0\n'])
+        f.writelines(['ligand_atom_file                                             {}\n'.format(ligand_file)])
+        f.writelines(['limit_max_ligands                                            no\n'])
+        f.writelines(['skip_molecule                                                no\n'])
+        f.writelines(['read_mol_solvation                                           no\n'])
+        f.writelines(['calculate_rmsd                                               no\n'])
+        f.writelines(['use_database_filter                                          no\n'])
+        f.writelines(['orient_ligand                                                no\n'])
+        f.writelines(['bump_filter                                                  no\n'])
+        f.writelines(['score_molecules                                              yes\n'])
+        f.writelines(['contact_score_primary                                        no\n'])
+        f.writelines(['contact_score_secondary                                      no\n'])
+        f.writelines(['grid_score_primary                                           no\n'])
+        f.writelines(['grid_score_secondary                                         no\n'])
+        f.writelines(['multigrid_score_primary                                      no\n'])
+        f.writelines(['multigrid_score_secondary                                    no\n'])
+        f.writelines(['dock3.5_score_primary                                        no\n'])
+        f.writelines(['dock3.5_score_secondary                                      no\n'])
+        f.writelines(['continuous_score_primary                                     yes\n'])
+        f.writelines(['continuous_score_secondary                                   no\n'])
+        f.writelines(['cont_score_rec_filename                                      rec_charged.mol2\n'])
+        f.writelines(['cont_score_att_exp                                           6\n'])
+        f.writelines(['cont_score_rep_exp                                           12\n'])
+        f.writelines(['cont_score_rep_rad_scale                                     1.0\n'])
+        f.writelines(['cont_score_use_dist_dep_dielectric                           yes\n'])
+        f.writelines(['cont_score_dielectric                                        4.0\n'])
+        f.writelines(['cont_score_vdw_scale                                         yes\n'])
+        f.writelines(['cont_score_turn_off_vdw                                      yes\n'])
+        f.writelines(['cont_score_es_scale                                          1.0\n'])
+        f.writelines(['footprint_similarity_score_secondary                         no\n'])
+        f.writelines(['pharmacophore_score_secondary                                no\n'])
+        f.writelines(['descriptor_score_secondary                                   no\n'])
+        f.writelines(['gbsa_zou_score_secondary                                     no\n'])
+        f.writelines(['gbsa_hawkins_score_secondary                                 no\n'])
+        f.writelines(['SASA_score_secondary                                         no\n'])
+        f.writelines(['amber_score_secondary                                        no\n'])
+        f.writelines(['minimize_ligand                                              yes\n'])
+        f.writelines(['simplex_max_iterations                                       1000\n'])
+        f.writelines(['simplex_tors_premin_iterations                               0\n'])
+        f.writelines(['simplex_max_cycles                                           1\n'])
+        f.writelines(['simplex_score_converge                                       0.1\n'])
+        f.writelines(['simplex_cycle_converge                                       1.0\n'])
+        f.writelines(['simplex_trans_step                                           1.0\n'])
+        f.writelines(['simplex_rot_step                                             0.1\n'])
+        f.writelines(['simplex_tors_step                                            10.0\n'])
+        f.writelines(['simplex_random_seed                                          0\n'])
+        f.writelines(['simplex_restraint_min                                        no\n'])
+        f.writelines(['atom_model                                                   all\n'])
+        f.writelines(['vdw_defn_file                                                {}/parameters/vdw_AMBER_parm99.defn\n'.format(dock6_path)])
+        f.writelines(['flex_defn_file                                               {}/parameters/flex.defn\n'.format(dock6_path)])
+        f.writelines(['flex_drive_file                                              {}/parameters/flex_drive.tbl\n'.format(dock6_path)])
+        f.writelines(['ligand_outfile_prefix                                        ligand_out\n'])
+        f.writelines(['write_orientations                                           no\n'])
+        f.writelines(['num_scored_conformers                                        1\n'])
+        f.writelines(['rank_ligands                                                 no\n'])
+    
+    os.system('./dock6_sript.sh')
+    
+    os.system('rm Continuous_Score.in dock6_sript.sh dockprep.py dockprep.pyc rec_charged.mol2 rec_noH.pdb')
+    
+    with open('./ligand_out_scored.mol2', 'r') as f: 
+        lines = f.readlines()
+    score = float([x for x in lines[2].split(' ') if x!= ''][-1])
+    
+    return score 
+
     
 def run_lightdock_docking(receptor, smi, exhaustiveness): 
     results = {}
