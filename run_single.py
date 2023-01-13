@@ -19,7 +19,7 @@ command = []
 # Parameters:  
 is_selfies     = False 
 is_peptide     = False
-program_choice = 'MpSDockZN_docking' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
+program_choice = 'qvina' # smina/qvina/qvina-w/vina/vina_carb/vina_xb/gwovina/PLANTS/autodock_gpu/autodock_cpu/EquiBind/rDock/gnina/ledock/idock
                                  # /autodock_vina/adfr/AutodockVina_1.2/AutodockZN/flexx/MM-GBSA/MCDock/LigandFit/GalaxyDock3/dock6/FRED/iGemDock/gold
                                  # /glide/rosetta-ligand/M-Dock/SEED/nnscore2/rf-score/molegro/FitDock/PSOVina/smina-scoring/gnina-scoring/AutoDock-Koto
                                  # /LightDock/RLDock
@@ -36,6 +36,10 @@ if program_choice == 'gnina-scoring':
 
 smi            = 'C=C=C=C' # 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'C=C=C=C', 'SQETFSDLWKLLPEN'
 exhaustiveness = 10
+
+
+if os.path.exists('./ligands') == False: 
+    subprocess.run(['mkdir', './ligands'])
 
 
 if is_selfies == True: 
