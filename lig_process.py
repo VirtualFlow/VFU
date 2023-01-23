@@ -213,7 +213,6 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
         # os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
         cmd = ['obabel', 'test.smi', '--gen3d', '-O', './ligands/{}.{}'.format(i, output_format), '-p', '7.4']
         command_run = subprocess.run(cmd, capture_output=True, timeout=10)
-        print(command_run)
         
         if command_run.returncode == 0: 
             energy_val = check_energy('./ligands/{}.{}'.format(i, output_format))
