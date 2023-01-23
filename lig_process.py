@@ -212,12 +212,18 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
             f.writelines(smi)        
         # os.system('obabel test.smi --gen3d  -O ./ligands/{}.{}'.format(i, output_format)) # Protonation states at pH 7.4 is used!
         cmd = ['obabel', 'test.smi', '--gen3d', '-O', './ligands/{}.{}'.format(i, output_format), '-p', '7.4']
-        command_run = subprocess.run(cmd, capture_output=True)
+        command_run = subprocess.run(cmd, capture_output=True, timeout=10)
+        print(command_run)
         
-        energy_val = check_energy('./ligands/{}.{}'.format(i, output_format))
-        if energy_val >= 10000: 
-            raise Exception('Bad ligand conformer encountered. The provided molecule possesses extremely high energy, or, contains atoms not parameterizable by the obenergy force-feild. Please raise a GitHub issue if (with the smile) if this seems incorrect.')
-        
+        if command_run.returncode == 0: 
+            energy_val = check_energy('./ligands/{}.{}'.format(i, output_format))
+            if energy_val >= 10000: 
+                print('Warning: Bad ligand conformer encountered (removing file): {}'.format(smi))
+                os.sytem('rm ./ligands/{}.{}'.format(i, output_format))
+        else: 
+            os.sytem('rm ./ligands/{}.{}'.format(i, output_format))
+
+                
     os.system('rm test.smi')    
     
     
