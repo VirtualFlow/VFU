@@ -218,9 +218,9 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
             energy_val = check_energy('./ligands/{}.{}'.format(i, output_format))
             if energy_val >= 10000: 
                 print('Warning: Bad ligand conformer encountered (removing file): {}'.format(smi))
-                os.sytem('rm ./ligands/{}.{}'.format(i, output_format))
+                os.system('rm ./ligands/{}.{}'.format(i, output_format))
         else: 
-            os.sytem('rm ./ligands/{}.{}'.format(i, output_format))
+            os.system('rm ./ligands/{}.{}'.format(i, output_format))
 
                 
     os.system('rm test.smi')    
