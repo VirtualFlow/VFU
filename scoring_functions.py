@@ -152,7 +152,7 @@ def run_vina_scoring(receptor):
 def run_gnina_scoring(receptor): 
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
-        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
         
@@ -177,6 +177,70 @@ def run_gnina_scoring(receptor):
         key_[A[0]] = float(A[1].split(' ')[1])
 
     return key_
+
+def run_PLANTS_chemplp_scoring(receptor, ligand_file):
+    
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'mol2': 
+        raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        raise Exception('Ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+    
+    with open('plants_config', 'w') as f: 
+        f.writelines('scoring_function 		chemplp\n')
+        f.writelines('protein_file 			{}\n'.format(receptor))
+    
+    cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = [x for x in command_out if 'best score:' in x][-1]    
+    
+    return float(command_out.split(' ')[-1])
+
+def run_PLANTS_plp_scoring(receptor, ligand_file):
+    
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'mol2': 
+        raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        raise Exception('Ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+    
+    with open('plants_config', 'w') as f: 
+        f.writelines('scoring_function 		plp\n')
+        f.writelines('protein_file 			{}\n'.format(receptor))
+    
+    cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = [x for x in command_out if 'best score:' in x][-1]    
+    
+    return float(command_out.split(' ')[-1])
+
+def run_PLANTS_plp95_scoring(receptor, ligand_file):
+    
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'mol2': 
+        raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        raise Exception('Ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+    
+    with open('plants_config', 'w') as f: 
+        f.writelines('scoring_function 		plp95\n')
+        f.writelines('protein_file 			{}\n'.format(receptor))
+    
+    cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
+    
+    command_run = subprocess.run(cmd, capture_output=True)
+    command_out = command_run.stdout.decode("utf-8").split('\n')
+    command_out = [x for x in command_out if 'best score:' in x][-1]    
+    
+    return float(command_out.split(' ')[-1])
+
 
 def contact_score(receptor_file, chimera_path, dock6_path, ligand_file): 
 
