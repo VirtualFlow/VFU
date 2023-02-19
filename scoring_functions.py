@@ -190,6 +190,7 @@ def run_PLANTS_chemplp_scoring(receptor, ligand_file):
     with open('plants_config', 'w') as f: 
         f.writelines('scoring_function 		chemplp\n')
         f.writelines('protein_file 			{}\n'.format(receptor))
+        f.writelines('ligand_file 			{}\n'.format(ligand_file))
     
     cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
     
@@ -211,7 +212,8 @@ def run_PLANTS_plp_scoring(receptor, ligand_file):
     with open('plants_config', 'w') as f: 
         f.writelines('scoring_function 		plp\n')
         f.writelines('protein_file 			{}\n'.format(receptor))
-    
+        f.writelines('ligand_file 			{}\n'.format(ligand_file))
+
     cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
     
     command_run = subprocess.run(cmd, capture_output=True)
@@ -232,6 +234,8 @@ def run_PLANTS_plp95_scoring(receptor, ligand_file):
     with open('plants_config', 'w') as f: 
         f.writelines('scoring_function 		plp95\n')
         f.writelines('protein_file 			{}\n'.format(receptor))
+        f.writelines('ligand_file 			{}\n'.format(ligand_file))
+
     
     cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
     
