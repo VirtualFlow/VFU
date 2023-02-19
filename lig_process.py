@@ -65,7 +65,6 @@ def enumerate_sterio(smi, asigned=True):
     '''
 
     m = Chem.MolFromSmiles(smi)
-    # m = Chem.AddHs(m) # TODO
     
     if asigned == True: # Faster
         opts = StereoEnumerationOptions(unique=True)
@@ -232,7 +231,6 @@ def process_ligand(smi, output_format, asigned_sterio=True, max_sterio=8, max_ta
     
 if __name__ == '__main__': 
     A = process_ligand('BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]', 'pdbqt', asigned_sterio=True)
-    # A = process_ligand('[H]C(Br)=C([H])C1([H])OC2(F)C([H])([H])C2(Cl)C1([H])[H]', 'sdf', asigned_sterio=True)
     
 
     
