@@ -16,6 +16,31 @@ from utils import  run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_dock
 
 
 def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor): 
+    '''
+    This function runs docking simulations on a given ligand for a specified receptor using the chosen docking program.
+
+    Parameters:    
+        program_choice (str): The name of the docking program to use.
+        center_x (int): The x-coordinate of the center of the search space.
+        center_y (int): The y-coordinate of the center of the search space.
+        center_z (int): The z-coordinate of the center of the search space.
+        size_x (int): The size of the search space along the x-axis.
+        size_y (int): The size of the search space along the y-axis.
+        size_z (int): The size of the search space along the z-axis.
+        exhaustiveness (int): The exhaustiveness parameter to use.
+        smi (str): The SMILES representation of the ligand to be docked.
+        receptor (str): The path to the receptor file for docking.
+        
+    Returns:
+        A dictionary containing the results of the docking simulations, with keys being the names of the ligand files and values being lists of docking scores and the path to the docked pose file.
+        
+    Raises:    
+        Exception: If the receptor file is not found in the config/ directory.
+        Exception: If the receptor file type is invalid.
+
+    Example usage:
+        results = run_pose_prediction_program('AutoDock-Koto', 10, 10, 10, 20, 20, 20, 8, 'C1=CC(=CC=C1CSCC2C(C(C(O2)N3C=NC4=C(N=CN=C43)N)O)O)Cl', './config/receptor.pdbqt')
+    '''
     command = []
     
     # Check if receptor file exists inside the config directory: 

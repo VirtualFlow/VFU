@@ -12,14 +12,32 @@ import multiprocessing
 from lig_process import process_ligand
 
 def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z): 
+    '''
+    Input Parameters:
+        receptor: The path to the receptor file. This file should be in mol2 format.
+        smi: The path to the SMILES file.
+        center_x, center_y, center_z: The x, y, z coordinates for the center of the binding site.
+        size_x, size_y, size_z: The dimensions of the binding site.
+    
+    Output:
+        A dictionary of results for each ligand with its score and the path to the result file.
+    
+    Function Description:
+        The function run_plants_docking runs PLANTS docking software to dock ligands to the given receptor. It prepares a config file and then runs PLANTS with the input ligands. 
+        PLANTS software creates a result directory for each ligand and saves docking results inside that directory. The function copies the directory in the outputs directory and then removes
+        it from the present working directory. It then returns a dictionary containing the score and path to the result file for each ligand. It raises an exception if the receptor is not in mol2 format.
+        
+    Note: The default values for cluster_structures and cluster_rmsd are 10 and 2.0 respectively.
+
+    '''
     
     results = {}
     print('Note: I am defaulting to setting cluster_structures to 10; please change me in function run_plants_docking, line 40')
     print('Note: I am defaulting to setting cluster_rmsd to 2; please change me in function run_plants_docking, line 41')
     
     # receptor needs to be in mol2 format: 
-    recetor_format = receptor.split('.')[-1]
-    if recetor_format != 'mol2': 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'mol2': 
         raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
         
     # prepare the ligands:
@@ -56,13 +74,29 @@ def run_plants_docking(receptor, smi, center_x, center_y, center_z, size_x, size
     return results        
 
 def run_autodock_gpu_docking(receptor, smi, program_choice): 
+    '''
+    Function: run_autodock_gpu_docking(receptor, smi, program_choice)
+    
+    Description: 
+        This function performs molecular docking on a given receptor using AutoDock-GPU or AutoDock-CPU program. 
+        It prepares the ligands in pdbqt format and executes docking to calculate docking scores for each ligand. The function returns a dictionary containing the results for each ligand.
+    
+    Parameters:
+        receptor (str): file path for the receptor (in .maps.fld format)
+        smi (str): SMILES string for the ligand(s)
+        program_choice (str): program of choice for docking, either 'autodock_cpu' or 'autodock_gpu'
+    
+    Returns:    
+        results (dict): a dictionary containing the docking score and .dlg file path for each ligand.
+        Note: The receptor file needs to be in .maps.fld format for AutoDock-GPU. The ligands will be converted to pdbqt format using the 'process_ligand' function from the 'lig_process' module.
+    '''
 
     print('Note: For use of vina gpu, the receptor needs to be prepared in a specific way. Have a look at the examples provided in https://github.com/ccsb-scripps/AutoDock-GPU & the example dir we provided within executables/vf_gpu_example.zip')
     command = []
     
     # receptor needs to be in mol2 format: 
-    recetor_format = receptor.split('.')
-    if recetor_format[-1] != 'fld' and recetor_format[-2] != 'maps': 
+    receptor_format = receptor.split('.')
+    if receptor_format[-1] != 'fld' and receptor_format[-2] != 'maps': 
         raise Exception('Receptor needs to be of file type .maps.fld (example: 1stp_protein.maps.fld). Please try again, after incorporating this correction.')
     
     # check for the existence of the executable: 
@@ -77,7 +111,7 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
         raise Exception('Executable file autodock_cpu/gpu not found in executables directory')
            
     # Assign the right program for docking:  
-    command.append('./executables/{}'.format(program_choice))
+    command.append('./executables/{}'.format(executable))
     
     # Prepare the ligands: 
     process_ligand(smi, 'pdbqt')
@@ -111,6 +145,21 @@ def run_autodock_gpu_docking(receptor, smi, program_choice):
 
 
 def run_EquiBind(receptor, smi): 
+    '''
+    Runs the EquiBind program for protein-ligand binding prediction.
+
+    Args:
+        - receptor (str): the file path of the receptor protein in PDB format.
+        - smi (str): the SMILES string of the ligand molecule.
+
+    Returns:
+        - results (dict): a dictionary of the form {ligand file path: results file path},
+                          containing the file paths of the output results for each ligand.
+
+    Raises:
+        - Exception: if the EquiBind files are not found in the current directory.
+        - Exception: if the receptor file is not in PDB format.
+    '''
     files_ls = os.listdir('./')
     if not('data' in files_ls and 'inference.py' in files_ls):
         raise Exception('Please make sure process EquiBind based on the instructions provided in the readme. I could not find the key EquiBind files.')
@@ -140,10 +189,28 @@ def run_EquiBind(receptor, smi):
 
 
 def run_rDock(receptor, smi): 
+    """
+    Runs rDock for docking the given ligand SMILES strings with the receptor molecule.
     
+    Args:
+        - receptor (str): The path of the receptor file in '.mol2' format.
+        - smi (str): The SMILES string of the ligand molecule.
+    
+    Returns:
+        - results (dict): A dictionary with ligand file names as keys and their corresponding docking scores as values.
+    
+    Raises:
+        - Exception: If the receptor is not in '.mol2' format.
+        - Exception: If the reference ligand file is not provided.
+        - Exception: If the prm file parameters need modification.
+    
+    Note: Before running the function, the user needs to provide a reference ligand file in the line containing 'ref_lig'
+    and adjust the parameters in the prm file. 
+    """
+        
     # receptor needs to be in mol2 format: 
-    recetor_format = receptor.split('.')[-1]
-    if recetor_format != 'mol2': 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'mol2': 
         raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
     
     
@@ -151,7 +218,7 @@ def run_rDock(receptor, smi):
     process_ligand(smi, 'sd') 
     lig_locations = os.listdir('./ligands/')
     
-    ref_lig = '' # TODO!!!
+    ref_lig = '' # TODO!
     raise Exception('Note: a reference ligand file needs to be filled in the line above. Please do so and comment this line!')
     
     # Creation of the prm file: 
@@ -201,6 +268,23 @@ def run_rDock(receptor, smi):
 
 
 def generate_ledock_file(receptor='pro.pdb',rmsd=1.0,x=[0,0],y=[0,0],z=[0,0], n_poses=10, l_list=[],l_list_outfile='',out='dock.in'):
+    """
+    Generate a LeDock input file with the given receptor and ligand information.
+    
+    Args:
+        - receptor (str): the name of the receptor PDB file.
+        - rmsd (float): the RMSD tolerance for docking.
+        - x (list of two floats): the X-coordinates of the binding pocket, in the format [x_min, x_max].
+        - y (list of two floats): the Y-coordinates of the binding pocket, in the format [y_min, y_max].
+        - z (list of two floats): the Z-coordinates of the binding pocket, in the format [z_min, z_max].
+        - n_poses (int): the number of binding poses to generate.
+        - l_list (list of str): a list of ligand files to dock.
+        - l_list_outfile (str): the name of the output file to write the ligand list to.
+        - out (str): the name of the output docking file to generate.
+    
+    Returns:
+        None.
+    """
     rmsd=str(rmsd)
     x=[str(x) for x in x]
     y=[str(y) for y in y]
@@ -234,6 +318,25 @@ def generate_ledock_file(receptor='pro.pdb',rmsd=1.0,x=[0,0],y=[0,0],z=[0,0], n_
 
 
 def run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z): 
+    """
+    Dock the ligand molecules to the given protein using the Ledock docking software. The docking box is centered at the given
+    coordinates with given dimensions.
+    
+    Args:
+        - receptor (str): the pdb file name of the protein receptor.
+        - smi (str): the SMILES string of the ligand to dock.
+        - center_x (float): the x coordinate of the center of the docking box.
+        - center_y (float): the y coordinate of the center of the docking box.
+        - center_z (float): the z coordinate of the center of the docking box.
+        - size_x (float): the dimension of the docking box in the x direction.
+        - size_y (float): the dimension of the docking box in the y direction.
+        - size_z (float): the dimension of the docking box in the z direction.
+    
+    Returns:
+        - results (dict): a dictionary with the ligand file path as key and a list of the path of the output file and the 
+                          predicted binding score as value. If the docking process fails for a ligand, the value for the 
+                          ligand key is 'FAIL'.
+    """
     # Ensure receptor is in the right format
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdb': 
@@ -280,6 +383,18 @@ def run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size
         
     
 def process_idock_output(results): 
+    '''
+    This function processes the output of iDock docking simulation.
+    The output pdbqt files are read and the corresponding log.csv file is analyzed for the docking score.
+    The scores are then saved in the 'results' dictionary in the format - {ligand_path: docking_score}
+    The pdbqt files are saved in the outputs directory.
+    
+    Parameters:
+    results (dict): The dictionary to store the results.
+    
+    Returns:
+    None
+    '''
     poses_ = os.listdir('./')
     poses_ = [x for x in poses_ if 'pdbqt' in x]
     
@@ -316,9 +431,22 @@ def process_idock_output(results):
     return 
 
 def run_adfr_docking(receptor, smi): 
+    '''
+    This function runs docking simulation using ADFR (AutoDock FR) program. The program requires the receptor to be in pdbqt format.
+    The program also requires a target file in trg format. The target file contains information on docking parameters.
+    The ligand is processed to be in pdbqt format.
+    The ligand files are docked to the receptor and the docking scores are returned in a dictionary. 
+    
+    Parameters:
+        receptor (str): The file path of the receptor in pdbqt format.
+        smi (str): The SMILES string of the ligand.
+    
+    Returns:
+       results (dict): A dictionary containing the ligand file path as keys and the docking score as values.
+    '''
     # receptor needs to be in mol2 format: 
-    recetor_format = receptor.split('.')[-1]
-    if recetor_format != 'pdbqt': 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
     
     files_ls = os.listdir('./')
@@ -362,6 +490,18 @@ def run_adfr_docking(receptor, smi):
 
 
 def run_flexx_docking(receptor, smi): 
+    """
+     Runs the flexx docking program on the given receptor and ligands.
+     
+     Args:
+         receptor (str): The path to the receptor file in pdb format.
+         smi (str): The SMILES string of the ligand to dock.
+         
+     Returns:
+         dict: A dictionary with the results of the docking. The dictionary contains the ligand file name as 
+         the key and the docking scores and the output file path as the value. If the execution is unsuccessful 
+         or if extremely high pose energy is encountered, the value for the corresponding ligand is a string with a message. 
+     """
     import multiprocessing
     results = {}
 
@@ -410,8 +550,29 @@ def run_flexx_docking(receptor, smi):
         return results
 
 def run_AutodockZN(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness): 
-    recetor_format = receptor.split('.')[-1]
-    if recetor_format != 'pdbqt': 
+    """
+    Runs AutoDockZn for a given receptor and ligand. 
+    
+    Parameters:
+        - receptor (str): path of receptor file in pdbqt format.
+        - smi (str): SMILES string of the ligand.
+        - center_x (float): x-coordinate of the center of binding box.
+        - center_y (float): y-coordinate of the center of binding box.
+        - center_z (float): z-coordinate of the center of binding box.
+        - size_x (float): size of the binding box along x-axis.
+        - size_y (float): size of the binding box along y-axis.
+        - size_z (float): size of the binding box along z-axis.
+        - exhaustiveness (int): exhaustiveness of the search algorithm.
+        
+    Returns:
+        - results (dict): a dictionary of the form ligand_path:[docking_output_path, out_path] containing the paths of docked poses and the output files of the AutoDockVina runs for each ligand.
+        
+    Raises:
+        - Exception: if receptor file is not in pdbqt format.
+        - Exception: if required files of ADFRsuite cannot be located.
+    """
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')    
         
     if os.path.exists('~/ADFRsuite-1.0/bin/pythonsh') == False: 
@@ -468,6 +629,16 @@ def run_AutodockZN(receptor, smi, center_x, center_y, center_z, size_x, size_y, 
 
 
 def run_mcdock(receptor, smi): 
+    """
+    Runs the MCDock molecular docking software on a given receptor and SMILES string. 
+    
+    Args:
+    - receptor: a string containing the filename of the receptor in XYZ format.
+    - smi: a string containing the SMILES representation of the ligand to be docked.
+    
+    Returns:
+    - A dictionary containing the binding energies of each ligand docked. The keys are the file paths of the ligands docked, and the values are lists of the binding energies for each conformation generated by MCDock.
+    """
     # Check to ensure receptor is in the right format: 
     if receptor.split('.')[-1] != 'xyz': 
         raise Exception('Please provide the receptor in xyz format for MCDock')
@@ -507,6 +678,21 @@ def run_mcdock(receptor, smi):
     return results
 
 def run_ligand_fit(receptor, smi, center_x, center_y, center_z): 
+    """
+    Runs the LigandFit docking program to dock ligands to a protein receptor.
+    
+    Args:
+    - receptor (str): The path to the protein receptor file in PDB format.
+    - smi (str): The SMILES string of the ligand to be docked.
+    - center_x (float): The x-coordinate of the center of the search box.
+    - center_y (float): The y-coordinate of the center of the search box.
+    - center_z (float): The z-coordinate of the center of the search box.
+
+    Returns:
+    - results (dict): A dictionary containing the docked poses of the ligands and their corresponding scores.
+                      Each key is the filename of a docked ligand pose in PDB format, and each value is a list
+                      containing the score of the docked pose and the path to the output file.
+    """
     if receptor.split('.')[-1] != 'pdb': 
         raise Exception('Please provide the receptor in pdb format for LigandFit')
     
@@ -545,6 +731,25 @@ def run_ligand_fit(receptor, smi, center_x, center_y, center_z):
     return results
 
 def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness): 
+    """
+    Dock ligands to a protein receptor using GalaxyDock3 software.
+    
+    Args:
+    - receptor (str): the path to the receptor PDB file. It should end with '.pdb'.
+    - smi (str): a SMILES string containing the ligands to be docked.
+    - center_x (float): the x-coordinate of the center of the docking box in Angstroms.
+    - center_y (float): the y-coordinate of the center of the docking box in Angstroms.
+    - center_z (float): the z-coordinate of the center of the docking box in Angstroms.
+    - exhaustiveness (int): the number of ligand poses to generate in the docking search.
+    
+    Returns:
+    - results (dict): a dictionary containing the output files and docking scores for each ligand. The dictionary has the format:
+    
+    Raises:
+    - Exception: If the receptor file format is not '.pdb'.
+    - Exception: If the GalaxyDock3 executable is not found in the 'executables' directory.
+    - Exception: If the 'data' directory is not found.
+    """
 
     results = {}
     # Check to ensure receptor is in the right format: 
@@ -633,7 +838,22 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
     return results
 
 def run_dock6(receptor, smi): 
+    """
+    Runs Dock6 molecular docking program to dock a set of ligands to a receptor protein.
 
+    Parameters:
+        receptor (str): Path to the receptor file in pdb format.
+        smi (str): SMILES string for the ligands to dock.
+
+    Returns:
+        Dictionary containing the results of Dock6 docking for each ligand. The keys are the file paths of the 
+        ligand files used for docking and the values are lists containing the file path of the output docked
+        ligand mol2 file and the docking score for the ligand.
+
+    Raises:
+        Exception: If the path to the Chimera software or Dock6 directory is invalid, if the reference ligand file
+                   is not specified, or if the receptor file is not in pdb format.
+    """
     chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
     dock6_path    = '/home/akshat/dock6'   # Location to the dock6 directory
     
@@ -759,6 +979,23 @@ def run_dock6(receptor, smi):
     return results
 
 def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness): 
+    """
+    Runs FRED docking to dock ligands to a receptor.
+
+    Args:
+    - receptor (str): The path to the receptor file in PDB format.
+    - smi (str): The SMILES string of the ligand(s) to dock.
+    - center_x (float): The x-coordinate of the center of the docking box.
+    - center_y (float): The y-coordinate of the center of the docking box.
+    - center_z (float): The z-coordinate of the center of the docking box.
+    - size_x (float): The size of the docking box along the x-axis.
+    - size_y (float): The size of the docking box along the y-axis.
+    - size_z (float): The size of the docking box along the z-axis.
+    - exhaustiveness (int): The exhaustiveness of the docking search. Higher values lead to more exhaustive searches.
+
+    Returns:
+    - results (dict): A dictionary where the keys are the paths to the ligand files and the values are the paths to the output poses in Mol2 format.
+    """
     if receptor.split('.')[-1] != 'pdb': 
         raise Exception('Please provide the receptor in pdb format for FRED')    
     
@@ -782,6 +1019,22 @@ def run_fred_docking(receptor, smi, center_x, center_y, center_z, size_x, size_y
     return results
 
 def run_iGemDock(receptor, smi, exhaustiveness): 
+    """
+    Runs ligand docking using iGemDock software.
+
+    Args:
+    - receptor (str): file path to receptor protein structure in PDB format.
+    - smi (str): SMILES string for the ligand(s) to be docked.
+    - exhaustiveness (int): exhaustiveness value for iGemDock docking. 
+
+    Returns:
+    - results (dict): dictionary of the docking results containing ligand file paths as keys and a list of output file path and docking score as values.
+
+    Raises:
+    - Exception: if the iGemDock executable mod_ga is not found in the 'executables' folder.
+    - Exception: if the receptor is not in PDB format.
+
+    """
     if os.path.exists('./executables/mod_ga'): 
         raise Exception('iGemDock executable mod_ga not found in the executables folder')
     if receptor.split('.')[-1] != 'pdb': 
@@ -816,6 +1069,28 @@ def run_iGemDock(receptor, smi, exhaustiveness):
     return results
         
 def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center_y, center_z): 
+    """
+    Performs Gold docking using the input receptor and SMILES ligand.
+    
+    Args:
+        receptor (str): File path to the receptor molecule in mol2 format.
+        smi (str): SMILES string for the ligand.
+        size_x (float): The length of the x dimension in Angstroms for the search space.
+        size_y (float): The length of the y dimension in Angstroms for the search space.
+        size_z (float): The length of the z dimension in Angstroms for the search space.
+        center_x (float): The x coordinate in Angstroms of the center of the search space.
+        center_y (float): The y coordinate in Angstroms of the center of the search space.
+        center_z (float): The z coordinate in Angstroms of the center of the search space.
+        
+    Returns:
+        dict: A dictionary where the keys are the file paths to the ligands used in docking, and the 
+        values are a list of two items. The first item is the file path to the output .xyz file, and 
+        the second item is the docking score as a float.
+        
+    Raises:
+        Exception: If the Gold executable gold_auto is not found in the executables folder.
+        Exception: If the receptor is not provided in mol2 format.
+    """
     if os.path.exists('./executables/gold_auto'): 
         raise Exception('Gold executable gold_auto not found in the executables folder')
     if receptor.split('.')[-1] != 'mol2': 
@@ -908,7 +1183,22 @@ def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center
     return results
 
 def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi): 
+    """Performs molecular docking using Glide.
 
+    Args:
+        receptor (str): The filename of the receptor in .mol2 format.
+        center_x (float): The X-coordinate of the center of the grid box.
+        center_y (float): The Y-coordinate of the center of the grid box.
+        center_z (float): The Z-coordinate of the center of the grid box.
+        size_x (float): The size of the grid box in the X dimension.
+        size_y (float): The size of the grid box in the Y dimension.
+        size_z (float): The size of the grid box in the Z dimension.
+        smi (str): The SMILES string of the ligand to be docked.
+
+    Returns:
+        dict: A dictionary where the keys are the SMILES strings of the input ligands and the values are lists containing the
+              docking scores and the filenames of the output .maegz files.
+    """
     print('Note: The path to Schrodinger is specified via the $SCHRODINGER variable, which is assigned during installation.')    
     
     # Receptor prparation with Glide: 
@@ -1006,6 +1296,34 @@ def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, si
     return results
     
 def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiveness): 
+    """
+    Performs molecular docking of a ligand to a receptor using Rosetta.
+    
+    Parameters
+    ----------
+    receptor : str
+        The filename of the receptor, in PDB format.
+    smi : str
+        The SMILES string of the ligand to be docked.
+    center_x : float
+        The x-coordinate of the center of the docking box.
+    center_y : float
+        The y-coordinate of the center of the docking box.
+    center_z : float
+        The z-coordinate of the center of the docking box.
+    exhaustiveness : int
+        The exhaustiveness of the docking search. A higher value will increase the time it takes to run the simulation,
+        but may lead to better results.
+        
+    Returns
+    -------
+    results : dict
+        A dictionary containing the results of the docking simulation. The dictionary has the following keys:
+        - smi: The SMILES string of the ligand that was docked.
+        The value corresponding to each key is a list with two elements:
+        - A list of paths to the output PDB files generated by the simulation.
+        - A list of docking scores associated with each output file.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdb': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
@@ -1022,7 +1340,7 @@ def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiven
     os.system('obabel ./test.smi --gen3D -O ligand.mol2')
     os.system('rm ./test.smi')
     # Generate conformational library for ligand: 
-    os.syetem('obabel ligand.mol2 -O conformers.sdf --conformer --score rmsd --writeconformers --nconf 30')
+    os.system('obabel ligand.mol2 -O conformers.sdf --conformer --score rmsd --writeconformers --nconf 30')
     os.system('rm ./ligand.mol2')
 
     os.system('$ROSETTA/source/scripts/python/public/molfile_to_params.py -n LIG -p LIG --conformers-in-one-file conformers.sdf')
@@ -1068,8 +1386,23 @@ def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiven
     return results
 
 def run_mdock_docking(receptor, smi): 
-    recetor_format = receptor.split('.')[-1]
-    if recetor_format != 'sph': 
+    """
+    Runs molecular docking using MDock software.
+    
+    Args:
+    - receptor (str): path to receptor file in sph format
+    - smi (str): ligand in SMILES format
+    
+    Returns:
+    - results (dict): dictionary with results for each ligand in the following format:
+    
+    Raises:
+    - Exception: if receptor file is not in sph format
+    - Exception: if reference ligand file not found in config folder
+    - Exception: if MDock path not found
+    """
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'sph': 
         raise Exception('Receptor needs to be in sph format. Please try again, after incorporating this correction.')
     
     ref_lig = './config/ref_lig.pdb'
@@ -1125,6 +1458,20 @@ def run_mdock_docking(receptor, smi):
     return results 
 
 def run_seed_docking(receptor, smi): 
+    """
+    Runs molecular docking using SEED software for a given receptor and SMILES string of the ligand.
+    
+    Args:
+    - receptor (str): The file path of the receptor in mol2 format.
+    - smi (str): The SMILES string of the ligand.
+    
+    Returns:
+    - A dictionary containing the docking score and the file path of the output ligand in mol2 format for each ligand.
+    
+    Raises:
+    - Exception: If the Chimera, SEED path or SEED executable path are incorrect.
+    - Exception: If the receptor file is not in mol2 format.
+    """
     chimera_path = '/home/chimera'
     seed_path    = '/home/SEED'
     if os.path.exists(chimera_path) == False: 
@@ -1169,7 +1516,26 @@ def run_seed_docking(receptor, smi):
 
 
 def run_molegro_docking(receptor, smi): 
-    
+    """
+    Runs ligand docking using Molegro Virtual Docker.
+
+    Args:
+    - receptor: string, path to the receptor file in PDB format.
+    - smi: string, SMILES representation of the ligand to dock.
+
+    Returns:
+    - results: dictionary, containing the results of the docking. Keys are the
+    path to the ligand file in the "ligands" directory. Values are lists, where
+    the first element is a list of docking scores (one for each pose generated)
+    and the second element is a list of paths to the output files (one for each
+    pose generated), in the "outputs" directory.
+
+    Raises:
+    - Exception: If receptor file is not in PDB format.
+    - Exception: If receptor file does not exist.
+    - Exception: If the Molegro installation directory is not found.
+    - Exception: If the reference ligand file is not found.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdb': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
@@ -1229,7 +1595,16 @@ def run_molegro_docking(receptor, smi):
     return results
 
 def run_fitdock_docking(receptor, smi): 
+    """
+    Performs docking of the provided SMILES string ligand to the processed protein structure using the FitDock program.
 
+    Args:
+    - receptor (str): The path to the processed protein structure file in pdb format.
+    - smi (str): The SMILES string of the ligand to be docked.
+
+    Returns:
+    - results (dict): A dictionary with the following structure:
+    """
     fitdock_executable = './execuatable/FitDock'
     if os.path.exists(fitdock_executable) == False: 
         raise Exception('FitDock executable path {} not found. Please try again, after adding the executable (named FitDock) in the right directory.'.format(fitdock_executable))
@@ -1276,11 +1651,22 @@ def run_fitdock_docking(receptor, smi):
 
     
 def run_lightdock_docking(receptor, smi, exhaustiveness): 
+    '''
+    Runs molecular docking using LightDock.
+
+    Parameters:
+    - receptor (str): path to the receptor file in PDB format.
+    - smi (str): SMILES string of the ligand.
+    - exhaustiveness (int): integer value for exhaustiveness of LightDock. 
+
+    Returns:
+    - results (dict): dictionary containing docking scores and paths to output PDB files.
+    '''
     results = {}
     
     # receptor needs to be in mol2 format: 
-    recetor_format = receptor.split('.')[-1]
-    if recetor_format != 'pdb': 
+    receptor_format = receptor.split('.')[-1]
+    if receptor_format != 'pdb': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')    
 
     if os.path.exists('./lightdock') == False: 
@@ -1329,7 +1715,19 @@ def run_lightdock_docking(receptor, smi, exhaustiveness):
     return results
 
 def run_RLDock_docking(receptor, smi, exhaustiveness): 
-    
+    """
+    Runs RLDock docking on the given receptor and ligand SMILES string.
+
+    Args:
+    - receptor (str): The path to the receptor file in mol2 format.
+    - smi (str): The SMILES string for the ligand to dock.
+    - exhaustiveness (int): The exhaustiveness parameter to use for RLDock.
+
+    Returns:
+    - results (dict): A dictionary containing the docking results for each ligand. The keys are the paths to the ligand files, and the values are lists containing two items:
+        - The path to the output file containing the docked poses.
+        - A list of the docking scores for each pose in the output file.
+    """
     if receptor.split('.')[2] != 'mol2': 
         raise Exception('Receptor file needs to be mol2 file type. Please incorporate this correction')
         
@@ -1360,6 +1758,19 @@ def run_RLDock_docking(receptor, smi, exhaustiveness):
 
 
 def run_MpSDockZN_docking(receptor, smi): 
+    '''
+    Dock ligands to the receptor using the MpSDockZN algorithm.
+    
+    Args:
+    - receptor (str): the path of the receptor file in pdb format.
+    - smi (str): the SMILES representation of the ligand to be docked.
+    
+    Returns:
+    - results (dict): a dictionary containing the docking results for each ligand.
+        Each key is the path to the ligand file, and the value is a list of the following:
+            - the path to the output file containing the docked conformations.
+            - a list of the docking scores for each conformation.
+    '''
     results = {}
     
     dock6_path   = ''
@@ -1418,6 +1829,15 @@ def run_MpSDockZN_docking(receptor, smi):
 
 
 def check_energy(lig_): 
+    """
+    Check the quality of a generated structure by computing its total energy using the Open Babel obenergy tool.
+
+    Parameters:
+        lig_ (str): the name of the ligand file in PDBQT format.
+
+    Returns:
+        total_energy (float): the computed total energy of the ligand in Kcal/mol.
+    """
     # Check the quality of generated structure (some post-processing quality control):
     try: 
         ob_cmd = ['obenergy', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]

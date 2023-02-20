@@ -44,7 +44,7 @@ def read_config_file():
         
     variables = {}
     for string in lines:
-        key, value = string.strip().split('=')
+        key, value = string.strip().split('=', 1)
         variables[key] = value    
         
     program_choice = variables['program_choice']
@@ -94,6 +94,8 @@ if __name__ == "__main__":
 
     # Perform pose prediction:
     pose_pred_out = run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor)
+
+    
 
     # receptor       = './config/5wiu_test.pdbqt'
     # if program_choice == 'nnscore2': 

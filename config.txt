@@ -35,7 +35,7 @@ exhaustiveness=10
 # Molecule (either a string in smiles, selfies or amino-acid sequence) to be used for docking
 # If the is_selfies=True, or is_peptide=True, a conversion from selfies->smiles
 # and aa-sequence->smiles is performed. 
-smi=CCCCCCCCCCCCC
+smi=C1=CC(=CC=C1CSCC2C(C(C(O2)N3C=NC4=C(N=CN=C43)N)O)O)Cl 
 is_selfies=False
 is_peptide=False
 
