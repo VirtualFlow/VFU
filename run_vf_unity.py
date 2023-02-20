@@ -66,6 +66,29 @@ def read_config_file():
 
 
 def main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor): 
+    """
+    Runs a docking program to predict the binding pose of a ligand to a receptor, and optionally performs an alternative
+    scoring using a separate scoring function.
+
+    Args:
+        program_choice (str): the choice of docking program to use.
+        scoring_function (str): the choice of scoring function to use for rescoring the poses, or an empty string if no
+                                rescoring is needed.
+        center_x (float): the x-coordinate of the center of the docking box.
+        center_y (float): the y-coordinate of the center of the docking box.
+        center_z (float): the z-coordinate of the center of the docking box.
+        size_x (float): the size of the docking box along the x-axis.
+        size_y (float): the size of the docking box along the y-axis.
+        size_z (float): the size of the docking box along the z-axis.
+        exhaustiveness (int): the exhaustiveness parameter for the docking program.
+        smi (str): the SMILES string or amino acid sequence of the ligand to dock.
+        is_selfies (str): a string indicating whether the SMILES string is in SELFIES format.
+        is_peptide (str): a string indicating whether the ligand is an amino acid sequence.
+        receptor (str): the file path of the receptor in PDBQT format.
+
+    Returns:
+        A tuple containing the output of the docking program and a dictionary of rescoring values, if any.
+    """
     # Convert molecules from selfies->smiles/AA_string->smiles if option is specified within config.txt:
     if is_selfies == 'True': 
         import selfies 

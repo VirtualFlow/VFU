@@ -25,7 +25,7 @@ Please ensure that the following packages are installed:
 
 
 
-## Quick Start (Running a docking calculation)
+## Quick Start (Using a config.txt file)
 We will be running QuickVina on a processed protein located in the config directory (`5wiu_test.pdbqt`). We provide a config.txt file which contains all parmeters for this simple run. 
 Please edit this file based on your preferance: 
 ```
@@ -124,6 +124,35 @@ We note:
     ./outputs/pose_2.pdbqt,Kd = 11.5 fM;Kd = 18.0 fM;Kd = 2.34 pM;Kd = 783.94 fM;Kd = 202.75 fM;Kd = 79.9 fM;Kd = 210.65 fM;Kd = 13.13 fM;Kd = 511.8 fM
     ./outputs/pose_14.pdbqt,Kd = 162.12 fM;Kd = 726.22 fM;Kd = 10.38 fM;Kd = 432.15 fM;Kd = 0.06 fM;Kd = 9.24 pM;Kd = 3.07 pM;Kd = 23.07 nM;Kd = 7.97 pM
     ```
+    
+## Quick Start (Using a python function call)
+```
+from run_vf_unity import main 
+
+program_choice   = 'qvina'
+scoring_function = 'nnscore2' 
+center_x         = -17.820
+center_y         = 16.140
+center_z         = -18.643
+size_x           = 20
+size_y           = 20 
+size_z           = 20
+exhaustiveness   = 10
+smi              = 'C1=CC(=CC=C1CSCC2C(C(C(O2)N3C=NC4=C(N=CN=C43)N)O)O)Cl'
+is_selfies       = False
+is_peptide       = False
+receptor         = './config/5wiu_test.pdbqt'
+
+pose_pred_out, re_scored_values = main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor)
+```
+We note: 
+1. The processed ligands will be located within the newly created ligands directory.
+2. The docked output from running QuickVina will be located in the newly created outputs directory.
+3. The default behaviour is for the program (QuickVina) is to make use of all available CPUs. 
+4. The output from running th QuickVina calculation will be stored in the dictionary pose_pred_out
+5. The output from running th QuickVina NNScore2.0 will be stored in the dictionary re_scored_values
+
+
 
 ## Running in batch 
 
