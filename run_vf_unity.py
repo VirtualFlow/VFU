@@ -6,6 +6,7 @@ Created on Sun Feb 19 17:23:20 2023
 @author: akshat
 """
 import os 
+import csv 
 from initiate_calc import run_pose_prediction_program, run_scoring_prediction_program
 
 
@@ -97,7 +98,16 @@ if __name__ == "__main__":
 
     # Perform pose prediction:
     pose_pred_out = run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor)
-
+    with open('docking_output.csv', 'a+', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Ligand File', 'Docking Values', 'Docking Pose'])
+        for key, value in pose_pred_out.items():
+            filename = key
+            values = ','.join(map(str, value[0]))
+            path = value[1]
+            writer.writerow([filename, values, path])
+            
+        
     # Use an alternative scoring function if indicated by user:     
     re_scored_values = {}
     if scoring_function != '': 
@@ -107,18 +117,15 @@ if __name__ == "__main__":
             score = run_scoring_prediction_program(scoring_function, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor)
             re_scored_values[ligand_path] = score
 
-                
+    with open('rescoring_output.csv', 'a+', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Docked Ligand', 'Re-scored Value'])
+        for key, value in re_scored_values.items():
+            filename = key
+            values = ';'.join(x for x in value)
+            writer.writerow([filename, values])
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
             
             
             

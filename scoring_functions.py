@@ -68,6 +68,7 @@ def run_nnscore2(receptor, lig_path):
     with open('./output.txt', 'r') as f: 
         lines = f.readlines()
     scores = [x for x in lines if 'Best Score:' in x]
+    scores = [A.split('(')[-1].split(')')[0] for A in scores]
     
     os.system('rm output.txt')
     return scores

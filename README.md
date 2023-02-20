@@ -44,7 +44,7 @@ Please edit this file based on your preferance:
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
 
-program_choice=qvina
+program_choice=qvina+nnscore2
 
 # The x,y&z coordinates of the center of the docking space. The binding space describes the location where a molecule
 # is allowed to bind.
@@ -84,7 +84,47 @@ We note:
 1. The processed ligands will be located within the newly created ligands directory.
 2. The docked output from running QuickVina will be located in the newly created outputs directory.
 3. The default behaviour is for the program (QuickVina) is to make use of all available CPUs. 
-
+4. A summary csv file `docking_output.csv` is created (for running QuickVina): 
+    ```
+    Ligand File,Docking Values,Docking Pose
+    7.pdbqt,"-9.9,-9.8,-9.1,-9.0,-9.0,-8.8,-8.8,-8.7,-8.6",./outputs/pose_7.pdbqt
+    14.pdbqt,"-9.6,-9.1,-9.0,-8.8,-8.7,-8.6,-8.6,-8.4,-8.4",./outputs/pose_14.pdbqt
+    6.pdbqt,"-9.8,-9.7,-9.2,-8.9,-8.8,-8.8,-8.7,-8.7,-8.5",./outputs/pose_6.pdbqt
+    9.pdbqt,"-9.3,-9.3,-9.3,-9.1,-9.1,-9.0,-9.0,-8.9,-8.8",./outputs/pose_9.pdbqt
+    12.pdbqt,"-8.9,-8.9,-8.8,-8.5,-8.5,-8.5,-8.5,-8.1,-8.0",./outputs/pose_12.pdbqt
+    4.pdbqt,"-9.6,-9.3,-9.2,-9.2,-9.0,-9.0,-8.8,-8.7,-8.7",./outputs/pose_4.pdbqt
+    3.pdbqt,"-9.9,-9.2,-9.0,-8.9,-8.8,-8.7,-8.6,-8.5,-8.4",./outputs/pose_3.pdbqt
+    1.pdbqt,"-9.4,-9.4,-9.1,-9.0,-8.9,-8.8,-8.7,-8.7,-8.7",./outputs/pose_1.pdbqt
+    5.pdbqt,"-9.8,-9.5,-9.4,-9.3,-9.3,-9.2,-9.1,-9.1,-9.0",./outputs/pose_5.pdbqt
+    10.pdbqt,"-9.6,-9.5,-9.4,-9.3,-9.2,-9.2,-9.1,-8.9,-8.8",./outputs/pose_10.pdbqt
+    2.pdbqt,"-9.6,-9.3,-8.9,-8.9,-8.8,-8.8,-8.8,-8.6,-8.5",./outputs/pose_2.pdbqt
+    15.pdbqt,"-9.8,-9.3,-9.2,-9.2,-9.1,-9.0,-9.0,-8.8,-8.8",./outputs/pose_15.pdbqt
+    13.pdbqt,"-9.1,-9.1,-9.0,-8.8,-8.7,-8.7,-8.7,-8.7,-8.7",./outputs/pose_13.pdbqt
+    8.pdbqt,"-9.1,-9.1,-9.1,-8.8,-8.7,-8.7,-8.6,-8.6,-8.5",./outputs/pose_8.pdbqt
+    11.pdbqt,"-9.7,-9.5,-9.3,-9.2,-9.2,-9.1,-9.0,-8.9,-8.8",./outputs/pose_11.pdbqt
+    0.pdbqt,"-9.6,-9.3,-9.3,-9.0,-8.9,-8.9,-8.7,-8.7,-8.5",./outputs/pose_0.pdbqt
+    ```
+5. Sepperately, a summary csv file is created (`rescoring_output.csv`) is created when running rescoring (nnscore2): 
+    ```
+    Docked Ligand,Re-scored Value
+    ./outputs/pose_11.pdbqt,Kd = 1.0 pM Kd = 672.97 fM Kd = 8.17 pM Kd = 349.7 fM Kd = 4.05 pM Kd = 2.11 pM Kd = 2.0 nM Kd = 66.72 fM Kd = 1.15 fM
+    ./outputs/pose_10.pdbqt,Kd = 11.52 fM Kd = 11.49 fM Kd = 266.9 fM Kd = 11.81 fM Kd = 0.0 fM Kd = 7.63 pM Kd = 115.91 fM Kd = 773.49 fM Kd = 1.79 pM
+    ./outputs/pose_9.pdbqt,Kd = 30.43 fM Kd = 22.13 pM Kd = 48.66 fM Kd = 1.03 pM Kd = 14.35 pM Kd = 103.81 fM Kd = 10.97 pM Kd = 0.14 fM Kd = 0.18 fM
+    ./outputs/pose_5.pdbqt,Kd = 0.19 fM Kd = 0.12 fM Kd = 55.87 fM Kd = 6.36 pM Kd = 2.96 pM Kd = 0.0 fM Kd = 4.77 fM Kd = 7.49 pM Kd = 44.51 pM
+    ./outputs/pose_12.pdbqt,Kd = 1.79 fM Kd = 1.5 fM Kd = 2.2 pM Kd = 192.03 pM Kd = 34.51 fM Kd = 15.97 pM Kd = 1.33 pM Kd = 45.29 fM Kd = 9.07 fM
+    ./outputs/pose_7.pdbqt,Kd = 279.09 fM Kd = 0.12 fM Kd = 7.22 pM Kd = 9.8 fM Kd = 2.08 fM Kd = 0.01 fM Kd = 0.0 fM Kd = 0.01 fM Kd = 20.22 pM
+    ./outputs/pose_13.pdbqt,Kd = 1.0 fM Kd = 0.13 fM Kd = 4.18 fM Kd = 41.14 fM Kd = 560.85 fM Kd = 142.89 fM Kd = 3.61 fM Kd = 376.98 fM Kd = 0.02 fM
+    ./outputs/pose_0.pdbqt,Kd = 4.52 fM Kd = 0.27 fM Kd = 3.81 pM Kd = 1.4 fM Kd = 14.76 fM Kd = 20.42 pM Kd = 0.0 fM Kd = 95.3 pM Kd = 370.42 pM
+    ./outputs/pose_4.pdbqt,Kd = 22.57 fM Kd = 528.16 fM Kd = 0.01 fM Kd = 0.0 fM Kd = 1.16 fM Kd = 7.17 pM Kd = 14.49 fM Kd = 379.8 pM Kd = 35.22 fM
+    ./outputs/pose_6.pdbqt,Kd = 0.5 fM Kd = 20.04 pM Kd = 0.17 fM Kd = 0.05 fM Kd = 10.83 fM Kd = 481.17 fM Kd = 9.3 pM Kd = 67.82 pM Kd = 3.61 pM
+    ./outputs/pose_8.pdbqt,Kd = 389.19 fM Kd = 0.68 fM Kd = 5.92 pM Kd = 0.0 fM Kd = 0.13 fM Kd = 62.06 nM Kd = 2.1 pM Kd = 2.79 fM Kd = 96.16 pM
+    ./outputs/pose_1.pdbqt,Kd = 0.13 fM Kd = 0.11 fM Kd = 17.96 pM Kd = 73.79 fM Kd = 34.98 fM Kd = 296.29 fM Kd = 4.31 pM Kd = 18.54 fM Kd = 0.25 fM
+    ./outputs/pose_3.pdbqt,Kd = 0.16 fM Kd = 50.41 fM Kd = 1.56 fM Kd = 0.18 fM Kd = 398.94 pM Kd = 12.01 fM Kd = 152.27 pM Kd = 1.19 fM Kd = 0.0 fM
+    ./outputs/pose_15.pdbqt,Kd = 181.12 fM Kd = 1.11 fM Kd = 0.01 fM Kd = 24.82 pM Kd = 0.8 fM Kd = 54.8 pM Kd = 489.94 pM Kd = 0.0 fM Kd = 13.35 fM
+    ./outputs/pose_2.pdbqt,Kd = 1.3 fM Kd = 18.63 fM Kd = 0.0 fM Kd = 19.07 fM Kd = 32.29 pM Kd = 38.18 pM Kd = 77.43 fM Kd = 830.99 fM Kd = 0.02 fM
+    ./outputs/pose_14.pdbqt,Kd = 11.13 pM Kd = 5.51 pM Kd = 48.55 fM Kd = 17.8 fM Kd = 20.05 pM Kd = 973.78 fM Kd = 45.21 pM Kd = 856.73 fM Kd = 7.61 pM
+     
+    ```
 
 ## Running in batch 
 
