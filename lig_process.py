@@ -137,6 +137,15 @@ def neutralize_atoms(mol):
     return mol
 
 def check_energy(lig_): 
+    """
+    Check the quality of a generated structure by computing its total energy using the Open Babel obenergy tool.
+
+    Parameters:
+        lig_ (str): the name of the ligand file in PDBQT format.
+
+    Returns:
+        total_energy (float): the computed total energy of the ligand in Kcal/mol.
+    """
     # Check the quality of generated structure (some post-processing quality control):
     try: 
         ob_cmd = ['obenergy', lig_]
