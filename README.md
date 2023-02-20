@@ -160,7 +160,7 @@ Index,Smiles
 0,CCCCCCCCCC
 1,C1=CC(=CC=C1CSCC2C(C(C(O2)N3C=NC4=C(N=CN=C43)N)O)O)Cl
 ``` 
-The molecules can be run simple using out python function call: 
+The molecules can be run simply using out python function call: 
 ```
 import os 
 from run_vf_unity import main 
