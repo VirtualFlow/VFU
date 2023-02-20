@@ -14,9 +14,18 @@ Please ensure that the following packages are installed:
 
 
 ## File Navigator
-* 
+* `run_vf_unity.py`: Main file that initiates docking calculations. 
+* `initiate_calc.py`: File that initiates scoring, docking calculations. 
+* `lig_process.py`: Process provided ligand into 3D format compatible with docking program (used by )
+* `pose_prediction.py`: File for running pose prediction on processed ligands (used by pose_prediction). 
+* `scoring_functions.py`: File for running scoring on already docked ligands (used by initiate_calc.py). 
+* `config.txt`: Config file concisting of user definable parameters for running calculation. 
+* `/ligands/`: Directory created by VF-Unity which will contain all processed ligands in a ready-to-dock format. 
+* `/outputs/`: Directory created by VF-Unity which will contain docked ligand files. 
 
-## Running a single example
+
+
+## Quick Start (Running a single docking calculation)
 For running a single example (a docking score of a single SMILES/SELFIES), we will be running `run_vf_unity.py`. Specifically, the following steps can be followed: 
 1. Inside the `config` directory, please add a protein file, and a ligand file. We will be performing this demonstration using the protein `prot_1.pdb`, already pasted inside the `config` directory.
 2. Please open the file `run_single.py`. At the top of the file are all the parameters for running the script. The parameters are, 
