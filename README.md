@@ -76,8 +76,14 @@ is_peptide=False
 #  Additionally, the file needs to be present in the config directory.
 receptor=./config/5wiu_test.pdbqt
 ```
-
-
+To execute the program, please run: 
+```
+python3 run_vf_unity.py
+```
+We note: 
+1. The processed ligands will be located within the newly created ligands directory.
+2. The docked output from running QuickVina will be located in the newly created outputs directory.
+3. The default behaviour is for the program (QuickVina) is to make use of all available CPUs. 
 
 
 ## Running in batch 
