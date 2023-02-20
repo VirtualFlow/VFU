@@ -149,12 +149,12 @@ We note:
 1. The processed ligands will be located within the newly created ligands directory.
 2. The docked output from running QuickVina will be located in the newly created outputs directory.
 3. The default behaviour is for the program (QuickVina) is to make use of all available CPUs. 
-4. The output from running th QuickVina calculation will be stored in the dictionary pose_pred_out
-5. The output from running th QuickVina NNScore2.0 will be stored in the dictionary re_scored_values
-
-
+4. The output from running th QuickVina calculation will be stored in the dictionary pose_pred_out.
+5. The output from running th QuickVina NNScore2.0 will be stored in the dictionary re_scored_values.
+6. No output csv files are created in this case. 
 
 ## Running in batch 
+
 
 ## Special Considerations
 ### Using AutoDock-GPU/CPU
@@ -205,9 +205,6 @@ Additionally, a valid OpenEye licence is required. Namely, a file named oe_licen
 ### GalaxyDock3
 Please paste the executable from [https://galaxy.seoklab.org/files/by2hsnvxjf/softwares/galaxydock.html](https://galaxy.seoklab.org/files/by2hsnvxjf/softwares/galaxydock.html) in the executables directory. 
 Note a data directory (name 'data') is required for successful runs. 
-
-### SMINA Scoring
-Please not that the ligand to be scored must be the sole ligand in the file. 
 
 ### LightDock
 We suggest downloading LightDock from: [https://github.com/lightdock/lightdock](https://github.com/lightdock/lightdock). For this, within the current working directory (VF-Unity), please run: 
