@@ -1,0 +1,32 @@
+# The choice of the docking method
+# Possible choices:
+# AutoDock-Koto, AutodockVina_1.2, AutodockZN, EquiBind, FRED
+# FitDock, GalaxyDock3, LigandFit, LightDock, M-Dock
+# MCDock, MM-GBSA, PLANTS, PSOVina, RLDock
+# SEED, adfr, autodock_cpu, autodock_gpu, autodock_vina
+# dock6, flexx, glide, gnina, gnina-scoring
+# gold, gwovina, iGemDock, idock, ledock
+# molegro, nnscore2, qvina, qvina-w, rDock
+# rf-score, rosetta-ligand, smina, smina-scoring, vina
+# vina_carb, vina_xb
+# Please note: different pose prediction/docking methods can be combined with scoring functions.
+# For example: ’qvina+nnscore2’.
+# For supported choices/combinations please see the VirtualFlow homepage.
+
+program_choice=qvina
+
+# The x,y&z coordinates of the center of the docking space. The binding space describes the location where a moolecule
+# is allowed to bind.
+center_x=10
+center_y=10
+center_z=10
+
+# The size (in Angstroms) of the docking space in the x,y&z directions.
+size_x=10
+size_y=10
+size_z=10
+
+# How many poses to search for, providing a limit to the maximum number of iterations that a docking program performs in
+# search for good poses
+# Large exhaustiveness settings lead to increased computational costs.
+exhaustiveness=10 
