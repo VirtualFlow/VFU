@@ -5,6 +5,7 @@ Created on Sun Feb 19 17:23:20 2023
 
 @author: akshat
 """
+import os 
 from pose_prediction import run_pose_prediction_program
 
 
@@ -69,6 +70,9 @@ if __name__ == "__main__":
     if '+' in program_choice: 
         program_choice, scoring_function = program_choice.split('+')[0], program_choice.split('+')[1]
         
+        
+    smi = 'CCCCCCCCC' # TODO!
+        
     # Convert molecules from selfies->smiles/AA_string->smiles if option is specified within config.txt:
     if is_selfies == 'True': 
         import selfies 
@@ -95,26 +99,71 @@ if __name__ == "__main__":
     # Perform pose prediction:
     pose_pred_out = run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor)
 
+    # Get ready to perform scoring: 
     
-
-    # receptor       = './config/5wiu_test.pdbqt'
-    # if program_choice == 'nnscore2': 
-    #     run_nnscore2(receptor)
-    #     sys.exit()
-    # if program_choice == 'rf-score': 
-    #     rescored_pose, rf_scores = run_rf_scoring(receptor)
-    # if program_choice == 'smina-scoring': 
-    #     score = run_smina_scoring(receptor)
-    #     sys.exit()
-    # if program_choice == 'gnina-scoring': 
-    #     score = run_gnina_scoring(receptor)
-    #     sys.exit()
-    # if program_choice == 'ad4_scoring': 
-    #     score = run_ad4_scoring(receptor)
-    #     sys.exit()
-    # if program_choice == 'vinandro_scoring': 
-    #     score = run_vinandro_scoring(receptor)
-    #     sys.exit()
-    # if program_choice == 'vina_scoring': 
-    #     score = run_vina_scoring(receptor)
-    #     sys.exit()
+    # Get a list of all output files within the outputs directory: 
+    docked_ligands_ls = os.listdir('./outputs')
+    
+    from scoring_functions import run_nnscore2, run_rf_scoring, run_smina_scoring, run_ad4_scoring, run_vinandro_scoring, run_vina_scoring, run_gnina_scoring
+    from scoring_functions import run_PLANTS_chemplp_scoring, run_PLANTS_plp_scoring, run_PLANTS_plp95_scoring, contact_score, continuous_score, grid_score
+    from scoring_functions import run_mm_gbsa
+    
+    for ligand in docked_ligands_ls: 
+        ligand_path = './outputs/{}'.format(ligand)
+        
+        if scoring_function == 'nnscore2': 
+            scores = run_nnscore2(receptor, ligand_path)
+        if scoring_function == 'rf-score': 
+            scores = run_rf_scoring(receptor, ligand_path) 
+        if scoring_function == 'smina-scoring': 
+            scores = run_smina_scoring(receptor, ligand_path)
+        if scoring_function == 'ad4_scoring': 
+            scores = run_ad4_scoring(receptor, ligand_path)
+        if scoring_function == 'vinandro_scoring': 
+            scores = run_vinandro_scoring(receptor, ligand_path)
+        if scoring_function == 'vina_scoring': 
+            scores = run_vina_scoring(receptor, ligand_path)
+        if scoring_function == 'gnina_scoring': 
+            scores = run_gnina_scoring(receptor, ligand_path)
+        if scoring_function == 'chemplp_scoring': 
+            scores = run_PLANTS_chemplp_scoring(receptor, ligand_path)
+        if scoring_function == 'PLP_scoring': 
+            scores = run_PLANTS_plp_scoring(receptor, ligand_path)
+        if scoring_function == 'PLP95_scoring': 
+            scores = run_PLANTS_plp95_scoring(receptor, ligand_path)
+        if scoring_function == 'contact_scoring': 
+            chimera_path = ''
+            dock6_path = ''
+            scores = contact_score(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
+        if scoring_function == 'continuous_scoring': 
+            chimera_path = ''
+            dock6_path = ''
+            scores = continuous_score(receptor, chimera_path, dock6_path, ligand_path)
+        if scoring_function == 'grid_scoring': 
+            chimera_path = ''
+            dock6_path = ''
+            scores = grid_score(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
+        if scoring_function == 'mm_gbsa_scoring': 
+            chimera_path = ''
+            scores = run_mm_gbsa(chimera_path, ligand_path, receptor)
+                         
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            

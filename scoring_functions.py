@@ -8,41 +8,105 @@ Created on Sat Feb 18 22:41:22 2023
 import os 
 import subprocess
 
-def run_nnscore2(receptor): 
+
+def convert_ligand_format(ligand_, new_format): 
+    """Converts a ligand file to a different file format using the Open Babel tool.
+
+        Args:
+            ligand_ (str): The path to the input ligand file.
+            new_format (str): The desired output format for the ligand file.
+    
+        Returns:
+            None
+    
+        Raises:
+            Exception: If the input file does not exist, or if the Open Babel tool is not installed.
+    
+        Examples:
+            To convert a ligand file from mol2 format to pdbqt format:
+            >>> convert_ligand_format('./ligands/ligand1.mol2', 'pdbqt')
+    """
+    input_format = ligand_.split('.')[-1]
+    os.system('obabel {} -O {}'.format(ligand_, ligand_.replace(input_format, new_format)))
+
+def run_nnscore2(receptor, lig_path): 
+    """
+    Perform scoring for docking ligands using the NNScore2 method.
+    
+    Args:
+    - receptor: string, path to the receptor file in pdbqt format.
+    - lig_path: string, path to the ligand file in pdbqt format.
+    
+    Returns:
+    - scores: list of strings, the best score for the docking run.
+    
+    Raises:
+    - Exception: If receptor is not in pdbqt format or not found.
+    - Exception: If lig_path is not in pdbqt format or not found.
+    
+    The function uses the Vina executable and NNScore2.py script in the executables directory to perform the docking run. The output of the run is saved in the output.txt file, which is then read to extract the best score.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
-        
-    lig_path = './config/ligand.pdbqt'
-    lig_format = lig_path.split('.')[-1]
-    if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(lig_path) == False: 
         raise Exception('Ligand path {} not found.'.format(lig_path))
+        
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(lig_path, 'pdbqt')
+        lig_path = lig_path.replace(lig_format, 'pdbqt')
 
     # Perform the calculation: 
     vina_loc = os.getcwd() + '/executables/vina'
     os.system('export VINA_EXEC={}; python ./config/NNScore2.py -receptor {} -ligand {} -vina_executable $VINA_EXEC > output.txt'.format(vina_loc, receptor, lig_path))
 
-    os.system('cp ./output.txt ./outputs/{}.txt'.format(lig_path.split('/')[-1].split('.')[0]))
+    # os.system('cp ./output.txt ./outputs/{}.txt'.format(lig_path.split('/')[-1].split('.')[0]))
+    with open('./output.txt', 'r') as f: 
+        lines = f.readlines()
+    scores = [x for x in lines if 'Best Score:' in x]
+    
     os.system('rm output.txt')
-    return 
+    return scores
 
-def run_rf_scoring(receptor): 
+def run_rf_scoring(receptor, lig_path): 
+    """
+    Runs RF-Score calculation for given receptor-ligand complex.
+
+    Parameters:
+    -----------
+    receptor : str
+        File path of the receptor in PDB format.
+    lig_path : str
+        File path of the ligand in PDB or PDBQT format.
+
+    Returns:
+    --------
+    list
+        A list containing the file path of the rescored ligand in PDBQT format and a list of RF-Score scores for the ligand.
+
+    Raises:
+    -------
+    Exception
+        If the receptor file is not in PDB format or not found.
+        If the ligand file is not found.
+    """
     receptor_format = receptor.split('.')[-1]
-    if receptor_format != 'pdb': 
-        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    if receptor_format != 'pdbqt': 
+        raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
-        
-    lig_path = './config/ligand.pdbqt'
-    lig_format = lig_path.split('.')[-1]
-    if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(lig_path) == False: 
         raise Exception('Ligand path {} not found.'.format(lig_path))
+        
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(lig_path, 'pdbqt')
+        lig_path = lig_path.replace(lig_format, 'pdbqt')
 
     # Perform the calculation: 
     os.system('./executables/rf-score-vs --receptor {} {} -O ./outputs/ligands_rescored.pdbqt'.format(receptor, lig_path))
@@ -57,19 +121,30 @@ def run_rf_scoring(receptor):
     os.system('rm temp.csv')
     return ['./outputs/ligands_rescored.pdbqt', rf_scores]
 
-def run_smina_scoring(receptor): 
+def run_smina_scoring(receptor, lig_path): 
+    """
+    Runs smina scoring on a receptor-ligand complex and returns the score.
+
+    Args:
+    receptor (str): path to the receptor PDBQT file
+    lig_path (str): path to the ligand PDBQT file
+
+    Returns:
+    float: the smina score for the complex
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))        
         
-    lig_path = './config/pose_ligand_1.pdbqt'
     lig_format = lig_path.split('.')[-1]
     if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
-    if os.path.exists(lig_path) == False: 
-        raise Exception('Ligand path {} not found.'.format(lig_path))
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(lig_path, 'pdbqt')
+        lig_path = lig_path.replace(lig_format, 'pdbqt')
 
     cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only']    
     
@@ -80,21 +155,32 @@ def run_smina_scoring(receptor):
 
     return command_out
 
-def run_ad4_scoring(receptor): 
+def run_ad4_scoring(receptor, ligand_path): 
+    """
+    Runs AutoDock4 scoring on a receptor-ligand complex and returns the score.
+
+    Args:
+    receptor (str): path to the receptor PDBQT file
+    lig_path (str): path to the ligand PDBQT file
+    
+    Returns: 
+    float: binding affinity (in kcal/mol) as a floating point number
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
-        
-    lig_path = './config/pose_ligand_1.pdbqt'
-    lig_format = lig_path.split('.')[-1]
+    if os.path.exists(ligand_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(ligand_path))
+    
+    lig_format = ligand_path.split('.')[-1]
     if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
-    if os.path.exists(lig_path) == False: 
-        raise Exception('Ligand path {} not found.'.format(lig_path))
-
-    cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only', '--scoring', 'ad4_scoring']    
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_path, 'pdbqt')
+        ligand_path = ligand_path.replace(lig_format, 'pdbqt')
+        
+    cmd = ['./executables/smina', '--receptor', receptor, '-l', ligand_path, '--score_only', '--scoring', 'ad4_scoring']    
     
     command_run = subprocess.run(cmd, capture_output=True)
 
@@ -103,70 +189,143 @@ def run_ad4_scoring(receptor):
 
     return command_out
 
-def run_vinandro_scoring(receptor): 
+def run_vinandro_scoring(receptor, lig_path): 
+    """
+    Runs Vinardo scoring on the given receptor-ligand pair and returns the binding affinity score.
+
+    Parameters:
+    -----------
+    receptor: str
+        Path to the receptor file in pdbqt format.
+    lig_path: str
+        Path to the ligand file in pdbqt format.
+    
+    Returns:
+    --------
+    float
+        Vinardo binding affinity score for the receptor-ligand pair.
+
+    Raises:
+    -------
+    Exception
+        If receptor file format is not pdbqt.
+    Exception
+        If receptor file is not found in the provided path.
+    Exception
+        If ligand file is not found in the provided path.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
-        
-    lig_path = './config/pose_ligand_1.pdbqt'
-    lig_format = lig_path.split('.')[-1]
-    if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(lig_path) == False: 
         raise Exception('Ligand path {} not found.'.format(lig_path))
+   
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(lig_path, 'pdbqt')
+        lig_path = lig_path.replace(lig_format, 'pdbqt')
 
     cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only', '--scoring', 'vinardo']    
     
     command_run = subprocess.run(cmd, capture_output=True)
-
     command_out = command_run.stdout.decode("utf-8").split('\n')
     command_out = float([x for x in command_out if 'Affinity' in x][0].split(' ')[1])
 
     return command_out
 
-def run_vina_scoring(receptor): 
+def run_vina_scoring(receptor, lig_path): 
+    """
+    Runs Vina scoring on the given receptor-ligand pair and returns the binding affinity score.
+
+    Parameters:
+    -----------
+    receptor: str
+        Path to the receptor file in pdbqt format.
+    lig_path: str
+        Path to the ligand file in pdbqt format.
+    
+    Returns:
+    --------
+    float
+        Vina binding affinity score for the receptor-ligand pair.
+
+    Raises:
+    -------
+    Exception
+        If receptor file format is not pdbqt.
+    Exception
+        If receptor file is not found in the provided path.
+    Exception
+        If ligand file is not found in the provided path.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
-        
-    lig_path = './config/pose_ligand_1.pdbqt'
-    lig_format = lig_path.split('.')[-1]
-    if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(lig_path) == False: 
         raise Exception('Ligand path {} not found.'.format(lig_path))
+        
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(lig_path, 'pdbqt')
+        lig_path = lig_path.replace(lig_format, 'pdbqt')
 
     cmd = ['./executables/smina', '--receptor', receptor, '-l', lig_path, '--score_only', '--scoring', 'vina']    
-    
     command_run = subprocess.run(cmd, capture_output=True)
-
     command_out = command_run.stdout.decode("utf-8").split('\n')
     command_out = float([x for x in command_out if 'Affinity' in x][0].split(' ')[1])
 
     return command_out
 
-def run_gnina_scoring(receptor): 
+def run_gnina_scoring(receptor, lig_path): 
+    """
+    Runs Gnina scoring on the given receptor-ligand pair and returns the binding affinity score.
+
+    Parameters:
+    -----------
+    receptor: str
+        Path to the receptor file in pdbqt format.
+    lig_path: str
+        Path to the ligand file in pdbqt format.
+    
+    Returns:
+    --------
+    float
+        Gnina binding affinity score for the receptor-ligand pair.
+
+    Raises:
+    -------
+    Exception
+        If receptor file format is not pdbqt.
+    Exception
+        If receptor file is not found in the provided path.
+    Exception
+        If ligand file is not found in the provided path.
+    Exception
+        If Gnina executable is not found in /executables/.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
-        
-    lig_path = './config/pose_ligand_1.pdbqt'
-    lig_format = lig_path.split('.')[-1]
-    if lig_format != 'pdbqt': 
-        raise Exception('Ligand needs to be in pdbqt format. Please try again, after incorporating this correction.')
-    if os.path.exists(lig_path) == False: 
-        raise Exception('Ligand path {} not found.'.format(lig_path))
     if os.path.exists('./executables/gnina') == False: 
         raise Exception('Gnina executable {} not found.'.format('./executables/gnina'))
+    if os.path.exists(lig_path) == False: 
+        raise Exception('Ligand path {} not found.'.format(lig_path))
+        
+    lig_format = lig_path.split('.')[-1]
+    if lig_format != 'pdbqt': 
+        print('Ligand needs to be in pdbqt format. Converting ligand format using obabel.')
+        convert_ligand_format(lig_path, 'pdbqt')
+        lig_path = lig_path.replace(lig_format, 'pdbqt')
 
-    cmd = ['./executables/gnina', '--receptor', receptor, '-l', lig_path, '--score_only']    
-    
+    cmd = ['./executables/gnina', '--receptor', receptor, '-l', lig_path, '--score_only']
     command_run = subprocess.run(cmd, capture_output=True)
 
     command_out = command_run.stdout.decode("utf-8").split('\n')
@@ -179,13 +338,26 @@ def run_gnina_scoring(receptor):
     return key_
 
 def run_PLANTS_chemplp_scoring(receptor, ligand_file):
+    """
+    Runs the PLANTS molecular docking program with the ChemPLP scoring function to predict
+    the binding affinity of a ligand to a receptor. 
+    
+    Args:
+    - receptor (str): path to the receptor file in mol2 format.
+    - ligand_file (str): path to the ligand file in pdb or mol2 format.
+    
+    Returns:
+    - score (float): predicted binding affinity score.
+    """
     
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'mol2': 
         raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
     lig_format = ligand_file.split('.')[-1]
     if lig_format != 'mol2': 
-        raise Exception('Ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
     
     with open('plants_config', 'w') as f: 
         f.writelines('scoring_function 		chemplp\n')
@@ -193,21 +365,32 @@ def run_PLANTS_chemplp_scoring(receptor, ligand_file):
         f.writelines('ligand_file 			{}\n'.format(ligand_file))
     
     cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
-    
     command_run = subprocess.run(cmd, capture_output=True)
     command_out = command_run.stdout.decode("utf-8").split('\n')
     command_out = [x for x in command_out if 'best score:' in x][-1]    
-    
+    os.system('rm plants_config')
     return float(command_out.split(' ')[-1])
 
 def run_PLANTS_plp_scoring(receptor, ligand_file):
+    """
+    Runs the PLANTS molecular docking program with the PLP scoring function to predict
+    the binding affinity of a ligand to a receptor. 
     
+    Args:
+    - receptor (str): path to the receptor file in mol2 format.
+    - ligand_file (str): path to the ligand file in pdb or mol2 format.
+    
+    Returns:
+    - score (float): predicted binding affinity score.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'mol2': 
         raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
     lig_format = ligand_file.split('.')[-1]
     if lig_format != 'mol2': 
-        raise Exception('Ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
     
     with open('plants_config', 'w') as f: 
         f.writelines('scoring_function 		plp\n')
@@ -219,39 +402,72 @@ def run_PLANTS_plp_scoring(receptor, ligand_file):
     command_run = subprocess.run(cmd, capture_output=True)
     command_out = command_run.stdout.decode("utf-8").split('\n')
     command_out = [x for x in command_out if 'best score:' in x][-1]    
-    
+    os.system('rm plants_config')
     return float(command_out.split(' ')[-1])
 
 def run_PLANTS_plp95_scoring(receptor, ligand_file):
+    """
+    Runs the PLANTS molecular docking program with the PLP95 scoring function to predict
+    the binding affinity of a ligand to a receptor. 
     
+    Args:
+    - receptor (str): path to the receptor file in mol2 format.
+    - ligand_file (str): path to the ligand file in pdb or mol2 format.
+    
+    Returns:
+    - score (float): predicted binding affinity score.
+    """
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'mol2': 
         raise Exception('Receptor needs to be in mol2 format. Please try again, after incorporating this correction.')
     lig_format = ligand_file.split('.')[-1]
     if lig_format != 'mol2': 
-        raise Exception('Ligand needs to be in mol2 format. Please try again, after incorporating this correction.')
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
     
     with open('plants_config', 'w') as f: 
         f.writelines('scoring_function 		plp95\n')
         f.writelines('protein_file 			{}\n'.format(receptor))
         f.writelines('ligand_file 			{}\n'.format(ligand_file))
 
-    
     cmd = ['./executables/PLANTS', '--mode', 'rescore', './plants_config']    
-    
     command_run = subprocess.run(cmd, capture_output=True)
     command_out = command_run.stdout.decode("utf-8").split('\n')
     command_out = [x for x in command_out if 'best score:' in x][-1]    
-    
+    os.system('rm plants_config')
     return float(command_out.split(' ')[-1])
 
 
-def contact_score(receptor_file, chimera_path, dock6_path, ligand_file): 
+def contact_score(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z): 
+    """
+    Calculate the Contact Score between a receptor and a ligand using DOCK6.
+
+    Args:
+        - receptor_file (str): Path to the receptor file (in PDB format).
+        - chimera_path (str): Path to UCSF Chimera executable.
+        - dock6_path (str): Path to DOCK6 program.
+        - ligand_file (str): Path to the ligand file (in MOL2 format).
+        - center_x (float): x-coordinate of the center of the box.
+        - center_y (float): y-coordinate of the center of the box.
+        - center_z (float): z-coordinate of the center of the box.
+        - size_x (float): Size of the box in the x direction.
+        - size_y (float): Size of the box in the y direction.
+        - size_z (float): Size of the box in the z direction.
+
+    Returns:
+        - score (float): Contact Score between the receptor and the ligand.
+    """
 
     recetor_format = receptor_file.split('.')[-1]
     if recetor_format != 'pdb': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
-    
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
+
     with open('./dock6_sript.sh', 'w') as f: 
         f.writelines(['export Chimera={}\n'.format(chimera_path)])
         f.writelines(['export DOCK6={}\n'.format(dock6_path)])
@@ -279,8 +495,8 @@ def contact_score(receptor_file, chimera_path, dock6_path, ligand_file):
     with open('./box.in', 'w') as f: 
         f.writelines('N\n')
         f.writelines('U\n')
-        f.writelines('{}   {}    {}\n'.format(9, 14, 7))
-        f.writelines('25 25 25\n')
+        f.writelines('{}   {}    {}\n'.format(center_x, center_y, center_z))
+        f.writelines('{} {} {}\n'.format(size_x, size_y, size_z))
         f.writelines('rec_box.pdb\n')
     
     with open('./grid.in', 'w') as f: 
@@ -364,10 +580,31 @@ def contact_score(receptor_file, chimera_path, dock6_path, ligand_file):
 
 
 def continuous_score(receptor_file, chimera_path, dock6_path, ligand_file): 
+    """
+    This function performs docking of a given ligand to a receptor using DOCK6 and returns the continuous score of the docked complex.
+
+    Args:
+        - receptor_file (str): path to the receptor file in PDB format.
+        - chimera_path (str): path to the Chimera installation directory.
+        - dock6_path (str): path to the DOCK6 installation directory.
+        - ligand_file (str): path to the ligand file in MOL2 format.
+
+    Returns:
+        - score (float): the continuous score of the docked complex.
+
+    Raises:
+        - Exception: if the receptor file is not in PDB format.
+    """
 
     recetor_format = receptor_file.split('.')[-1]
     if recetor_format != 'pdb': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
+
     
     with open('./dock6_sript.sh', 'w') as f: 
         f.writelines(['export Chimera={}\n'.format(chimera_path)])
@@ -448,11 +685,38 @@ def continuous_score(receptor_file, chimera_path, dock6_path, ligand_file):
     
     return score 
 
-def grid_score(receptor_file, chimera_path, dock6_path, ligand_file): 
-
+def grid_score(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z): 
+    """
+    This function calculates the grid score of a given ligand on the receptor protein. The function performs the following steps:
+        1. Checks if the receptor and ligand files are in the correct format. If not, it converts the ligand file to the correct format.
+        2. Generates a box around the receptor protein.
+        3. Generates spheres around the ligand and selects spheres that are within 12 Angstrom of the ligand.
+        4. Calculates the grid scores of the ligand in the box.
+    
+    Args:
+        - receptor_file (str): The path to the receptor file in PDB format.
+        - chimera_path (str): The path to the Chimera installation directory.
+        - dock6_path (str): The path to the Dock6 installation directory.
+        - ligand_file (str): The path to the ligand file in MOL2 format.
+        - center_x (float): The x-coordinate of the center of the grid box.
+        - center_y (float): The y-coordinate of the center of the grid box.
+        - center_z (float): The z-coordinate of the center of the grid box.
+        - size_x (float): The size of the grid box in the x-dimension.
+        - size_y (float): The size of the grid box in the y-dimension.
+        - size_z (float): The size of the grid box in the z-dimension.
+        
+    Returns:
+        - score (float): The grid score of the ligand on the receptor protein.
+    """
+    
     recetor_format = receptor_file.split('.')[-1]
     if recetor_format != 'pdb': 
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
     
     with open('./dock6_sript.sh', 'w') as f: 
         f.writelines(['export Chimera={}\n'.format(chimera_path)])
@@ -480,8 +744,8 @@ def grid_score(receptor_file, chimera_path, dock6_path, ligand_file):
     with open('./box.in', 'w') as f: 
         f.writelines('N\n')
         f.writelines('U\n')
-        f.writelines('{}   {}    {}\n'.format(9, 14, 7))
-        f.writelines('25 25 25\n')
+        f.writelines('{}   {}    {}\n'.format(center_x, center_y, center_z))
+        f.writelines('{} {} {}\n'.format(size_x, size_y, size_z))
         f.writelines('rec_box.pdb\n')
     
     with open('./grid.in', 'w') as f: 
@@ -566,10 +830,7 @@ def grid_score(receptor_file, chimera_path, dock6_path, ligand_file):
         
         return score 
 
-def run_mm_gbsa(): 
-    chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
-    ligand_file   = 'ligand.mol2' 
-    receptor_file = 'receptor.pdb'
+def run_mm_gbsa(chimera_path, ligand_file, receptor_file): 
     
     output = {}
     
