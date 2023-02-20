@@ -153,8 +153,42 @@ We note:
 5. The output from running th QuickVina NNScore2.0 will be stored in the dictionary re_scored_values.
 6. No output csv files are created in this case. 
 
-## Running in batch 
+## Running calculations for multiple molecules: 
+Please prepare a file concisting of a list of smiles. For example, `molecules.txt`: 
+```
+Index,Smiles
+0,CCCCCCCCCC
+1,C1=CC(=CC=C1CSCC2C(C(C(O2)N3C=NC4=C(N=CN=C43)N)O)O)Cl
+``` 
+The molecules can be run simple using out python function call: 
+```
+import os 
+from run_vf_unity import main 
 
+program_choice   = 'qvina'
+scoring_function = '' 
+center_x         = -17.820
+center_y         = 16.140
+center_z         = -18.643
+size_x           = 20
+size_y           = 20 
+size_z           = 20
+exhaustiveness   = 10
+is_selfies       = False
+is_peptide       = False
+receptor         = './config/5wiu_test.pdbqt'
+
+with open('./molecules.smi', 'r') as f: 
+    lines = f.readlines()
+lines = lines[1: ]
+
+for item in lines: 
+    idx,smi = item.split(',')
+    pose_pred_out, re_scored_values = main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor)
+    os.system('rm -rf ligands')
+    os.system('cp -a outputs outputs_{}'.format(idx))
+```
+The corresponding index (column 1) of a molecule in the `molecules.txt` file will be used for storing the results in `outputs_*index*`
 
 ## Special Considerations
 ### Using AutoDock-GPU/CPU

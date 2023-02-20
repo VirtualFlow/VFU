@@ -136,7 +136,6 @@ if __name__ == "__main__":
     else: 
         scoring_function = ''
                 
-
     pose_pred_out, re_scored_values = main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor)
 
     with open('docking_output.csv', 'a+', newline='') as csvfile:

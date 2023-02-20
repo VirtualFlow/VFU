@@ -52,7 +52,9 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         
     if os.path.exists('./ligands') == False: 
         subprocess.run(['mkdir', './ligands'])
-    
+    if os.path.exists('./outputs') == False: 
+        subprocess.run(['mkdir', './outputs'])
+        
     if program_choice == 'flexx': 
         results = run_flexx_docking(receptor, smi)
         return results
