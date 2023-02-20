@@ -107,23 +107,22 @@ We note:
 5. Sepperately, a summary csv file is created (`rescoring_output.csv`) is created when running rescoring (nnscore2): 
     ```
     Docked Ligand,Re-scored Value
-    ./outputs/pose_11.pdbqt,Kd = 1.0 pM Kd = 672.97 fM Kd = 8.17 pM Kd = 349.7 fM Kd = 4.05 pM Kd = 2.11 pM Kd = 2.0 nM Kd = 66.72 fM Kd = 1.15 fM
-    ./outputs/pose_10.pdbqt,Kd = 11.52 fM Kd = 11.49 fM Kd = 266.9 fM Kd = 11.81 fM Kd = 0.0 fM Kd = 7.63 pM Kd = 115.91 fM Kd = 773.49 fM Kd = 1.79 pM
-    ./outputs/pose_9.pdbqt,Kd = 30.43 fM Kd = 22.13 pM Kd = 48.66 fM Kd = 1.03 pM Kd = 14.35 pM Kd = 103.81 fM Kd = 10.97 pM Kd = 0.14 fM Kd = 0.18 fM
-    ./outputs/pose_5.pdbqt,Kd = 0.19 fM Kd = 0.12 fM Kd = 55.87 fM Kd = 6.36 pM Kd = 2.96 pM Kd = 0.0 fM Kd = 4.77 fM Kd = 7.49 pM Kd = 44.51 pM
-    ./outputs/pose_12.pdbqt,Kd = 1.79 fM Kd = 1.5 fM Kd = 2.2 pM Kd = 192.03 pM Kd = 34.51 fM Kd = 15.97 pM Kd = 1.33 pM Kd = 45.29 fM Kd = 9.07 fM
-    ./outputs/pose_7.pdbqt,Kd = 279.09 fM Kd = 0.12 fM Kd = 7.22 pM Kd = 9.8 fM Kd = 2.08 fM Kd = 0.01 fM Kd = 0.0 fM Kd = 0.01 fM Kd = 20.22 pM
-    ./outputs/pose_13.pdbqt,Kd = 1.0 fM Kd = 0.13 fM Kd = 4.18 fM Kd = 41.14 fM Kd = 560.85 fM Kd = 142.89 fM Kd = 3.61 fM Kd = 376.98 fM Kd = 0.02 fM
-    ./outputs/pose_0.pdbqt,Kd = 4.52 fM Kd = 0.27 fM Kd = 3.81 pM Kd = 1.4 fM Kd = 14.76 fM Kd = 20.42 pM Kd = 0.0 fM Kd = 95.3 pM Kd = 370.42 pM
-    ./outputs/pose_4.pdbqt,Kd = 22.57 fM Kd = 528.16 fM Kd = 0.01 fM Kd = 0.0 fM Kd = 1.16 fM Kd = 7.17 pM Kd = 14.49 fM Kd = 379.8 pM Kd = 35.22 fM
-    ./outputs/pose_6.pdbqt,Kd = 0.5 fM Kd = 20.04 pM Kd = 0.17 fM Kd = 0.05 fM Kd = 10.83 fM Kd = 481.17 fM Kd = 9.3 pM Kd = 67.82 pM Kd = 3.61 pM
-    ./outputs/pose_8.pdbqt,Kd = 389.19 fM Kd = 0.68 fM Kd = 5.92 pM Kd = 0.0 fM Kd = 0.13 fM Kd = 62.06 nM Kd = 2.1 pM Kd = 2.79 fM Kd = 96.16 pM
-    ./outputs/pose_1.pdbqt,Kd = 0.13 fM Kd = 0.11 fM Kd = 17.96 pM Kd = 73.79 fM Kd = 34.98 fM Kd = 296.29 fM Kd = 4.31 pM Kd = 18.54 fM Kd = 0.25 fM
-    ./outputs/pose_3.pdbqt,Kd = 0.16 fM Kd = 50.41 fM Kd = 1.56 fM Kd = 0.18 fM Kd = 398.94 pM Kd = 12.01 fM Kd = 152.27 pM Kd = 1.19 fM Kd = 0.0 fM
-    ./outputs/pose_15.pdbqt,Kd = 181.12 fM Kd = 1.11 fM Kd = 0.01 fM Kd = 24.82 pM Kd = 0.8 fM Kd = 54.8 pM Kd = 489.94 pM Kd = 0.0 fM Kd = 13.35 fM
-    ./outputs/pose_2.pdbqt,Kd = 1.3 fM Kd = 18.63 fM Kd = 0.0 fM Kd = 19.07 fM Kd = 32.29 pM Kd = 38.18 pM Kd = 77.43 fM Kd = 830.99 fM Kd = 0.02 fM
-    ./outputs/pose_14.pdbqt,Kd = 11.13 pM Kd = 5.51 pM Kd = 48.55 fM Kd = 17.8 fM Kd = 20.05 pM Kd = 973.78 fM Kd = 45.21 pM Kd = 856.73 fM Kd = 7.61 pM
-     
+    ./outputs/pose_11.pdbqt,Kd = 114.94 fM;Kd = 2.29 pM;Kd = 3.22 fM;Kd = 10.3 fM;Kd = 11.92 fM;Kd = 0.87 fM;Kd = 307.09 fM;Kd = 2.18 pM;Kd = 22.69 pM
+    ./outputs/pose_10.pdbqt,Kd = 14.22 fM;Kd = 13.13 fM;Kd = 10.96 pM;Kd = 29.48 fM;Kd = 73.28 fM;Kd = 2.35 fM;Kd = 108.96 fM;Kd = 122.82 fM;Kd = 0.35 fM
+    ./outputs/pose_9.pdbqt,Kd = 216.4 fM;Kd = 685.98 fM;Kd = 155.95 fM;Kd = 116.24 fM;Kd = 72.66 fM;Kd = 189.04 pM;Kd = 4.74 pM;Kd = 7.01 pM;Kd = 1.04 nM
+    ./outputs/pose_5.pdbqt,Kd = 0.14 fM;Kd = 3.58 pM;Kd = 2.75 fM;Kd = 23.24 fM;Kd = 7.79 pM;Kd = 152.06 nM;Kd = 0.12 fM;Kd = 121.77 fM;Kd = 18.27 pM
+    ./outputs/pose_12.pdbqt,Kd = 0.16 fM;Kd = 11.43 fM;Kd = 1.76 pM;Kd = 4.74 pM;Kd = 2.15 pM;Kd = 4.79 pM;Kd = 364.24 fM;Kd = 55.44 fM;Kd = 20.77 fM
+    ./outputs/pose_7.pdbqt,Kd = 101.4 fM;Kd = 0.12 fM;Kd = 1.14 fM;Kd = 134.77 fM;Kd = 0.55 fM;Kd = 10.53 nM;Kd = 0.0 fM;Kd = 129.84 fM;Kd = 8.86 nM
+    ./outputs/pose_13.pdbqt,Kd = 0.34 fM;Kd = 0.13 fM;Kd = 1.74 pM;Kd = 73.35 fM;Kd = 203.96 fM;Kd = 11.28 pM;Kd = 3.75 pM;Kd = 85.11 fM;Kd = 5.17 pM
+    ./outputs/pose_0.pdbqt,Kd = 19.81 fM;Kd = 0.01 fM;Kd = 0.06 fM;Kd = 14.96 fM;Kd = 0.1 fM;Kd = 578.15 fM;Kd = 120.14 fM;Kd = 24.31 fM;Kd = 3.01 pM
+    ./outputs/pose_4.pdbqt,Kd = 12.63 fM;Kd = 2.81 pM;Kd = 0.0 fM;Kd = 52.42 fM;Kd = 0.96 fM;Kd = 310.52 fM;Kd = 36.57 pM;Kd = 17.94 fM;Kd = 0.13 fM
+    ./outputs/pose_6.pdbqt,Kd = 0.91 fM;Kd = 8.34 pM;Kd = 0.14 fM;Kd = 0.19 fM;Kd = 0.02 fM;Kd = 0.0 fM;Kd = 16.4 fM;Kd = 60.84 fM;Kd = 1.34 pM
+    ./outputs/pose_8.pdbqt,Kd = 94.53 fM;Kd = 23.83 pM;Kd = 6.22 pM;Kd = 1.34 fM;Kd = 276.47 fM;Kd = 0.63 fM;Kd = 71.78 fM;Kd = 5.64 fM;Kd = 18.55 pM
+    ./outputs/pose_1.pdbqt,Kd = 0.13 fM;Kd = 0.09 fM;Kd = 11.47 pM;Kd = 11.69 fM;Kd = 5.36 pM;Kd = 8.35 pM;Kd = 2.44 pM;Kd = 4.19 pM;Kd = 23.34 pM
+    ./outputs/pose_3.pdbqt,Kd = 0.0 fM;Kd = 1.65 fM;Kd = 14.99 fM;Kd = 0.24 fM;Kd = 213.73 pM;Kd = 6.34 pM;Kd = 472.1 fM;Kd = 329.75 pM;Kd = 261.08 fM
+    ./outputs/pose_15.pdbqt,Kd = 1.06 pM;Kd = 136.55 fM;Kd = 1.82 pM;Kd = 106.86 fM;Kd = 4.26 pM;Kd = 1.55 pM;Kd = 6.23 pM;Kd = 61.89 fM;Kd = 242.37 pM
+    ./outputs/pose_2.pdbqt,Kd = 11.5 fM;Kd = 18.0 fM;Kd = 2.34 pM;Kd = 783.94 fM;Kd = 202.75 fM;Kd = 79.9 fM;Kd = 210.65 fM;Kd = 13.13 fM;Kd = 511.8 fM
+    ./outputs/pose_14.pdbqt,Kd = 162.12 fM;Kd = 726.22 fM;Kd = 10.38 fM;Kd = 432.15 fM;Kd = 0.06 fM;Kd = 9.24 pM;Kd = 3.07 pM;Kd = 23.07 nM;Kd = 7.97 pM
     ```
 
 ## Running in batch 

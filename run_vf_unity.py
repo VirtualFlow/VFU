@@ -64,15 +64,8 @@ def read_config_file():
     
     return program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor
 
-if __name__ == "__main__": 
-    
-    # Read in parameters from config.txt: 
-    program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor = read_config_file()
-    if '+' in program_choice: 
-        program_choice, scoring_function = program_choice.split('+')[0], program_choice.split('+')[1]
-    else: 
-        scoring_function = ''
-                
+
+def main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor): 
     # Convert molecules from selfies->smiles/AA_string->smiles if option is specified within config.txt:
     if is_selfies == 'True': 
         import selfies 
@@ -98,15 +91,6 @@ if __name__ == "__main__":
 
     # Perform pose prediction:
     pose_pred_out = run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor)
-    with open('docking_output.csv', 'a+', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Ligand File', 'Docking Values', 'Docking Pose'])
-        for key, value in pose_pred_out.items():
-            filename = key
-            values = ','.join(map(str, value[0]))
-            path = value[1]
-            writer.writerow([filename, values, path])
-            
         
     # Use an alternative scoring function if indicated by user:     
     re_scored_values = {}
@@ -117,6 +101,30 @@ if __name__ == "__main__":
             score = run_scoring_prediction_program(scoring_function, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor)
             re_scored_values[ligand_path] = score
 
+    return pose_pred_out, re_scored_values
+            
+
+if __name__ == "__main__": 
+    
+    # Read in parameters from config.txt: 
+    program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor = read_config_file()
+    if '+' in program_choice: 
+        program_choice, scoring_function = program_choice.split('+')[0], program_choice.split('+')[1]
+    else: 
+        scoring_function = ''
+                
+
+    pose_pred_out, re_scored_values = main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor)
+
+    with open('docking_output.csv', 'a+', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Ligand File', 'Docking Values', 'Docking Pose'])
+        for key, value in pose_pred_out.items():
+            filename = key
+            values = ','.join(map(str, value[0]))
+            path = value[1]
+            writer.writerow([filename, values, path])   
+        
     with open('rescoring_output.csv', 'a+', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['Docked Ligand', 'Re-scored Value'])
