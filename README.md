@@ -25,30 +25,59 @@ Please ensure that the following packages are installed:
 
 
 
-## Quick Start (Running a single docking calculation)
-For running a single example (a docking score of a single SMILES/SELFIES), we will be running `run_vf_unity.py`. Specifically, the following steps can be followed: 
-1. Inside the `config` directory, please add a protein file, and a ligand file. We will be performing this demonstration using the protein `prot_1.pdb`, already pasted inside the `config` directory.
-2. Please open the file `run_single.py`. At the top of the file are all the parameters for running the script. The parameters are, 
-   - is_selfies     = False 
-   - program_choice = 'smina' 
-   - receptor       = './config/prot_1.pdb'
-   - smi            = 'BrC=CC1OC(C2)(F)C2(Cl)C1.CC.[Cl][Cl]'
-   - Parameters for executing the docking pose search: 
-     - exhaustiveness = 10
-     - center_x       = -16  
-     - center_y       = 145  
-     - center_z       = 27   
-     - size_x         = 10  
-     - size_y         = 10   
-     - size_z         = 10   
-3. Please do not worry. We will be describing these paramters one at a time! :)
-4. We begin by looking at the paramter `smi`. The variable needs to be set to a valid smile string. To process the SMILE string, the program uses RdKit to (1) desaults, (2) neutralizes and (3) enumerates sterio-isomers. Subsequently, all molecules will be converted to 3D using OpenBabel. 
-5. `is_selfies`: If set to True, the program expects the variable `smi` to contain a valied SELFIES string. Please ensure to install SELFIES using `pip install selfies`. 
-6. `receptor`: The name of the receptor file. Note: it is assumed that this file name is located within the config directory. 
-7. `program_choice`: We currently support the docking programs `smina,qvina,qvina-w,vina,vina_carb,vina_xb,gwovina,PLANTS,autodock_gpu,autodock_cpu,EquiBind,rDock,gnina,ledock,idock,autodock_vina,adfr`. The variable `program_choice` can be set to any of these values. <br />Note: There are special instructions for AutoDock-GPU(CPU),EquiBind & rDock. Please have a look at the Special Considerations section below. 
-8. Finally, there are a few parameters for the docking software: `exhaustiveness, center_x/y/z, size_x/y/z`. The exhaustive parameter describes how many poses to search for (we have set it to 10 for this example). center_x/y/z and size_x/y/z describe where the docking is performed in the protein (i.e., the binding spot for the ligand).
-9. Alright! I hope the parameters make sense, along with the example we will be running! You are ready to run `python3 run_single.py`
-10. The output poses for the docking calculation are saved within the directory `outputs`. The dictionay `results` (from running `run_single.py`) contains the ligand file, the docked pose file name, along with the docking score. 
+## Quick Start (Running a docking calculation)
+We will be running QuickVina on a processed protein located in the config directory (`5wiu_test.pdbqt`). We provide a config.txt file which contains all parmeters for this simple run. 
+Please edit this file based on your preferance: 
+```
+# The choice of the docking method
+# Possible choices:
+# AutoDock-Koto, AutodockVina_1.2, AutodockZN, EquiBind, FRED
+# FitDock, GalaxyDock3, LigandFit, LightDock, M-Dock
+# MCDock, MM-GBSA, PLANTS, PSOVina, RLDock
+# SEED, adfr, autodock_cpu, autodock_gpu, autodock_vina
+# dock6, flexx, glide, gnina, gnina-scoring
+# gold, gwovina, iGemDock, idock, ledock
+# molegro, nnscore2, qvina, qvina-w, rDock
+# rf-score, rosetta-ligand, smina, smina-scoring, vina
+# vina_carb, vina_xb
+# Please note: different pose prediction/docking methods can be combined with scoring functions.
+# For example: ’qvina+nnscore2’.
+# For supported choices/combinations please see the VirtualFlow homepage.
+
+program_choice=qvina
+
+# The x,y&z coordinates of the center of the docking space. The binding space describes the location where a molecule
+# is allowed to bind.
+center_x=-17.820
+center_y=16.140
+center_z=-18.643
+
+# The size (in Angstroms) of the docking space in the x,y&z directions.
+size_x=20
+size_y=20
+size_z=20
+
+# How many poses to search for, providing a limit to the maximum number of iterations that a docking program performs in
+# search for good poses
+# Large exhaustiveness settings lead to increased computational costs.
+exhaustiveness=10 
+
+
+# Molecule (either a string in smiles, selfies or amino-acid sequence) to be used for docking
+# If the is_selfies=True, or is_peptide=True, a conversion from selfies->smiles
+# and aa-sequence->smiles is performed. 
+smi=C1=CC(=CC=C1CSCC2C(C(C(O2)N3C=NC4=C(N=CN=C43)N)O)O)Cl 
+is_selfies=False
+is_peptide=False
+
+
+# Location to the prepared receptor file
+#  The receptor needs to be in the correct format, supported by the user's selected docking program.
+#  Additionally, the file needs to be present in the config directory.
+receptor=./config/5wiu_test.pdbqt
+```
+
+
 
 
 ## Running in batch 

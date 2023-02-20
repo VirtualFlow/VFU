@@ -13,7 +13,7 @@
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
 
-program_choice=qvina+nnscore2
+program_choice=qvina
 
 # The x,y&z coordinates of the center of the docking space. The binding space describes the location where a molecule
 # is allowed to bind.
