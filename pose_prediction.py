@@ -205,6 +205,8 @@ def run_rDock(receptor, smi, ref_lig):
         - Exception: If the prm file parameters need modification.
     """
         
+    if os.path.exists(ref_lig) == False:
+        raise Exception('Required reference ligand not found') 
     # receptor needs to be in mol2 format: 
     receptor_format = receptor.split('.')[-1]
     if receptor_format != 'mol2': 
@@ -1543,6 +1545,9 @@ def run_molegro_docking(receptor, smi, ref_ligand):
         raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
         raise Exception('Recpetion path {} not found.'.format(receptor))
+    
+    if os.path.exists(ref_ligand) == False:
+        raise Exception('Required reference ligand not found') 
     
     molegro_path = '$HOME/MVD'
     if os.path.exists(molegro_path) == False: 
