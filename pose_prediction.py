@@ -1388,13 +1388,14 @@ def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiven
 
     return results
 
-def run_mdock_docking(receptor, smi): 
+def run_mdock_docking(receptor, smi, mdock_path): 
     """
     Runs molecular docking using MDock software.
     
     Args:
     - receptor (str): path to receptor file in sph format
     - smi (str): ligand in SMILES format
+    - mdock_path (str): Path in system for MDOCK software
     
     Returns:
     - results (dict): dictionary with results for each ligand in the following format:
@@ -1412,7 +1413,7 @@ def run_mdock_docking(receptor, smi):
     if os.path.exists(ref_lig) == False: 
         raise Exception('Reference ligand {} not found. Please try again, after incorporating this correction.'.format(ref_lig))
 
-    mdock_path = '/home/MDock'
+    # mdock_path = '/home/MDock'
 
     if os.path.exists('{}/bin/MDock_Linux'.format(mdock_path)) == False: 
         raise Exception('MDock path {} not found. Please try again, after incorporating this correction.'.format(mdock_path))
