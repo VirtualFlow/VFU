@@ -17,7 +17,7 @@ from scoring_functions import run_nnscore2, run_rf_scoring, run_smina_scoring, r
 from scoring_functions import run_PLANTS_chemplp_scoring, run_PLANTS_plp_scoring, run_PLANTS_plp95_scoring, contact_score, continuous_score, grid_score
 from scoring_functions import run_mm_gbsa
 
-def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor, chimera_path = '', dock6_path = '', ref_lig = '', seed_path = '', mdock_path = ''): 
+def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor, chimera_path = '', dock6_path = '', ref_lig = '', seed_path = '', mdock_path = '', molegro_path = ''): 
     '''
     This function runs docking simulations on a given ligand for a specified receptor using the chosen docking program.
 
@@ -37,6 +37,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         ref_lig (str): Reference ligand file, required by some docking programs
         seed_path (str): Path in system for SEED application
         mdock_path (str): Path in system for MDOCK software
+        molegro_path (str): Path in system for Molegro software
         
     Returns:
         A dictionary containing the results of the docking simulations, with keys being the names of the ligand files and values being lists of docking scores and the path to the docked pose file.
@@ -79,7 +80,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         results = run_seed_docking(receptor, smi, chimera_path, seed_path)
         return results
     if program_choice == 'molegro': 
-        results = run_molegro_docking(receptor, smi, ref_lig)
+        results = run_molegro_docking(receptor, smi, ref_lig, molegro_path)
         return results
     if program_choice == 'FitDock': 
         results = run_fitdock_docking(receptor, smi)
