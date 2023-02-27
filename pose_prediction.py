@@ -1460,13 +1460,15 @@ def run_mdock_docking(receptor, smi):
             
     return results 
 
-def run_seed_docking(receptor, smi): 
+def run_seed_docking(receptor, smi, chimera_path, seed_path): 
     """
     Runs molecular docking using SEED software for a given receptor and SMILES string of the ligand.
     
     Args:
     - receptor (str): The file path of the receptor in mol2 format.
     - smi (str): The SMILES string of the ligand.
+    - chimera_path (str): Path in system for Chimera software
+    - seed_path (str): Path in system for SEED software
     
     Returns:
     - A dictionary containing the docking score and the file path of the output ligand in mol2 format for each ligand.
@@ -1475,8 +1477,8 @@ def run_seed_docking(receptor, smi):
     - Exception: If the Chimera, SEED path or SEED executable path are incorrect.
     - Exception: If the receptor file is not in mol2 format.
     """
-    chimera_path = '/home/chimera'
-    seed_path    = '/home/SEED'
+    # chimera_path = '/home/chimera'
+    # seed_path    = '/home/SEED'
     if os.path.exists(chimera_path) == False: 
         raise Exception('Chimera path {} not found. Please try again, after updating the Chimera path. '.format(chimera_path))
     if os.path.exists(seed_path) == False: 
