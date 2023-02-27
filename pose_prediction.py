@@ -483,7 +483,7 @@ def run_adfr_docking(receptor, smi):
     return results
 
 
-def run_flexx_docking(receptor, smi): 
+def run_flexx_docking(receptor, smi, ref_lig): 
     """
      Runs the flexx docking program on the given receptor and ligands.
      
@@ -1382,7 +1382,7 @@ def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiven
 
     return results
 
-def run_mdock_docking(receptor, smi, mdock_path): 
+def run_mdock_docking(receptor, smi, mdock_path, ref_lig): 
     """
     Runs molecular docking using MDock software.
     
@@ -1390,6 +1390,7 @@ def run_mdock_docking(receptor, smi, mdock_path):
     - receptor (str): path to receptor file in sph format
     - smi (str): ligand in SMILES format
     - mdock_path (str): Path in system for MDOCK software
+    - ref_lig (str): Reference ligand that needs to be specified for MDock software (.pdb format)
     
     Returns:
     - results (dict): dictionary with results for each ligand in the following format:
@@ -1403,7 +1404,7 @@ def run_mdock_docking(receptor, smi, mdock_path):
     if receptor_format != 'sph': 
         raise Exception('Receptor needs to be in sph format. Please try again, after incorporating this correction.')
     
-    ref_lig = './config/ref_lig.pdb'
+    # ref_lig = './config/ref_lig.pdb'
     if os.path.exists(ref_lig) == False: 
         raise Exception('Reference ligand {} not found. Please try again, after incorporating this correction.'.format(ref_lig))
 

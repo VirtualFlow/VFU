@@ -73,7 +73,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         results = run_iGemDock(receptor, smi, exhaustiveness)
         return results
     if program_choice == 'M-Dock': 
-        results = run_mdock_docking(receptor, smi, mdock_path)
+        results = run_mdock_docking(receptor, smi, mdock_path, ref_lig)
         return results
     if program_choice == 'SEED': 
         results = run_seed_docking(receptor, smi, chimera_path, seed_path)
