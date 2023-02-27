@@ -17,7 +17,7 @@ from scoring_functions import run_nnscore2, run_rf_scoring, run_smina_scoring, r
 from scoring_functions import run_PLANTS_chemplp_scoring, run_PLANTS_plp_scoring, run_PLANTS_plp95_scoring, contact_score, continuous_score, grid_score
 from scoring_functions import run_mm_gbsa
 
-def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor): 
+def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor, chimera_path = '', dock6_path = '', ref_lig = ''): 
     '''
     This function runs docking simulations on a given ligand for a specified receptor using the chosen docking program.
 
@@ -32,6 +32,9 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         exhaustiveness (int): The exhaustiveness parameter to use.
         smi (str): The SMILES representation of the ligand to be docked.
         receptor (str): The path to the receptor file for docking.
+        chimera_path (str): Path in system for Chimera application
+        dock6_path (str): Path in system for dock6 application
+        ref_lig (str): Reference ligand file, required by some docking programs
         
     Returns:
         A dictionary containing the results of the docking simulations, with keys being the names of the ligand files and values being lists of docking scores and the path to the docked pose file.
@@ -62,7 +65,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         results = run_mcdock(receptor, smi)
         return results
     if program_choice == 'dock6': 
-        results = run_dock6(receptor, smi)
+        results = run_dock6(receptor, smi, chimera_path, dock6_path, ref_lig)
         return results
     if program_choice == 'iGemDock': 
         results = run_iGemDock(receptor, smi, exhaustiveness)
@@ -228,7 +231,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
     
     return results
 
-def run_scoring_prediction_program(scoring_function, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor): 
+def run_scoring_prediction_program(scoring_function, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor, chimera_path = '', dock6_path = ''): 
     """Runs a molecular scoring program on a docked ligand-receptor pair and returns the resulting score(s).
 
     Args:
@@ -243,7 +246,8 @@ def run_scoring_prediction_program(scoring_function, ligand_path, center_x, cent
         exhaustiveness (int): The exhaustiveness parameter used for some docking programs.
         smi (str): The SMILES string of the ligand to be docked or scored.
         receptor (str): The file path to the receptor to which the ligand should be docked or scored.
-
+        chimera_path (str): Path in system for Chimera application
+        dock6_path (str): Path in system for dock6 application
     Returns:
         scores (float or strings): The score(s) resulting from the molecular docking or scoring program. 
     """
@@ -268,19 +272,12 @@ def run_scoring_prediction_program(scoring_function, ligand_path, center_x, cent
     if scoring_function == 'PLP95_scoring': 
         scores = run_PLANTS_plp95_scoring(receptor, ligand_path)
     if scoring_function == 'contact_scoring': 
-        chimera_path = ''
-        dock6_path = ''
         scores = contact_score(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
     if scoring_function == 'continuous_scoring': 
-        chimera_path = ''
-        dock6_path = ''
         scores = continuous_score(receptor, chimera_path, dock6_path, ligand_path)
     if scoring_function == 'grid_scoring': 
-        chimera_path = ''
-        dock6_path = ''
         scores = grid_score(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
     if scoring_function == 'mm_gbsa_scoring': 
-        chimera_path = ''
         scores = run_mm_gbsa(chimera_path, ligand_path, receptor)
                      
     return scores

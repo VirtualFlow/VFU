@@ -837,13 +837,16 @@ def run_GalaxyDock3(receptor, smi, center_x, center_y, center_z, exhaustiveness)
         
     return results
 
-def run_dock6(receptor, smi): 
+def run_dock6(receptor, smi, chimera_path, dock6_path, ref_lig): 
     """
     Runs Dock6 molecular docking program to dock a set of ligands to a receptor protein.
 
     Parameters:
         receptor (str): Path to the receptor file in pdb format.
         smi (str): SMILES string for the ligands to dock.
+        chimera_path (str): Path in system for Chimera application
+        dock6_path (str): Path in system for dock6 application
+        ref_lig (str): Reference ligand that needs to be specified for dock6
 
     Returns:
         Dictionary containing the results of Dock6 docking for each ligand. The keys are the file paths of the 
@@ -854,10 +857,10 @@ def run_dock6(receptor, smi):
         Exception: If the path to the Chimera software or Dock6 directory is invalid, if the reference ligand file
                    is not specified, or if the receptor file is not in pdb format.
     """
-    chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
-    dock6_path    = '/home/akshat/dock6'   # Location to the dock6 directory
+    # chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
+    # dock6_path    = '/home/akshat/dock6'   # Location to the dock6 directory
     
-    ref_lig       = '/ref_lig.mol2' # Reference ligand needs to be specified for dock6
+    # ref_lig       = '/ref_lig.mol2' # Reference ligand needs to be specified for dock6
     box_padding   = 12.0
     
     results       = {}
