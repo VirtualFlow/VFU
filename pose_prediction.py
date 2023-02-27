@@ -490,6 +490,8 @@ def run_flexx_docking(receptor, smi, ref_lig):
      Args:
          receptor (str): The path to the receptor file in pdb format.
          smi (str): The SMILES string of the ligand to dock.
+         ref_lig (str): Reference ligand that needs to be specified for flexx
+
          
      Returns:
          dict: A dictionary with the results of the docking. The dictionary contains the ligand file name as 
@@ -499,11 +501,9 @@ def run_flexx_docking(receptor, smi, ref_lig):
     import multiprocessing
     results = {}
 
-    ref_lig = 'ref_lig.mol2' # TODO
-    ref_lig = os.listdir('./config')
-    if 'ref_lig.mol2' not in ref_lig: 
-        raise Exception('A reference ligand by the name of ref_lig.mol2 needs to be copied in the config directory for running flexx')
-    
+    if os.path.exists(ref_lig) == False:
+        raise Exception('Required reference ligand not found')
+
     executable_files = os.listdir('./executables')
     if 'flexx' not in executable_files: 
         raise Exception('The flexx executable was not foung. Please note: the execuatable file (named flexx) needs to be placed inside the directory executables')

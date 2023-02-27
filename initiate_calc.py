@@ -61,7 +61,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         subprocess.run(['mkdir', './outputs'])
         
     if program_choice == 'flexx': 
-        results = run_flexx_docking(receptor, smi)
+        results = run_flexx_docking(receptor, smi, ref_lig)
         return results
     if program_choice == 'MCDock': 
         results = run_mcdock(receptor, smi)
