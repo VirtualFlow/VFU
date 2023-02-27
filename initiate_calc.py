@@ -79,7 +79,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         results = run_seed_docking(receptor, smi, chimera_path, seed_path)
         return results
     if program_choice == 'molegro': 
-        results = run_molegro_docking(receptor, smi)
+        results = run_molegro_docking(receptor, smi, ref_lig)
         return results
     if program_choice == 'FitDock': 
         results = run_fitdock_docking(receptor, smi)

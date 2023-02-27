@@ -1516,13 +1516,14 @@ def run_seed_docking(receptor, smi, chimera_path, seed_path):
     return results
 
 
-def run_molegro_docking(receptor, smi): 
+def run_molegro_docking(receptor, smi, ref_ligand): 
     """
     Runs ligand docking using Molegro Virtual Docker.
 
     Args:
     - receptor: string, path to the receptor file in PDB format.
     - smi: string, SMILES representation of the ligand to dock.
+    - ref_ligand (str): Reference ligand that needs to be specified for Molegro
 
     Returns:
     - results: dictionary, containing the results of the docking. Keys are the
@@ -1546,10 +1547,6 @@ def run_molegro_docking(receptor, smi):
     molegro_path = '$HOME/MVD'
     if os.path.exists(molegro_path) == False: 
         raise Exception('Molegro directory path {} not found. Please try again, after updating the location for Molegro. '.format(molegro_path))
-        
-    ref_ligand = ''
-    if os.path.exists(ref_ligand) == False: 
-        raise Exception('Molegro requires a reference ligand for docking. Reference ligand pat {} was not found. Please try again, after updating the path.'.format(ref_ligand))
         
     # prepare the ligands:
     process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
