@@ -1550,8 +1550,8 @@ def run_molegro_docking(receptor, smi, ref_ligand, molegro_path):
     if os.path.exists(ref_ligand) == False:
         raise Exception('Required reference ligand not found') 
 
-    if os.path.exists(molegro_path) == False: 
-        raise Exception('Molegro directory path {} not found. Please try again, after updating the location for Molegro. '.format(molegro_path))
+    if os.path.exists(molegro_path) == False:
+        raise Exception('Required molegro program path not found') 
         
     # prepare the ligands:
     process_ligand(smi, 'mol2') # mol2 ligand format is supported in plants
@@ -1573,7 +1573,7 @@ def run_molegro_docking(receptor, smi, ref_ligand, molegro_path):
             f.writelines(['DOCK Ligand[1]\n\n\n'])
             f.writelines(['EXIT'])
 
-        os.system('$Molegro/bin/mvd docking.mvdscript -nogui')
+        os.system('{}/bin/mvd docking.mvdscript -nogui'.format(molegro_path))
         
         cmd_ = [molegro_path, '.docking.mvdscript', '-nogui']
         cmd_run = subprocess.run(cmd_, capture_output=True)
