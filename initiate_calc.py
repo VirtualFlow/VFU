@@ -127,7 +127,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         results = run_EquiBind(receptor, smi)
         return results
     if program_choice == 'rDock':   
-        results = run_rDock(receptor, smi)
+        results = run_rDock(receptor, smi, ref_lig)
         return results
     if program_choice == 'ledock': 
         run_leDock(receptor, smi, center_x, center_y, center_z, size_x, size_y, size_z)

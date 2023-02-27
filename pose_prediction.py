@@ -188,24 +188,21 @@ def run_EquiBind(receptor, smi):
     return results
 
 
-def run_rDock(receptor, smi): 
+def run_rDock(receptor, smi, ref_lig): 
     """
     Runs rDock for docking the given ligand SMILES strings with the receptor molecule.
     
     Args:
         - receptor (str): The path of the receptor file in '.mol2' format.
         - smi (str): The SMILES string of the ligand molecule.
+        - ref_lig (str): Reference ligand that needs to be specified for rDock
     
     Returns:
         - results (dict): A dictionary with ligand file names as keys and their corresponding docking scores as values.
     
     Raises:
         - Exception: If the receptor is not in '.mol2' format.
-        - Exception: If the reference ligand file is not provided.
         - Exception: If the prm file parameters need modification.
-    
-    Note: Before running the function, the user needs to provide a reference ligand file in the line containing 'ref_lig'
-    and adjust the parameters in the prm file. 
     """
         
     # receptor needs to be in mol2 format: 
@@ -217,9 +214,6 @@ def run_rDock(receptor, smi):
     # Create ligands as '.sd' file type: 
     process_ligand(smi, 'sd') 
     lig_locations = os.listdir('./ligands/')
-    
-    ref_lig = '' # TODO!
-    raise Exception('Note: a reference ligand file needs to be filled in the line above. Please do so and comment this line!')
     
     # Creation of the prm file: 
     print('Please have a look at the prm parameters. Inside [TODO]; we have assigned some default values.')
