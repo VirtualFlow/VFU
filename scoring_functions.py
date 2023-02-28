@@ -99,7 +99,7 @@ def run_rf_scoring(receptor, lig_path):
     if receptor_format != 'pdbqt': 
         raise Exception('Receptor needs to be in pdbqt format. Please try again, after incorporating this correction.')
     if os.path.exists(receptor) == False: 
-        raise Exception('Recpetion path {} not found.'.format(receptor))
+        raise Exception('Reception path {} not found.'.format(receptor))
     if os.path.exists(lig_path) == False: 
         raise Exception('Ligand path {} not found.'.format(lig_path))
         
