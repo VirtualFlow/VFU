@@ -889,7 +889,7 @@ def run_mm_gbsa(chimera_path, ligand_file, receptor_file):
     
     return output
 
-def Zou_GBSA(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
+def Hawkins_gbsa(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
     """
     Args:
     - receptor_file (str): The path to the receptor file in PDB format.
