@@ -731,6 +731,7 @@ def grid_score(receptor_file, chimera_path, dock6_path, ligand_file, center_x, c
         f.writelines(['$DOCK6/bin/dock6 -i Grid_Score.in\n'])
     
     os.system('chmod 777 dock6_sript.sh')
+    os.system('cp config/dockprep.py ./dockprep.py')
     
     # Create INSPH File: 
     with open('./INSPH', 'w') as f: 
