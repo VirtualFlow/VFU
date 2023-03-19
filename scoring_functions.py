@@ -886,3 +886,134 @@ def run_mm_gbsa(chimera_path, ligand_file, receptor_file):
     os.system('rm FINAL_RESULTS_MMPBSA.dat')
     
     return output
+
+def Zou_GBSA(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
+    """
+    Args:
+    - receptor_file (str): The path to the receptor file in PDB format.
+    - chimera_path (str): The path to the Chimera installation directory.
+    - dock6_path (str): The path to the Dock6 installation directory.
+    - ligand_file (str): The path to the ligand file in MOL2 format.
+    - center_x (float): The x-coordinate of the center of the grid box.
+    - center_y (float): The y-coordinate of the center of the grid box.
+    - center_z (float): The z-coordinate of the center of the grid box.
+    - size_x (float): The size of the grid box in the x-dimension.
+    - size_y (float): The size of the grid box in the y-dimension.
+    - size_z (float): The size of the grid box in the z-dimension.
+    """
+    recetor_format = receptor_file.split('.')[-1]
+    if recetor_format != 'pdb': 
+        raise Exception('Receptor needs to be in pdb format. Please try again, after incorporating this correction.')
+    lig_format = ligand_file.split('.')[-1]
+    if lig_format != 'mol2': 
+        print('Ligand needs to be in mol2 format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_file, 'mol2')
+        ligand_file = ligand_file.replace(lig_format, 'mol2')
+
+
+    with open('./GBSA.sh', 'w') as f: 
+        f.writelines(['export Chimera={}\n'.format(chimera_path)])
+        f.writelines(['export DOCK6={}\n'.format(dock6_path)])
+        f.writelines(['$Chimera/bin/chimera --nogui {} dockprep.py\n'.format(receptor_file)])
+        f.writelines(['$DOCK6/bin/sphgen INSPH\n']) 
+        f.writelines(['$DOCK6/bin/sphere_selector rec.sph {} 12.0 \n'.format(ligand_file)])
+        f.writelines(['$DOCK6/bin/showbox < box.in\n'])
+        f.writelines(['$DOCK6/bin/grid -i grid.in\n'])
+        f.writelines(['cd nchemgrid_GB\n'])
+        f.writelines(['$DOCK6/bin/nchemgrid_GB\n'])
+        f.writelines(['cd ../nchemgrid_SA\n'])
+        f.writelines(['$DOCK6/bin/nchemgrid_SA\n'])
+
+        f.writelines(['$DOCK6/bin/dock6 -i Hawkins_GBSA_Score.in\n'])
+
+
+    os.system('cp config/dockprep.py ./dockprep.py')
+    os.system('chmod 777 GBSA.sh')  
+
+    # Create INSPH File: 
+    with open('./INSPH', 'w') as f: 
+        f.writelines('rec.ms\n')
+        f.writelines('R\n')
+        f.writelines('X\n')
+        f.writelines('0.0\n')
+        f.writelines('4.0\n')
+        f.writelines('1.4\n')
+        f.writelines('rec.sph\n')
+
+    # Create box.in File: 
+    with open('./box.in', 'w') as f: 
+        f.writelines('N\n')
+        f.writelines('U\n')
+        f.writelines('{}   {}    {}\n'.format(center_x, center_y, center_z))
+        f.writelines('{} {} {}\n'.format(size_x, size_y, size_z))
+        f.writelines('rec_box.pdb\n')
+
+    with open('./grid.in', 'w') as f: 
+        f.writelines('compute_grids                  yes\n')
+        f.writelines('grid_spacing                   0.3\n')
+        f.writelines('output_molecule                no\n')
+        f.writelines('contact_score                  no\n')
+        f.writelines('energy_score                   yes\n')
+        f.writelines('energy_cutoff_distance         9999\n')
+        f.writelines('atom_model                     a\n')
+        f.writelines('attractive_exponent            6\n')
+        f.writelines('repulsive_exponent             12\n')
+        f.writelines('distance_dielectric            no\n')
+        f.writelines('dielectric_factor              1\n')
+        f.writelines('bump_filter                    yes\n')
+        f.writelines('bump_overlap                   0.75\n')
+        f.writelines('receptor_file                  {}\n'.format(receptor_file))
+        f.writelines('box_file                       rec_box.pdb\n')
+        f.writelines('vdw_definition_file            {}/parameters/vdw_AMBER_parm99.defn\n'.format(dock6_path))
+        f.writelines('score_grid_prefix              solvent_grid\n')
+
+    with open('./Hawkins_GBSA_Score.in', 'w') as f: 
+        f.writelines('conformer_search_type                                        rigid\n')
+        f.writelines('use_internal_energy                                          no\n')
+        f.writelines('ligand_atom_file                                             {}\n'.format(ligand_file))
+        f.writelines('limit_max_ligands                                            no\n')
+        f.writelines('skip_molecule                                                no\n')
+        f.writelines('read_mol_solvation                                           no\n')
+        f.writelines('calculate_rmsd                                               no\n')
+        f.writelines('use_database_filter                                          no\n')
+        f.writelines('orient_ligand                                                no\n')
+        f.writelines('bump_filter                                                  no\n')
+        f.writelines('score_molecules                                              yes\n')
+        f.writelines('contact_score_primary                                        no\n')
+        f.writelines('contact_score_secondary                                      no\n')
+        f.writelines('grid_score_primary                                           no\n')
+        f.writelines('grid_score_secondary                                         no\n')
+        f.writelines('multigrid_score_primary                                      no\n')
+        f.writelines('multigrid_score_secondary                                    no\n')
+        f.writelines('dock3.5_score_primary                                        no\n')
+        f.writelines('dock3.5_score_secondary                                      no\n')
+        f.writelines('continuous_score_primary                                     no\n')
+        f.writelines('continuous_score_secondary                                   no\n')
+        f.writelines('footprint_similarity_score_primary                           no\n')
+        f.writelines('footprint_similarity_score_secondary                         no\n')
+        f.writelines('pharmacophore_score_primary                                  no\n')
+        f.writelines('pharmacophore_score_secondary                                no\n')
+        f.writelines('descriptor_score_primary                                     no\n')
+        f.writelines('descriptor_score_secondary                                   no\n')
+        f.writelines('gbsa_zou_score_primary                                       no\n')
+        f.writelines('gbsa_zou_score_secondary                                     no\n')
+        f.writelines('gbsa_hawkins_score_primary                                   yes\n')
+        f.writelines('gbsa_hawkins_score_secondary                                 no\n')
+        f.writelines('gbsa_hawkins_score_rec_filename                              rec_charged.mol2')
+        f.writelines('gbsa_hawkins_score_solvent_dielectric                        78.5\n')
+        f.writelines('gbsa_hawkins_use_salt_screen                                 no\n')
+        f.writelines('gbsa_hawkins_score_gb_offset                                 0.09\n')
+        f.writelines('gbsa_hawkins_score_cont_vdw_and_es                           no\n')
+        f.writelines('gbsa_hawkins_score_grid_prefix                               solvent_grid\n')
+        f.writelines('SASA_score_secondary                                         no\n')
+        f.writelines('amber_score_secondary                                        no\n')
+        f.writelines('minimize_ligand                                              no\n')
+        f.writelines('atom_model                                                   all\n')
+        # fill in 3 file parts
+        f.writelines('ligand_outfile_prefix                                        gbsa_hawkins\n')
+        f.writelines('write_orientations                                           no\n')
+        f.writelines('num_scored_conformers                                        1\n')
+        f.writelines('rank_ligands                                                 no\n')
+
+    os.system('./GBSA.sh')
+    
