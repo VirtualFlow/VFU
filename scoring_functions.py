@@ -7,6 +7,7 @@ Created on Sat Feb 18 22:41:22 2023
 """
 import os 
 import subprocess
+import shutil
 
 
 def convert_ligand_format(ligand_, new_format): 
@@ -1009,11 +1010,23 @@ def Zou_GBSA(receptor_file, chimera_path, dock6_path, ligand_file, center_x, cen
         f.writelines('amber_score_secondary                                        no\n')
         f.writelines('minimize_ligand                                              no\n')
         f.writelines('atom_model                                                   all\n')
-        # fill in 3 file parts
+        f.writelines('vdw_defn_file                                                {}/parameters/vdw_AMBER_parm99.defn\n'.format(dock6_path))
+        f.writelines('flex_defn_file                                               {}/parameters/flex.defn'.format(dock6_path))
+        f.writelines('flex_drive_file                                              {}/parameters/flex_drive.tbl'.format(dock6_path))
         f.writelines('ligand_outfile_prefix                                        gbsa_hawkins\n')
         f.writelines('write_orientations                                           no\n')
         f.writelines('num_scored_conformers                                        1\n')
         f.writelines('rank_ligands                                                 no\n')
 
     os.system('./GBSA.sh')
+
+    # Check that this OS system remove removes everything correctly
+    os.system('rm box.in grid.in INSPH OUTSPH rec_box.pdb dockprep.py dockprep.pyc rec_charged.mol2 solvent_grid.bmp solvent_grid.nrg rec.ms rec.sph rec.pdb rec_noH.pdb selected_spheres.sph')
+    # need to import shutil function
+    shutil.rmtree('nchemgrid_GB')
+    shutil.rmtree('nchemgrid_SA')
+    with open('./gbsa_hawkins_scored.mol2', 'r') as f: 
+        lines = f.readlines()
+    score = float([x for x in lines[2].split(' ') if x!= ''][-1])
     
+    return score
