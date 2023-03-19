@@ -15,7 +15,7 @@ from pose_prediction import run_glide_docking, run_rosetta_docking, run_mdock_do
 from pose_prediction import  run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_docking
 from scoring_functions import run_nnscore2, run_rf_scoring, run_smina_scoring, run_ad4_scoring, run_vinandro_scoring, run_vina_scoring, run_gnina_scoring
 from scoring_functions import run_PLANTS_chemplp_scoring, run_PLANTS_plp_scoring, run_PLANTS_plp95_scoring, contact_score, continuous_score, grid_score
-from scoring_functions import run_mm_gbsa
+from scoring_functions import run_mm_gbsa, Zou_GBSA
 
 def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor, chimera_path = '', dock6_path = '', ref_lig = '', seed_path = '', mdock_path = '', molegro_path = ''): 
     '''
@@ -282,6 +282,9 @@ def run_scoring_prediction_program(scoring_function, ligand_path, center_x, cent
         scores = grid_score(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
     if scoring_function == 'mm_gbsa_scoring': 
         scores = run_mm_gbsa(chimera_path, ligand_path, receptor)
+    if scoring_function == "hawkins_GBSA":
+        scores = Zou_GBSA(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
+
                      
     return scores
     
