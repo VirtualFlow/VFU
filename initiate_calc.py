@@ -151,13 +151,13 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
     if program_choice == 'smina' or program_choice == 'gnina': 
         command.append('-r')
         command.append(receptor)
-    elif program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina'  or program_choice == 'PSOVina': 
+    elif program_choice == 'AutodockVina_1.2' or program_choice == 'AutodockVina_1.1.2' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina'  or program_choice == 'PSOVina': 
         command.append('--receptor')
         command.append(receptor)
     
     
     # Assign the right ligand for docking
-    if  program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'PSOVina':
+    if  program_choice == 'AutodockVina_1.2' or program_choice == 'AutodockVina_1.1.2' or program_choice == 'idock' or program_choice == 'qvina' or program_choice == 'smina' or program_choice == 'gnina' or program_choice == 'qvina-w' or program_choice == 'qvina-w' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'PSOVina':
         process_ligand(smi, 'pdbqt')
     lig_locations = os.listdir('./ligands/')
     
@@ -165,7 +165,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
     for lig_ in lig_locations: 
         
         # Add in the ligand file and the exhaustiveness setting
-        if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'idock' or  program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'PSOVina': 
+        if program_choice == 'AutodockVina_1.2' or program_choice == 'AutodockVina_1.1.2' or program_choice == 'idock' or  program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'PSOVina': 
             if program_choice == 'idock': 
                 cmd = command + ['--ligand', './ligands/{}'.format(lig_)]
             else: 
@@ -182,7 +182,7 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         cmd = cmd + ['--size_z', str(size_z)]
     
         # Add in parameters for generating output files: 
-        if program_choice == 'AutodockVina_1.2' or program_choice == 'autodock_vina' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'PSOVina': 
+        if program_choice == 'AutodockVina_1.2' or program_choice == 'AutodockVina_1.1.2' or program_choice == 'qvina' or program_choice == 'qvina-w' or program_choice == 'vina' or program_choice == 'vina_carb' or program_choice == 'vina_xb' or program_choice == 'gwovina' or program_choice == 'PSOVina': 
             cmd = cmd + ['--out', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
         elif program_choice == 'smina' or program_choice == 'gnina': 
             cmd = cmd + ['-o', './outputs/pose_{}.pdbqt'.format(lig_.split('.')[0])]
