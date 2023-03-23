@@ -231,6 +231,9 @@ Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https:/
 ### RF-score
 Please paste the executable from [https://github.com/oddt/rfscorevs_binary](https://github.com/oddt/rfscorevs_binary) in the executables directory. 
 
+### ADFR
+An adfr executable (of name adfr) should be placed in directory: /tools/bin directory. An executable needs to be compiled based on a user’s system using instructions described in [https://ccsb.scripps.edu/adfr/downloads/](https://ccsb.scripps.edu/adfr/downloads/).
+
 ### FRED
 Requirments
 Please install OpenEye: [https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html](https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html).

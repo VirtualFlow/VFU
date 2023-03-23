@@ -460,7 +460,7 @@ def run_adfr_docking(receptor, smi):
     for lig_ in lig_locations: 
         lig_path = 'ligands/{}'.format(lig_)
         
-        cmd = ['adfr', '-t', '{}'.format(target_file[0]), '-l', '{}'.format(lig_path), '--jobName', 'rigid']
+        cmd = ['./executables/adfr', '-t', '{}'.format(target_file[0]), '-l', '{}'.format(lig_path), '--jobName', 'rigid']
         
         # Perform the docking: 
         command_run = subprocess.run(cmd, capture_output=True)
