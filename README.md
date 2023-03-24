@@ -232,11 +232,11 @@ Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https:/
 Please paste the executable from [https://github.com/oddt/rfscorevs_binary](https://github.com/oddt/rfscorevs_binary) in the executables directory. 
 
 ### ADFR
-An adfr executable (of name adfr) should be placed in directory: /tools/bin directory. An executable needs to be compiled based on a user’s system using instructions described in [https://ccsb.scripps.edu/adfr/downloads/](https://ccsb.scripps.edu/adfr/downloads/).
+An adfr executable (of name adfr) should be placed in directory: /executables directory. An executable needs to be compiled based on a user’s system using instructions described in [https://ccsb.scripps.edu/adfr/downloads/](https://ccsb.scripps.edu/adfr/downloads/).
 
 ### HDock
-An HDock executable (of name hdock) should be placed in directory: /tools/bin directory. 
-An createpl executable (of name createpl) should be placed in directory: /tools/bin directory. 
+An HDock executable (of name hdock) should be placed in directory: /executables directory. 
+An createpl executable (of name createpl) should be placed in directory: /executables directory. 
 
 
 ### FRED
