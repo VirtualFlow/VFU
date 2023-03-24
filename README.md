@@ -234,6 +234,11 @@ Please paste the executable from [https://github.com/oddt/rfscorevs_binary](http
 ### ADFR
 An adfr executable (of name adfr) should be placed in directory: /tools/bin directory. An executable needs to be compiled based on a user’s system using instructions described in [https://ccsb.scripps.edu/adfr/downloads/](https://ccsb.scripps.edu/adfr/downloads/).
 
+### HDock
+An HDock executable (of name hdock) should be placed in directory: /tools/bin directory. 
+An createpl executable (of name createpl) should be placed in directory: /tools/bin directory. 
+
+
 ### FRED
 Requirments
 Please install OpenEye: [https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html](https://docs.eyesopen.com/toolkits/python/quickstart-python/install.html).
@@ -254,7 +259,6 @@ pip install -e .
 ```
 
 ### MpSDockZN
-
 Please add the executable (of name `MpSDock`) in executables directory.
 Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https://ambermd.org/GetAmber.php#ambertools).
 We managed performed the download using conda. 

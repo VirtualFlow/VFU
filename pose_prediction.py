@@ -1062,7 +1062,26 @@ def run_iGemDock(receptor, smi, exhaustiveness):
         results[lig_path] = [out_path, docking_score]
     
     return results
+
+def perform_HDock_docking(receptor_1, receptor_2):
+    
+    results = {}
+    if receptor_1.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide protein 1 in pdb format for HDock')    
+    if receptor_2.split('.')[-1] != 'pdb': 
+        raise Exception('Please provide protein 2 in pdb format for HDock')    
         
+    os.system("./executables/hdock {} {} -out Hdock.out; ./executables/createpl Hdock.out top100.pdb -nmax 1 -complex -models".format(receptor_1, receptor_2))
+        
+    with open('./model_1.pdb', 'r') as f: 
+        lines = f.readlines()
+    docking_score = float(lines[3].split(' ')[-1])
+    results[receptor_2] = docking_score
+    
+    os.system('rm Hdock.out; cp model_1.pdb ./results/')
+    
+    return results
+
 def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center_y, center_z): 
     """
     Performs Gold docking using the input receptor and SMILES ligand.
@@ -1175,7 +1194,8 @@ def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center
         
         results[lig_path] = [out_path, docking_score]
     
-    return results
+    return results    
+    
 
 def run_CovDock_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi, covalent_bond_constraints):
     """
