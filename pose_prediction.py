@@ -522,7 +522,7 @@ def run_flexx_docking(receptor, smi, ref_lig):
         lig_path = 'ligands/{}'.format(lig_)
         out_path = './outputs/pose_{}.sdf'.format(lig_.split('.')[0])
         
-        os.system('./flexx -i {} -o {} -p {} -r {} --thread-count {}'.format(lig_path, out_path, receptor, './config/ref_lig.mol2', multiprocessing.cpu_count()))
+        os.system('./flexx -i {} -o {} -p {} -r {} --thread-count {}'.format(lig_path, out_path, receptor, ref_lig, multiprocessing.cpu_count()))
         
         # Check energy of docked pose: 
         total_energy = check_energy(lig_)
