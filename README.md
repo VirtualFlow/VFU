@@ -264,6 +264,9 @@ A `box.in` input file is required for the program. Please specify the path in va
 A `grid.in` input file is required for the program. Please specify the path in variable `grid_in_file`.
 A `dock.in` input file is required for the program. Please specify the path in variable `dock_in_file`.
 
+### Running with CovDock
+A valid Schrödinger license is required to run CovDock.
+
 ### Contributing
 If you are interested in contributing to VirtualFlow, whether it is to report a bug or to extend VirtualFlow with your own code, please see the file [CONTRIBUTING.md](CONTRIBUTING.md) and the file [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
