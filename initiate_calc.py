@@ -12,7 +12,7 @@ from lig_process import process_ligand
 from pose_prediction import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from pose_prediction import check_energy, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
 from pose_prediction import run_glide_docking, run_rosetta_docking, run_mdock_docking, run_seed_docking, run_molegro_docking, run_fitdock_docking
-from pose_prediction import  run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_docking, run_CovDock_docking
+from pose_prediction import  run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_docking, run_CovDock_docking, run_Glide_HTVS, run_Glide_SP, run_Glide_XP
 
 from scoring_functions import run_nnscore2, run_rf_scoring, run_smina_scoring, run_ad4_scoring, run_vinandro_scoring, run_vina_scoring, run_gnina_scoring
 from scoring_functions import run_PLANTS_chemplp_scoring, run_PLANTS_plp_scoring, run_PLANTS_plp95_scoring, contact_score, continuous_score, grid_score
@@ -139,6 +139,15 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         return results
     if program_choice == 'CovDock': 
         results =  run_CovDock_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi, covalent_bond_constraints)
+        return results
+    if program_choice == 'GlideHTVS': 
+        results =  run_Glide_HTVS(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
+        return results
+    if program_choice == 'GlideXP': 
+        results =  run_Glide_XP(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
+        return results
+    if program_choice == 'GlideSP': 
+        results =  run_Glide_SP(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
         return results
         
     results = {}  # Storage for results

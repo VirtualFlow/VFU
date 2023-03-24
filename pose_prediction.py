@@ -1385,6 +1385,269 @@ def run_CovDock_docking(receptor, center_x, center_y, center_z, size_x, size_y, 
     return docking_scores    
 
 
+def run_Glide_HTVS(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi):
+    """
+    Perform docking using Schrödinger's Glide with the HTVS precision setting,
+    given a receptor, binding site, and ligand.
+    
+    Note: A valid Schrödinger license is required to run this code.
+    
+    Parameters
+    ----------
+    receptor : str
+        Path to the receptor file in maestro format (maegz).
+    center_x, center_y, center_z : float
+        Coordinates of the center of the binding site.
+    size_x, size_y, size_z : float
+        Dimensions of the binding site box.
+    smi : str
+        SMILES string representing the ligand.
+    
+    Returns
+    -------
+    float
+        The minimum docking score obtained.
+    
+    Raises
+    ------
+    Exception
+        If LigPrep or Glide jobs fail.
+    """
+    from schrodinger import structure
+    from schrodinger.job import jobcontrol
+    from schrodinger.application.glide import glide
+    from schrodinger.application.ligprep import LigprepJob, LigprepSettings
+    
+    if receptor.split('.')[-1] != 'maegz': 
+        raise Exception('Please provide a prepared receptor file in maegz format for Glide.')  
+    
+    # Prepare the ligand
+    ligand_struct = structure.create_structure_from_smiles(smi)
+    ligand_output_file = os.path.join("ligands", f"ligand_{ligand_struct.title}.maegz")
+
+    ligprep_settings = LigprepSettings()
+    ligprep_settings.set_output_file(ligand_output_file)
+    ligprep_job = LigprepJob(ligprep_settings, input_structure=ligand_struct)
+    ligprep_job.run()
+    ligprep_job.wait()
+
+    if ligprep_job.status != jobcontrol.FINISHED:
+        raise Exception("LigPrep job failed. Please check the logs.")
+
+    # Prepare the receptor and ligand structures
+    receptor_struct = structure.StructureReader(receptor).next()
+    ligand_struct = structure.StructureReader(ligand_output_file).next()
+
+    # Set up Glide settings
+    settings = glide.GlideSettings()
+    settings.set_receptor_file(receptor_struct)
+    settings.set_ligand_file(ligand_output_file)
+
+    output_file = os.path.join("outputs", f"output_glide_{ligand_struct.title}.maegz")
+    settings.set_output_file(output_file)
+
+    # Specify the ligand binding site as coordinates and box size
+    settings.set_site_box_center((center_x, center_y, center_z))
+    settings.set_site_box_size((size_x, size_y, size_z))
+
+    # Set Glide precision to HTVS
+    settings.set_precision("HTVS")
+
+    # Run the Glide job
+    glide_job = glide.Glide(settings)
+    glide_job.run()
+    glide_job.wait()
+
+    if glide_job.status != jobcontrol.FINISHED:
+        raise Exception("Glide HTVS docking job failed. Please check the logs.")
+
+    # Read the output file
+    output_structures = list(structure.StructureReader(output_file))
+
+    # Extract the docking scores
+    docking_scores = []
+    for struct in output_structures:
+        docking_score = struct.property['r_i_docking_score']
+        docking_scores.append(docking_score)
+
+    return min(docking_scores)
+
+
+def run_Glide_XP(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi):
+    """
+    Perform docking using Schrödinger's Glide with the XP precision setting,
+    given a receptor, binding site, and ligand.
+    
+    Note: A valid Schrödinger license is required to run this code.
+    
+    Parameters
+    ----------
+    receptor : str
+        Path to the receptor file in maestro format (maegz).
+    center_x, center_y, center_z : float
+        Coordinates of the center of the binding site.
+    size_x, size_y, size_z : float
+        Dimensions of the binding site box.
+    smi : str
+        SMILES string representing the ligand.
+    
+    Returns
+    -------
+    float
+        The minimum docking score obtained.
+    
+    Raises
+    ------
+    Exception
+        If LigPrep or Glide jobs fail.
+    """
+    from schrodinger import structure
+    from schrodinger.job import jobcontrol
+    from schrodinger.application.glide import glide
+    from schrodinger.application.ligprep import LigprepJob, LigprepSettings
+    
+    if receptor.split('.')[-1] != 'maegz': 
+        raise Exception('Please provide a prepared receptor file in maegz format for Glide.')  
+    
+    # Prepare the ligand
+    ligand_struct = structure.create_structure_from_smiles(smi)
+    ligand_output_file = os.path.join("ligands", f"ligand_{ligand_struct.title}.maegz")
+
+    ligprep_settings = LigprepSettings()
+    ligprep_settings.set_output_file(ligand_output_file)
+    ligprep_job = LigprepJob(ligprep_settings, input_structure=ligand_struct)
+    ligprep_job.run()
+    ligprep_job.wait()
+
+    if ligprep_job.status != jobcontrol.FINISHED:
+        raise Exception("LigPrep job failed. Please check the logs.")
+
+    # Prepare the receptor and ligand structures
+    receptor_struct = structure.StructureReader(receptor).next()
+    ligand_struct = structure.StructureReader(ligand_output_file).next()
+
+    # Set up Glide settings
+    settings = glide.GlideSettings()
+    settings.set_receptor_file(receptor_struct)
+    settings.set_ligand_file(ligand_output_file)
+
+    output_file = os.path.join("outputs", f"output_glide_{ligand_struct.title}.maegz")
+    settings.set_output_file(output_file)
+
+    # Specify the ligand binding site as coordinates and box size
+    settings.set_site_box_center((center_x, center_y, center_z))
+    settings.set_site_box_size((size_x, size_y, size_z))
+
+    # Set Glide precision to XP
+    settings.set_precision("XP")
+
+    # Run the Glide job
+    glide_job = glide.Glide(settings)
+    glide_job.run()
+    glide_job.wait()
+
+    if glide_job.status != jobcontrol.FINISHED:
+        raise Exception("Glide XP docking job failed. Please check the logs.")
+
+    # Read the output file
+    output_structures = list(structure.StructureReader(output_file))
+
+    # Extract the docking scores
+    docking_scores = []
+    for struct in output_structures:
+        docking_score = struct.property['r_i_docking_score']
+        docking_scores.append(docking_score)
+
+    return min(docking_scores)
+
+
+def run_Glide_SP(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi):
+    """
+    Perform docking using Schrödinger's Glide with the SP precision setting,
+    given a receptor, binding site, and ligand.
+    
+    Note: A valid Schrödinger license is required to run this code.
+    
+    Parameters
+    ----------
+    receptor : str
+        Path to the receptor file in maestro format (maegz).
+    center_x, center_y, center_z : float
+        Coordinates of the center of the binding site.
+    size_x, size_y, size_z : float
+        Dimensions of the binding site box.
+    smi : str
+        SMILES string representing the ligand.
+    
+    Returns
+    -------
+    float
+        The minimum docking score obtained.
+    
+    Raises
+    ------
+    Exception
+        If LigPrep or Glide jobs fail.
+    """
+    from schrodinger import structure
+    from schrodinger.job import jobcontrol
+    from schrodinger.application.glide import glide
+    from schrodinger.application.ligprep import LigprepJob, LigprepSettings
+    
+    if receptor.split('.')[-1] != 'maegz': 
+        raise Exception('Please provide a prepared receptor file in maegz format for Glide.')  
+    
+    # Prepare the ligand
+    ligand_struct = structure.create_structure_from_smiles(smi)
+    ligand_output_file = os.path.join("ligands", f"ligand_{ligand_struct.title}.maegz")
+
+    ligprep_settings = LigprepSettings()
+    ligprep_settings.set_output_file(ligand_output_file)
+    ligprep_job = LigprepJob(ligprep_settings, input_structure=ligand_struct)
+    ligprep_job.run()
+    ligprep_job.wait()
+
+    if ligprep_job.status != jobcontrol.FINISHED:
+        raise Exception("LigPrep job failed. Please check the logs.")
+
+    # Prepare the receptor and ligand structures
+    receptor_struct = structure.StructureReader(receptor).next()
+    ligand_struct = structure.StructureReader(ligand_output_file).next()
+
+    # Set up Glide settings
+    settings = glide.GlideSettings()
+    settings.set_receptor_file(receptor_struct)
+    settings.set_ligand_file(ligand_output_file)
+
+    output_file = os.path.join("outputs", f"output_glide_{ligand_struct.title}.maegz")
+    settings.set_output_file(output_file)
+
+    # Specify the ligand binding site as coordinates and box size
+    settings.set_site_box_center((center_x, center_y, center_z))
+    settings.set_site_box_size((size_x, size_y, size_z))
+
+    # Set Glide precision to SP
+    settings.set_precision("SP")
+
+    # Run the Glide job
+    glide_job = glide.Glide(settings)
+    glide_job.run()
+    glide_job.wait()
+
+    if glide_job.status != jobcontrol.FINISHED:
+        raise Exception("Glide SP docking job failed. Please check the logs.")
+
+    # Read the output file
+    output_structures = list(structure.StructureReader(output_file))
+
+    # Extract the docking scores
+    docking_scores = []
+    for struct in output_structures:
+        docking_score = struct.property['r_i_docking_score']
+        docking_scores.append(docking_score)
+
+    return min(docking_scores)
+
     
 def run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiveness): 
     """

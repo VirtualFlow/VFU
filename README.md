@@ -39,7 +39,7 @@ Please edit this file based on your preferance:
 # gold, gwovina, iGemDock, idock, ledock
 # molegro, nnscore2, qvina, qvina-w, rDock
 # rf-score, rosetta-ligand, smina, smina-scoring, vina
-# vina_carb, vina_xb
+# vina_carb, vina_xb, GlideSP, GlideXP, GlideHTVS
 # Please note: different pose prediction/docking methods can be combined with scoring functions.
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
@@ -266,6 +266,10 @@ A `dock.in` input file is required for the program. Please specify the path in v
 
 ### Running with CovDock
 A valid Schrödinger license is required to run CovDock.
+
+### Running with GlideSP/XP/HTVS
+A valid Schrödinger license is required to run GlideSP/XP/HTVS.
+
 
 ### Contributing
 If you are interested in contributing to VirtualFlow, whether it is to report a bug or to extend VirtualFlow with your own code, please see the file [CONTRIBUTING.md](CONTRIBUTING.md) and the file [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
