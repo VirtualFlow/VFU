@@ -853,10 +853,6 @@ def run_dock6(receptor, smi, chimera_path, dock6_path, ref_lig):
         Exception: If the path to the Chimera software or Dock6 directory is invalid, if the reference ligand file
                    is not specified, or if the receptor file is not in pdb format.
     """
-    # chimera_path  = '/home/akshat/chimera' # Please update the Chimera path 
-    # dock6_path    = '/home/akshat/dock6'   # Location to the dock6 directory
-    
-    # ref_lig       = '/ref_lig.mol2' # Reference ligand needs to be specified for dock6
     box_padding   = 12.0
     
     results       = {}
@@ -1180,120 +1176,6 @@ def perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center
         results[lig_path] = [out_path, docking_score]
     
     return results
-
-def run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi): 
-    """Performs molecular docking using Glide.
-
-    Args:
-        receptor (str): The filename of the receptor in .mol2 format.
-        center_x (float): The X-coordinate of the center of the grid box.
-        center_y (float): The Y-coordinate of the center of the grid box.
-        center_z (float): The Z-coordinate of the center of the grid box.
-        size_x (float): The size of the grid box in the X dimension.
-        size_y (float): The size of the grid box in the Y dimension.
-        size_z (float): The size of the grid box in the Z dimension.
-        smi (str): The SMILES string of the ligand to be docked.
-
-    Returns:
-        dict: A dictionary where the keys are the SMILES strings of the input ligands and the values are lists containing the
-              docking scores and the filenames of the output .maegz files.
-    """
-    print('Note: The path to Schrodinger is specified via the $SCHRODINGER variable, which is assigned during installation.')    
-    
-    # Receptor prparation with Glide: 
-    os.system('$SCHRODINGER/utilities/prepwizard {} receptor.maegz -fillsidechains -addOXT -epik_pH 7 -minimize_adj_h'.format(receptor))
-    
-    # Create grid file: 
-    with open('./glide-grid.in', 'w') as f: 
-        f.writelines(['FORCEFIELD   OPLS_2005\n'])
-        f.writelines(['GRID_CENTER   {}, {}, {}\n'.format(center_x, center_y, center_z)])
-        f.writelines(['GRIDFILE   receptor.zip\n'])
-        f.writelines(['INNERBOX   {}, {}, {}\n'.format(size_x, size_y, size_z)])
-        f.writelines(['OUTERBOX   {}, {}, {}\n'.format(size_x+15, size_y+15, size_z+15)])
-        f.writelines(['RECEP_FILE   receptor.maegz\n'])
-        
-    # Run LigPrep; ligand processing with Glide: 
-    with open('./grid_prep.sh', 'w') as f: 
-        f.writelines(['while :\n'])
-        f.writelines(['\tdo\n'])
-        f.writelines(["\tif [[ `tail -n1 receptor.log|awk '{print $1}'` != 'DONE.' ]]; then\n"])
-        f.writelines(['\t\tcontinue\n'])
-        f.writelines(['\tfi\n'])
-        f.writelines(["\tif [[ `tail -n1 receptor.log|awk '{print $1}'` == 'DONE.' ]]; then\n"])
-        f.writelines(['\t\t$SCHRODINGER/glide glide-grid.in\n'])
-        f.writelines(['\t\tbreak\n'])
-        f.writelines(['\tfi\n'])
-        f.writelines(['done\n'])
-        
-    # Wait 3mins for protein preparation to finish: 
-    time.sleep(180) 
-    os.system('chmod 777 ./grid_prep.sh')
-    os.system('./grid_prep.sh')
-    # Wait 3mins for grid preparation to finish: 
-    time.sleep(180) 
-
-    process_ligand(smi, 'sd') 
-    
-    lig_locations = os.listdir('./ligands/')
-
-    results = {}
-    
-    for lig_ in lig_locations: 
-        lig_path = 'ligands/{}'.format(lig_)
-        out_path = './outputs/complex_{}.maegz'.format(lig_.split('.')[0])
-        
-        # Run LigPrep; ligand processing with Glide: 
-        with open('./lig_prep.sh', 'w') as f: 
-            f.writelines(['while :\n'])
-            f.writelines(['\tdo\n'])
-            f.writelines(["\tif [[ `tail -n1 glide-grid.log|awk '{print $1}'` != 'Total' ]]; then\n"])
-            f.writelines(['\t\tcontinue\n'])
-            f.writelines(['\tfi\n'])
-            f.writelines(["\tif [[ `tail -n1 glide-grid.log|awk '{print $1}'` != 'Total' ]]; then\n"])
-            f.writelines(['\t\t$SCHRODINGER/ligprep -isd {} -omae ligand.mae -epik -ph 7\n'.format(lig_path)])
-            f.writelines(['\t\tbreak\n'])
-            f.writelines(['\tfi\n'])
-            f.writelines(['done\n'])
-            
-        os.system('chmod 777 ./lig_prep.sh; ./lig_prep.sh\n')
-        # Wait 30seconds for ligand preparation to finish: 
-        time.sleep(30) 
-        
-        # Perform molecular docking: 
-        with open('./glide-dock.in', 'w') as f: 
-            f.writelines(['FORCEFIELD   OPLS_2005\n'])
-            f.writelines(['GRIDFILE   receptor.zip\n'])
-            f.writelines(['LIGANDFILE   ligand.mae\n'])
-            f.writelines(['PRECISION   SP\n'])
-        
-        with open('./docking_run.sh', 'w') as f: 
-            f.writelines(['while :\n'])
-            f.writelines(['\tdo\n'])
-            f.writelines(["\tif [[ `tail -n1 ligand.log|awk '{print $1}'` != 'backend' ]]; then\n"])
-            f.writelines(['\t\tcontinue\n'])
-            f.writelines(['\tfi\n'])
-            f.writelines(["\tif [[ `tail -n1 ligand.log|awk '{print $1}'` != 'backend' ]]; then\n"])
-            f.writelines(['\t\t$SCHRODINGER/glide glide-grid.in\n'])
-            f.writelines(['\t\tbreak\n'])
-            f.writelines(['\tfi\n'])
-
-        os.system('chmod 777 ./docking_run.sh; ./docking_run.sh')
-        # Wait 60seconds for docking to finish: 
-        time.sleep(60) 
-
-        with open('./glide-dock.csv', 'r') as f: 
-            lines = f.readlines()
-        docking_scores = [] # Collect the docking score
-        for item in lines[1: ]: 
-            A = item.split(',')
-            docking_scores.append(float(A[5]))
-
-        # Delete aux files: 
-        os.system('rm glide-dock.csv glide-dock.log receptor.log glide-grid.log; cp glide-dock_pv.maegz {}; rm glide-dock_pv.maegz'.format(out_path))
-
-        results[smi] = [docking_scores, out_path]
-    return results
-
 
 def run_CovDock_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi, covalent_bond_constraints):
     """
