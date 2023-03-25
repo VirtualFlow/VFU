@@ -40,6 +40,7 @@ Please edit this file based on your preferance:
 # molegro, nnscore2, qvina, qvina-w, rDock
 # rf-score, rosetta-ligand, smina, smina-scoring, vina
 # vina_carb, vina_xb, GlideSP, GlideXP, GlideHTVS
+# qvina_gpu
 # Please note: different pose prediction/docking methods can be combined with scoring functions.
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
