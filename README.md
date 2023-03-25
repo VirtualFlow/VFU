@@ -40,7 +40,7 @@ Please edit this file based on your preferance:
 # molegro, nnscore2, qvina, qvina-w, rDock
 # rf-score, rosetta-ligand, smina, smina-scoring, vina
 # vina_carb, vina_xb, GlideSP, GlideXP, GlideHTVS
-# qvina_gpu
+# qvina_gpu, qvina_w_gpu, vina_gpu, vina_gpu_2.0
 # Please note: different pose prediction/docking methods can be combined with scoring functions.
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
@@ -231,6 +231,22 @@ Please install AmberTools: [https://ambermd.org/GetAmber.php#ambertools](https:/
 
 ### RF-score
 Please paste the executable from [https://github.com/oddt/rfscorevs_binary](https://github.com/oddt/rfscorevs_binary) in the executables directory. 
+
+### qvina_gpu
+A qvina_gpu executable (of name 'qvina_gpu') should be placed in directory: /executables
+Instructions for compilation are provided in https://github.com/DeltaGroupNJUPT/QuickVina2-GPU
+
+### qvina_w_gpu
+A qvina_gpu executable (of name 'qvina_w_gpu') should be placed in directory: /executables
+Instructions for compilation are provided in https://github.com/DeltaGroupNJUPT/QVina-W-GPU
+
+### vina_gpu
+A qvina_gpu executable (of name 'vina_gpu') should be placed in directory: /executables
+Instructions for compilation are provided in https://github.com/DeltaGroupNJUPT/Vina-GPU
+
+### vina_gpu_2.0
+A qvina_gpu executable (of name 'vina_gpu_2.0') should be placed in directory: /executables
+Instructions for compilation are provided in https://github.com/DeltaGroupNJUPT/Vina-GPU-2.0
 
 ### ADFR
 An adfr executable (of name adfr) should be placed in directory: /executables directory. An executable needs to be compiled based on a user’s system using instructions described in [https://ccsb.scripps.edu/adfr/downloads/](https://ccsb.scripps.edu/adfr/downloads/).
