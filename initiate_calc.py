@@ -12,7 +12,7 @@ from lig_process import process_ligand
 
 from pose_prediction import run_plants_docking, run_autodock_gpu_docking, run_EquiBind, run_rDock, run_leDock, process_idock_output, run_adfr_docking, run_flexx_docking
 from pose_prediction import check_energy, run_ligand_fit, run_mcdock, run_AutodockZN, run_GalaxyDock3, run_dock6, run_fred_docking, run_iGemDock, perform_gold_docking
-from pose_prediction import run_glide_docking, run_rosetta_docking, run_mdock_docking, run_seed_docking, run_molegro_docking, run_fitdock_docking
+from pose_prediction import run_rosetta_docking, run_mdock_docking, run_seed_docking, run_molegro_docking, run_fitdock_docking
 from pose_prediction import  run_lightdock_docking, run_RLDock_docking, run_MpSDockZN_docking, run_CovDock_docking, run_Glide_HTVS, run_Glide_SP, run_Glide_XP
 from pose_prediction import perform_HDock_docking
 
@@ -111,9 +111,6 @@ def run_pose_prediction_program(program_choice, center_x, center_y, center_z, si
         return results
     if program_choice == 'gold': 
         results = perform_gold_docking(receptor, smi, size_x, size_y, size_z, center_x, center_y, center_z)
-        return results
-    if program_choice == 'glide':
-        results = run_glide_docking(receptor, center_x, center_y, center_z, size_x, size_y, size_z, smi)
         return results
     if program_choice == 'rosetta-ligand':
         results = run_rosetta_docking(receptor, smi, center_x, center_y, center_z, exhaustiveness)

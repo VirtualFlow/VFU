@@ -35,7 +35,7 @@ Please edit this file based on your preferance:
 # FitDock, GalaxyDock3, LigandFit, LightDock, M-Dock
 # MCDock, MM-GBSA, PLANTS, PSOVina, RLDock
 # SEED, adfr, autodock_cpu, autodock_gpu, AutodockVina_1.1.2
-# dock6, flexx, glide, gnina, gnina-scoring
+# dock6, flexx, gnina, gnina-scoring
 # gold, gwovina, iGemDock, idock, ledock
 # molegro, nnscore2, qvina, qvina-w, rDock
 # rf-score, rosetta-ligand, smina, smina-scoring, vina

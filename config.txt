@@ -8,7 +8,7 @@
 # gold, gwovina, iGemDock, idock, ledock
 # molegro, nnscore2, qvina, qvina-w, rDock
 # rf-score, rosetta-ligand, smina, smina-scoring, vina
-# vina_carb, vina_xb, CovDock
+# vina_carb, vina_xb, CovDock, GlideSP, GlideXP, GlideHTVS
 # Please note: different pose prediction/docking methods can be combined with scoring functions.
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
