@@ -302,4 +302,4 @@ The project ist distributed under the GNU GPL v2.0. Please see the file [LICENSE
 
 
 ### Citation
-TODO
+Gorgulla, Christoph, et al. "VirtualFlow 2.0-The Next Generation Drug Discovery Platform Enabling Adaptive Screens of 69 Billion Molecules." bioRxiv (2023): 2023-04.
