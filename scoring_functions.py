@@ -6,9 +6,15 @@ Created on Sat Feb 18 22:41:22 2023
 @author: akshat
 """
 import os 
+import errno
 import subprocess
 import shutil
+import logging
+import logging.config
+import tempfile
 
+logging.config.fileConfig('./config/logging.conf')
+logger = logging.getLogger('scoringLogger')
 
 def convert_ligand_format(ligand_, new_format): 
     """Converts a ligand file to a different file format using the Open Babel tool.
@@ -888,6 +894,58 @@ def run_mm_gbsa(chimera_path, ligand_file, receptor_file):
     os.system('rm FINAL_RESULTS_MMPBSA.dat')
     
     return output
+
+def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_filepath: str):
+    """Runs a GOLD fitness function on a protein-ligand docking result.
+
+    Args:
+        scoring_function (str): Path to GOLD scoring function shared object (or dynamically loadable library).
+        receptor_filepath (str): Path to receptor file.
+        ligand_filepath (str): Path to ligand file.
+    """
+    receptor_format = receptor_filepath.split('.')[-1]
+    lig_format = ligand_filepath.split('.')[-1]
+    
+    if not os.path.exists(receptor_filepath):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), receptor_filepath)
+    if not os.path.exists(ligand_filepath):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), ligand_filepath)
+    
+    if receptor_format not in ['pdb', 'ent', 'mol2']:
+        raise ValueError('Receptor needs to be in pdb or mol2 format. Please try again, after incorporating this correction.')
+    if lig_format not in ['mol2', 'mol', 'mdl', 'sdf']: 
+        logger.warning('Ligand needs to be in mol2 or mol format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_=ligand_filepath, new_format='mol2')
+        ligand_filepath = ligand_filepath.replace(lig_format, 'mol2')
+    
+    output_dirname = 'gold_output'
+    output_dir = os.mkdir(output_dirname)
+    with tempfile.NamedTemporaryFile() as input_conf:
+        input_conf.writelines([
+            f'protein_datafile = {receptor_filepath}\n',
+            f'ligand_data_file = {ligand_filepath} 10\n',
+            'param_file = DEFAULT\n',
+            f'directory = {output_dirname}\n',
+            f'gold_fitfunc_path {scoring_function}\n',
+            'run_flag = RESCORE\n',
+        ])
+
+        cmd = ['./executables/gold_auto', input_conf.name]
+    
+        try:
+            subprocess.run(cmd, capture_output=True, check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(f'GOLD scoring for {receptor_filepath} and {ligand_filepath} failed.')
+            logger.error(e.stdout)
+            logger.error(e.stderr)
+            return None
+
+    cmd = ['tail', '-n1', f'./{output_dirname}/rescore.log', '|', 'awk', "'{print $5}'"]
+    command_run = subprocess.run(cmd, check_output=True)
+    command_out = command_run.stdout.decode("utf-8")
+    os.rmdir(output_dirname)
+    
+    return float(command_out)
 
 def Hawkins_gbsa(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
     """
