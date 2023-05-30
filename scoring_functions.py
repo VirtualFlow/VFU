@@ -920,7 +920,7 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
     
     output_dir = 'gold_output'
     os.mkdir(output_dir)
-    with tempfile.NamedTemporaryFile() as input_conf:
+    with open('input.conf', mode='w') as input_conf:
         input_conf.writelines([
             f'protein_datafile = {receptor_filepath}\n',
             f'ligand_data_file = {ligand_filepath} 10\n',
@@ -940,12 +940,15 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
             logger.error(e.stderr)
             return None
 
-    cmd = ['tail', '-n1', f'./{output_dir}/rescore.log', '|', 'awk', "'{print $5}'"]
-    command_run = subprocess.run(cmd, check_output=True)
-    command_out = command_run.stdout.decode("utf-8")
-    os.rmdir(output_dir)
-
-    return float(command_out)
+    with open(f'./{output_dir}/rescore.log') as rescore_log:
+        for line in rescore_log:
+            pass
+        last_line = [i for i in line.split(sep=' ') if i]
+        score = last_line[4]
+    
+    os.remove('./input.conf')
+    shutil.rmtree(output_dir)
+    return float(score)
 
 def Hawkins_gbsa(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
     """
