@@ -918,14 +918,14 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
         convert_ligand_format(ligand_=ligand_filepath, new_format='mol2')
         ligand_filepath = ligand_filepath.replace(ligand_format, 'mol2')
     
-    output_dirname = 'gold_output'
-    output_dir = os.mkdir(output_dirname)
+    output_dir = 'gold_output'
+    os.mkdir(output_dir)
     with tempfile.NamedTemporaryFile() as input_conf:
         input_conf.writelines([
             f'protein_datafile = {receptor_filepath}\n',
             f'ligand_data_file = {ligand_filepath} 10\n',
             'param_file = DEFAULT\n',
-            f'directory = {output_dirname}\n',
+            f'directory = {output_dir}\n',
             f'gold_fitfunc_path {scoring_function}\n',
             'run_flag = RESCORE\n',
         ])
@@ -940,10 +940,10 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
             logger.error(e.stderr)
             return None
 
-    cmd = ['tail', '-n1', f'./{output_dirname}/rescore.log', '|', 'awk', "'{print $5}'"]
+    cmd = ['tail', '-n1', f'./{output_dir}/rescore.log', '|', 'awk', "'{print $5}'"]
     command_run = subprocess.run(cmd, check_output=True)
     command_out = command_run.stdout.decode("utf-8")
-    os.rmdir(output_dirname)
+    os.rmdir(output_dir)
 
     return float(command_out)
 
