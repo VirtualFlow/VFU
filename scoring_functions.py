@@ -6,9 +6,15 @@ Created on Sat Feb 18 22:41:22 2023
 @author: akshat
 """
 import os 
+import errno
 import subprocess
 import shutil
+import logging
+import logging.config
+import tempfile
 
+logging.config.fileConfig('./config/logging.conf')
+logger = logging.getLogger('scoringLogger')
 
 def convert_ligand_format(ligand_, new_format): 
     """Converts a ligand file to a different file format using the Open Babel tool.
@@ -888,6 +894,98 @@ def run_mm_gbsa(chimera_path, ligand_file, receptor_file):
     os.system('rm FINAL_RESULTS_MMPBSA.dat')
     
     return output
+
+def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_filepath: str) -> float:
+    """Runs a GOLD fitness function on a protein-ligand docking result.
+
+    Args:
+        scoring_function (str): Path to GOLD scoring function shared object (or dynamically loadable library).
+        receptor_filepath (str): Path to receptor file.
+        ligand_filepath (str): Path to ligand file.
+
+    Returns:
+        float: The score calculated by the fitness function.
+    """
+    receptor_format = receptor_filepath.split('.')[-1]
+    ligand_format = ligand_filepath.split('.')[-1]
+    
+    if not os.path.exists(receptor_filepath):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), receptor_filepath)
+    if not os.path.exists(ligand_filepath):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), ligand_filepath)
+    
+    if receptor_format not in ['pdb', 'ent', 'mol2']:
+        raise ValueError('Receptor needs to be in pdb or mol2 format. Please try again, after incorporating this correction.')
+    if ligand_format not in ['mol2', 'mol', 'mdl', 'sdf']: 
+        logger.warning('Ligand needs to be in mol2 or mol format. Converting ligand format using obabel.')
+        convert_ligand_format(ligand_=ligand_filepath, new_format='mol2')
+        ligand_filepath = ligand_filepath.replace(ligand_format, 'mol2')
+    
+    output_dir = 'gold_output'
+    os.mkdir(output_dir)
+    with open('input.conf', mode='w') as input_conf:
+        input_conf.writelines([
+            f'protein_datafile = {receptor_filepath}\n',
+            f'ligand_data_file = {ligand_filepath} 10\n',
+            'param_file = DEFAULT\n',
+            f'directory = {output_dir}\n',
+            f'gold_fitfunc_path {scoring_function}\n',
+            'run_flag = RESCORE\n',
+        ])
+
+        cmd = ['./executables/gold_auto', input_conf.name]
+    
+        try:
+            subprocess.run(cmd, capture_output=True, check=True)
+        except subprocess.CalledProcessError as e:
+            logger.error(f'GOLD scoring for {receptor_filepath} and {ligand_filepath} failed.')
+            logger.error(e.stdout)
+            logger.error(e.stderr)
+            return None
+
+    with open(f'./{output_dir}/rescore.log') as rescore_log:
+        for line in rescore_log:
+            pass
+        last_line = [i for i in line.split(sep=' ') if i]
+        score = last_line[4]
+    
+    os.remove('./input.conf')
+    shutil.rmtree(output_dir)
+    return float(score)
+
+def gold_chemscore_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the ChemScore scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='chemscore', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
+
+def gold_asp_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the Astex Statistical Potential scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='asp', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
+
+
+def gold_goldscore_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the GoldScore scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='goldscore', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
+
+
+def gold_plp_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the Piecewise Linear Potential scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='plp', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
 
 def Hawkins_gbsa(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
     """
