@@ -904,7 +904,7 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
         ligand_filepath (str): Path to ligand file.
     """
     receptor_format = receptor_filepath.split('.')[-1]
-    lig_format = ligand_filepath.split('.')[-1]
+    ligand_format = ligand_filepath.split('.')[-1]
     
     if not os.path.exists(receptor_filepath):
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), receptor_filepath)
@@ -913,10 +913,10 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
     
     if receptor_format not in ['pdb', 'ent', 'mol2']:
         raise ValueError('Receptor needs to be in pdb or mol2 format. Please try again, after incorporating this correction.')
-    if lig_format not in ['mol2', 'mol', 'mdl', 'sdf']: 
+    if ligand_format not in ['mol2', 'mol', 'mdl', 'sdf']: 
         logger.warning('Ligand needs to be in mol2 or mol format. Converting ligand format using obabel.')
         convert_ligand_format(ligand_=ligand_filepath, new_format='mol2')
-        ligand_filepath = ligand_filepath.replace(lig_format, 'mol2')
+        ligand_filepath = ligand_filepath.replace(ligand_format, 'mol2')
     
     output_dirname = 'gold_output'
     output_dir = os.mkdir(output_dirname)
@@ -944,7 +944,7 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
     command_run = subprocess.run(cmd, check_output=True)
     command_out = command_run.stdout.decode("utf-8")
     os.rmdir(output_dirname)
-    
+
     return float(command_out)
 
 def Hawkins_gbsa(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
