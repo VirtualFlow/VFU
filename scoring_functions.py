@@ -895,13 +895,16 @@ def run_mm_gbsa(chimera_path, ligand_file, receptor_file):
     
     return output
 
-def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_filepath: str):
+def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_filepath: str) -> float:
     """Runs a GOLD fitness function on a protein-ligand docking result.
 
     Args:
         scoring_function (str): Path to GOLD scoring function shared object (or dynamically loadable library).
         receptor_filepath (str): Path to receptor file.
         ligand_filepath (str): Path to ligand file.
+
+    Returns:
+        float: The score calculated by the fitness function.
     """
     receptor_format = receptor_filepath.split('.')[-1]
     ligand_format = ligand_filepath.split('.')[-1]
@@ -949,6 +952,40 @@ def _execute_gold_scoring(scoring_function: str, receptor_filepath: str, ligand_
     os.remove('./input.conf')
     shutil.rmtree(output_dir)
     return float(score)
+
+def gold_chemscore_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the ChemScore scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='chemscore', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
+
+def gold_asp_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the Astex Statistical Potential scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='asp', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
+
+
+def gold_goldscore_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the GoldScore scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='goldscore', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
+
+
+def gold_plp_scoring(receptor_filepath: str, ligand_filepath: str):
+    """Runs the Piecewise Linear Potential scoring function.
+
+    See Also:
+        _execute_gold_scoring()
+    """
+    return _execute_gold_scoring(scoring_function='plp', receptor_filepath=receptor_filepath, ligand_filepath=ligand_filepath)
 
 def Hawkins_gbsa(receptor_file, chimera_path, dock6_path, ligand_file, center_x, center_y, center_z, size_x, size_y, size_z):
     """
