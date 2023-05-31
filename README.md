@@ -41,6 +41,12 @@ Please edit this file based on your preferance:
 # rf-score, rosetta-ligand, smina, smina-scoring, vina
 # vina_carb, vina_xb, GlideSP, GlideXP, GlideHTVS
 # qvina_gpu, qvina_w_gpu, vina_gpu, vina_gpu_2.0
+# The choice of the scoring function
+# Possible choices:
+# nnscore2, rf-score, smina-scoring, ad4_scoring, vinandro_scoring
+# vina_scoring, gnina_scoring, chemplp_scoring, PLP_scoring, PLP95_scoring
+# contact_scoring, continuous_scoring, grid_scoring, 
+# asp, chemscore, goldscore, plp, mm_gbsa_scoring, Hawkins_gbsa
 # Please note: different pose prediction/docking methods can be combined with scoring functions.
 # For example: ’qvina+nnscore2’.
 # For supported choices/combinations please see the VirtualFlow homepage.
@@ -291,6 +297,13 @@ A valid Schrödinger license is required to run CovDock.
 ### Running with GlideSP/XP/HTVS
 A valid Schrödinger license is required to run GlideSP/XP/HTVS.
 
+### Re-scoring with GOLD fitness functions
+A valid GOLD license is required to re-score docking results with GOLD fitness functions.  
+An executable named `gold_auto` should be placed in the `/executables` directory.
+
+When specifying a GOLD fitness function with which to re-score docking results, a dynamically loadable 
+shared object library must be available in the top-level directory of this repository and named correspondingly 
+with the parameter defined in the VFU configuration, i.e., one of `plp`, `asp`, `chemscore`, `goldscore`.
 
 ### Contributing
 If you are interested in contributing to VirtualFlow, whether it is to report a bug or to extend VirtualFlow with your own code, please see the file [CONTRIBUTING.md](CONTRIBUTING.md) and the file [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).

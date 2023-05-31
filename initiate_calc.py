@@ -18,6 +18,7 @@ from pose_prediction import perform_HDock_docking
 
 from scoring_functions import run_nnscore2, run_rf_scoring, run_smina_scoring, run_ad4_scoring, run_vinandro_scoring, run_vina_scoring, run_gnina_scoring
 from scoring_functions import run_PLANTS_chemplp_scoring, run_PLANTS_plp_scoring, run_PLANTS_plp95_scoring, contact_score, continuous_score, grid_score
+from scoring_functions import gold_asp_scoring, gold_chemscore_scoring, gold_goldscore_scoring, gold_plp_scoring
 from scoring_functions import run_mm_gbsa, Hawkins_gbsa
 
 def run_pose_prediction_program(program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, receptor, chimera_path = '', dock6_path = '', ref_lig = '', seed_path = '', mdock_path = '', molegro_path = '', covalent_bond_constraints='', receptor_2=''): 
@@ -295,6 +296,14 @@ def run_scoring_prediction_program(scoring_function, ligand_path, center_x, cent
         scores = continuous_score(receptor, chimera_path, dock6_path, ligand_path)
     if scoring_function == 'grid_scoring': 
         scores = grid_score(receptor, chimera_path, dock6_path, ligand_path, center_x, center_y, center_z, size_x, size_y, size_z)
+    if scoring_function == 'asp':
+        scores = gold_asp_scoring(receptor_filepath=receptor, ligand_filepath=ligand_path)
+    if scoring_function == 'chemscore':
+        scores = gold_chemscore_scoring(receptor_filepath=receptor, ligand_filepath=ligand_path)
+    if scoring_function == 'goldscore':
+        scores = gold_goldscore_scoring(receptor_filepath=receptor, ligand_filepath=ligand_path)
+    if scoring_function == 'plp':
+        scores = gold_plp_scoring(receptor_filepath=receptor, ligand_filepath=ligand_path)
     if scoring_function == 'mm_gbsa_scoring': 
         scores = run_mm_gbsa(chimera_path, ligand_path, receptor)
     if scoring_function == "Hawkins_gbsa":
