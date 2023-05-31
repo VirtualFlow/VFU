@@ -301,10 +301,9 @@ A valid Schrödinger license is required to run GlideSP/XP/HTVS.
 A valid GOLD license is required to re-score docking results with GOLD fitness functions.  
 An executable named `gold_auto` should be placed in the `/executables` directory.
 
-`plp`, `asp`, `chemscore`, `goldscore`
-gold_fitfunc_path defines which
-scoring function is to be used by specifying the path to the relevant
-dynamically loadable shared object library  
+When specifying a GOLD fitness function with which to re-score docking results, a dynamically loadable 
+shared object library must be available in the top-level directory of this repository and named correspondingly 
+with the parameter defined in the VFU configuration, i.e., one of `plp`, `asp`, `chemscore`, `goldscore`.
 
 ### Contributing
 If you are interested in contributing to VirtualFlow, whether it is to report a bug or to extend VirtualFlow with your own code, please see the file [CONTRIBUTING.md](CONTRIBUTING.md) and the file [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
