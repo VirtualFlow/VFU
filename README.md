@@ -11,6 +11,7 @@ Please ensure that the following packages are installed:
 - [Open Babel 3.1.0](https://openbabel.org/docs/dev/Installation/install.html)
 - [Python 3.7.13](https://www.python.org/downloads/)
 - [SELFIES](https://github.com/aspuru-guzik-group/selfies)
+- [PyTorch version 2.0.1](https://pytorch.org/get-started/previous-versions/) (only required for the optional ML tranche-prioritization classifier described below; a CPU-only build is sufficient, a CUDA build is used automatically if available)
 
 
 ## File Navigator
@@ -19,6 +20,7 @@ Please ensure that the following packages are installed:
 * `lig_process.py`: Process provided ligand into 3D format compatible with docking program (used by )
 * `pose_prediction.py`: File for running pose prediction on processed ligands (used by pose_prediction). 
 * `scoring_functions.py`: File for running scoring on already docked ligands (used by initiate_calc.py). 
+* `ml_classifier.py`: Optional FNN classifier that prioritizes candidate compounds before docking (see "Using the optional ML tranche-prioritization classifier" below).
 * `config.txt`: Config file concisting of user definable parameters for running calculation. 
 * `/ligands/`: Directory created by VF-Unity which will contain all processed ligands in a ready-to-dock format. 
 * `/outputs/`: Directory created by VF-Unity which will contain docked ligand files. 
@@ -196,6 +198,33 @@ for item in lines:
     os.system('cp -a outputs outputs_{}'.format(idx))
 ```
 The corresponding index (column 1) of a molecule in the `molecules.txt` file will be used for storing the results in `outputs_*index*`
+
+## Using the optional ML tranche-prioritization classifier
+For ultra-large candidate lists, VF-Unity provides an optional machine learning classifier (`ml_classifier.py`) that predicts which candidate compounds are likely to be high-affinity binders, so that only those compounds are passed into the docking loop above. This is the FNN classifier described in the AdaptiveFlow manuscript's "Machine Learning Classifier for Tranche Prioritization" Methods section: a 4-layer feedforward network (1024 → 512 → 256 → 128 → 1, ReLU hidden activations, sigmoid output) trained on Morgan fingerprints (1024 bits, radius 2) and prescreen docking scores.
+
+The workflow has two stages:
+1. **Train** a classifier on a small "prescreen" batch of compounds you've already docked (their SMILES and docking scores).
+2. **Filter** a much larger list of undocked candidate compounds down to those predicted worth full docking (predicted binding probability > 0.5), before running them through the existing docking loop.
+
+### Using a python function call
+```
+from ml_classifier import train_classifier, filter_candidates
+
+# Step 1: train on a prescreen batch (CSV with columns Index,Smiles,DockingScore)
+train_classifier('./prescreen_scores.csv', './ml_models/classifier.pt', receptor='./config/5wiu_test.pdbqt')
+
+# Step 2: filter a larger candidate list (CSV with columns Index,Smiles) down to likely binders
+kept, stats = filter_candidates('./candidates.smi', './ml_models/classifier.pt', './candidates_filtered.smi')
+print(stats)  # {'n_total': ..., 'n_kept': ..., 'n_filtered': ..., 'fraction_filtered': ...}
+```
+The filtered output (`candidates_filtered.smi`) uses the same `Index,Smiles` schema as `molecules.smi` above, so it drops directly into the "Running calculations for multiple molecules" loop — just point that loop's `open(...)` call at `candidates_filtered.smi` instead of the full candidate list.
+
+### Using a config.txt file
+Set `use_ml_classifier=True` and `ml_classifier_mode=train` or `ml_classifier_mode=filter` in `config.txt` (see the "Optional: ML classifier" block near the end of the provided `config.txt`, which also documents `ml_prescreen_csv`, `ml_model_path`, `ml_candidates_csv`, and `ml_filtered_output_csv`), then run `python3 run_vf_unity.py` as usual. This is a thin CLI convenience wrapper around the same `train_classifier`/`filter_candidates` functions shown above.
+
+### Notes
+- A classifier trained once for a given target/receptor (`ml_model_path`) can be reused for that target's full candidate list without retraining — just re-run in `filter` mode.
+- `ml_classifier.py` can also be run directly (`python3 ml_classifier.py`) to execute a self-contained synthetic self-test that exercises training, persistence, and filtering without requiring any real docking runs.
 
 ## Special Considerations
 ### Using AutoDock-GPU/CPU

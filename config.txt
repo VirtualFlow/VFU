@@ -50,3 +50,24 @@ is_peptide=False
 #  The receptor needs to be in the correct format, supported by the user's selected docking program.
 #  Additionally, the file needs to be present in the config directory.
 receptor=./config/5wiu_test.pdbqt
+
+# --- Optional: ML classifier for candidate/tranche prioritization ---
+# (see ml_classifier.py and manuscript "Methods: Machine Learning Classifier for Tranche Prioritization")
+# Master switch. Default False: none of the keys below are used, and behavior is unchanged.
+use_ml_classifier=False
+# 'train'  -> train a new classifier from ml_prescreen_csv and save it to ml_model_path
+# 'filter' -> load the classifier from ml_model_path, filter ml_candidates_csv -> ml_filtered_output_csv
+ml_classifier_mode=filter
+# CSV with columns Index,Smiles,DockingScore, used only in 'train' mode.
+ml_prescreen_csv=./ml_models/prescreen_scores.csv
+# Where the trained classifier is saved to ('train' mode) / loaded from ('filter' mode).
+ml_model_path=./ml_models/classifier.pt
+# CSV with columns Index,Smiles, used only in 'filter' mode.
+ml_candidates_csv=./ml_models/candidates.smi
+# Filtered output, same Index,Smiles schema, used only in 'filter' mode.
+ml_filtered_output_csv=./ml_models/candidates_filtered.smi
+# % of most-negative-scoring prescreen compounds labeled "high-confidence binder" (default 25, per manuscript).
+ml_top_percent=25
+# Probability cutoff for retaining a candidate for full docking (default 0.5, per manuscript).
+ml_probability_cutoff=0.5
+ml_seed=42

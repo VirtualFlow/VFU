@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ML tranche-prioritization classifier artifacts (trained weights, self-test scratch data)
+ml_models/
+ml_classifier_selftest/

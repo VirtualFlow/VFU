@@ -65,6 +65,41 @@ def read_config_file():
     return program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor
 
 
+def read_ml_config_file():
+    """
+    Reads the optional ML tranche-prioritization classifier settings from config.txt.
+
+    These keys are all optional; if config.txt does not define them, the returned settings
+    default to a disabled state ('use_ml_classifier': False), so existing config.txt files
+    continue to work unchanged.
+
+    Returns:
+        dict with keys: use_ml_classifier (bool), ml_classifier_mode (str, 'train' or 'filter'),
+        ml_model_path, ml_prescreen_csv, ml_candidates_csv, ml_filtered_output_csv (str paths),
+        ml_top_percent (float), ml_probability_cutoff (float), ml_seed (int).
+    """
+    with open('./config.txt', 'r') as f:
+        lines = f.readlines()
+    lines = [x for x in lines if x[0] != '#' and x[0] != '\n']
+
+    variables = {}
+    for string in lines:
+        key, value = string.strip().split('=', 1)
+        variables[key] = value
+
+    return {
+        'use_ml_classifier': variables.get('use_ml_classifier', 'False') == 'True',
+        'ml_classifier_mode': variables.get('ml_classifier_mode', 'filter'),
+        'ml_model_path': variables.get('ml_model_path', './ml_models/classifier.pt'),
+        'ml_prescreen_csv': variables.get('ml_prescreen_csv', './ml_models/prescreen_scores.csv'),
+        'ml_candidates_csv': variables.get('ml_candidates_csv', './ml_models/candidates.smi'),
+        'ml_filtered_output_csv': variables.get('ml_filtered_output_csv', './ml_models/candidates_filtered.smi'),
+        'ml_top_percent': float(variables.get('ml_top_percent', 25)),
+        'ml_probability_cutoff': float(variables.get('ml_probability_cutoff', 0.5)),
+        'ml_seed': int(variables.get('ml_seed', 42)),
+    }
+
+
 def main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor): 
     """
     Runs a docking program to predict the binding pose of a ligand to a receptor, and optionally performs an alternative
@@ -127,33 +162,56 @@ def main(program_choice, scoring_function, center_x, center_y, center_z, size_x,
     return pose_pred_out, re_scored_values
             
 
-if __name__ == "__main__": 
-    
-    # Read in parameters from config.txt: 
-    program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor = read_config_file()
-    if '+' in program_choice: 
-        program_choice, scoring_function = program_choice.split('+')[0], program_choice.split('+')[1]
-    else: 
-        scoring_function = ''
-                
-    pose_pred_out, re_scored_values = main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor)
+if __name__ == "__main__":
 
-    with open('docking_output.csv', 'a+', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Ligand File', 'Docking Values', 'Docking Pose'])
-        for key, value in pose_pred_out.items():
-            filename = key
-            values = ','.join(map(str, value[0]))
-            path = value[1]
-            writer.writerow([filename, values, path])   
-        
-    with open('rescoring_output.csv', 'a+', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['Docked Ligand', 'Re-scored Value'])
-        for key, value in re_scored_values.items():
-            filename = key
-            values = ';'.join(x for x in value)
-            writer.writerow([filename, values])
+    # Optional ML tranche-prioritization classifier (see ml_classifier.py). Disabled by default;
+    # activated by setting use_ml_classifier=True in config.txt. When enabled, this mode runs
+    # instead of a docking calculation (train a classifier on prescreen results, or filter a
+    # candidate list down to compounds worth docking); it does not affect the docking flow below
+    # when disabled.
+    ml_settings = read_ml_config_file()
+    if ml_settings['use_ml_classifier']:
+        from ml_classifier import train_classifier, filter_candidates
+
+        if ml_settings['ml_classifier_mode'] == 'train':
+            train_classifier(ml_settings['ml_prescreen_csv'], ml_settings['ml_model_path'],
+                              top_percent=ml_settings['ml_top_percent'], seed=ml_settings['ml_seed'])
+        elif ml_settings['ml_classifier_mode'] == 'filter':
+            kept, stats = filter_candidates(ml_settings['ml_candidates_csv'], ml_settings['ml_model_path'],
+                                             ml_settings['ml_filtered_output_csv'],
+                                             probability_cutoff=ml_settings['ml_probability_cutoff'])
+            print('ML classifier filtering: kept {n_kept}/{n_total} candidates ({fraction_filtered:.1%} filtered out). '
+                  'Results written to {}'.format(ml_settings['ml_filtered_output_csv'], **stats))
+        else:
+            raise Exception("ml_classifier_mode must be 'train' or 'filter', got: {}".format(
+                ml_settings['ml_classifier_mode']))
+
+    else:
+        # Read in parameters from config.txt:
+        program_choice, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor = read_config_file()
+        if '+' in program_choice:
+            program_choice, scoring_function = program_choice.split('+')[0], program_choice.split('+')[1]
+        else:
+            scoring_function = ''
+
+        pose_pred_out, re_scored_values = main(program_choice, scoring_function, center_x, center_y, center_z, size_x, size_y, size_z, exhaustiveness, smi, is_selfies, is_peptide, receptor)
+
+        with open('docking_output.csv', 'a+', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Ligand File', 'Docking Values', 'Docking Pose'])
+            for key, value in pose_pred_out.items():
+                filename = key
+                values = ','.join(map(str, value[0]))
+                path = value[1]
+                writer.writerow([filename, values, path])
+
+        with open('rescoring_output.csv', 'a+', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Docked Ligand', 'Re-scored Value'])
+            for key, value in re_scored_values.items():
+                filename = key
+                values = ';'.join(x for x in value)
+                writer.writerow([filename, values])
             
 
             
